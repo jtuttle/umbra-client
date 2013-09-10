@@ -12,4 +12,8 @@ public class MapTile {
         Y = y;
         SpriteIndex = spriteIndex;
     }
+
+    public override string ToString() {
+        return string.Format("MapTile ({0}, {1})", X, Y);
+    }
 }
