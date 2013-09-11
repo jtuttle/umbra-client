@@ -4,17 +4,13 @@ using System.Collections;
 public class Map {
     public int Width { get; private set; }
     public int Height { get; private set; }
-    public int TileWidth { get; private set; }
-    public int TileHeight { get; private set; }
 
     private MapTile[,] _mapTiles;
 
-    public Map(int width, int height, int tileWidth, int tileHeight) {
+    public Map(int width, int height) {
         Width = width;
         Height = height;
-        TileWidth = tileWidth;
-        TileHeight = tileHeight;
-        
+
         _mapTiles = new MapTile[width, height];
     }
 
