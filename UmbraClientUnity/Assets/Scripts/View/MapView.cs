@@ -1,39 +1,66 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 public class MapView : MonoBehaviour {
     public tk2dCamera SpriteCamera;
-    
+
+    public int HorizontalTileCount { get { return SpriteCamera.nativeResolutionWidth / _tileSize; } }
+    public int VerticalTileCount { get { return SpriteCamera.nativeResolutionHeight / _tileSize; } }
+
     private Map _map;
     private int _tileSize;
     private tk2dSpriteCollectionData _spriteData;
+
+    private MapTileView[,] _tileViews;
+
+    protected void Update() {
+        UpdateActive();
+    }
 
     public void SetMap(Map map, int tileSize, tk2dSpriteCollectionData spriteData) {
         _map = map;
         _tileSize = tileSize;
         _spriteData = spriteData;
+
+        _tileViews = new MapTileView[map.Width, map.Height];
     }
 
     public void ShowMap() {
+        for(int x = 0; x < _map.Width; x++) {
+            for(int y = 0; y < _map.Width; y++) {
+                GameObject go = new GameObject();
+                go.name = "MapTileView";
+                go.transform.parent = gameObject.transform;
+                go.transform.position = new Vector3(x * _tileSize, y * _tileSize, 0);
+                go.SetActive(false);
+
+                MapTileView mapTileView = go.AddComponent<MapTileView>();
+                mapTileView.Sprite = go.AddComponent<tk2dSprite>();
+                mapTileView.MapTile = _map.GetMapTile(x, y);
+
+                mapTileView.Sprite.SetSprite(_spriteData, mapTileView.MapTile.SpriteIndex);
+
+                _tileViews[x, y] = mapTileView;
+            }
+        }
+    }
+
+    public void UpdateActive() {
         Vector3 camPos = SpriteCamera.transform.position;
-        XY camTileCoord = WorldCoordToTileCoord(camPos.x, camPos.y);
 
-        int xMax = camTileCoord.X + (SpriteCamera.nativeResolutionWidth / _tileSize) + 1;
-        int yMax = camTileCoord.Y + (SpriteCamera.nativeResolutionHeight / _tileSize) + 1;
+        XY bottomLeft = WorldCoordToTileCoord(camPos.x, camPos.y);
+        XY topRight = WorldCoordToTileCoord(camPos.x + SpriteCamera.nativeResolutionWidth, camPos.y + SpriteCamera.nativeResolutionHeight);
 
-        for(int x = camTileCoord.X - 1; x < xMax; x++) {
-            for(int y = camTileCoord.Y - 1; y < yMax; y++) {
-                MapTile mapTile = _map.GetMapTile(x, y);
+        int t = 4;
 
-                if(mapTile != null) {
-                    GameObject go = new GameObject();
-                    go.name = mapTile.ToString();
-                    go.transform.parent = gameObject.transform;
-                    go.transform.position = new Vector3((_tileSize / 2) + x * _tileSize, (_tileSize / 2) + y * _tileSize, 0);
-
-                    tk2dSprite sprite = go.AddComponent<tk2dSprite>();
-                    sprite.SetSprite(_spriteData, mapTile.SpriteIndex);
-                }
+        for(int x = Math.Max(0, bottomLeft.X - t); x <= Math.Min(topRight.X + t, _map.Width - 1); x++) {
+            for(int y = Math.Max(0, bottomLeft.Y - t); y <= Math.Min(topRight.Y + t, _map.Height - 1); y++) {
+                if(x < bottomLeft.X - 2 || x > topRight.X + 2 || y < bottomLeft.Y - 2 || y > topRight.Y + 2)
+                    _tileViews[x, y].gameObject.SetActive(false);
+                else
+                    _tileViews[x, y].gameObject.SetActive(true);
             }
         }
     }

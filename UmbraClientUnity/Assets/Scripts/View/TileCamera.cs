@@ -9,12 +9,12 @@ public class TileCamera : MonoBehaviour {
         Moving = false;
     }
 
-    public void Move(Vector3 destination) {
+    public void Move(Vector3 delta) {
         if(Moving) return;
 
         TweenParms parms = new TweenParms();
         parms.Ease(EaseType.Linear);
-        parms.Prop("position", destination);
+        parms.Prop("position", gameObject.transform.position + delta);
         parms.OnComplete(OnMoveComplete);
 
         Moving = true;

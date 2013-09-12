@@ -8,15 +8,17 @@ public class MapTestScene : MonoBehaviour {
 
     public MapView MapView;
 
+    private int TILE_SIZE = 32;
+
     protected void Awake() {
         Map map = CreateMap();
-
+        
         tk2dSpriteCollectionData spriteData = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
-        MapView.SetMap(map, 32, spriteData);
+        MapView.SetMap(map, TILE_SIZE, spriteData);
 
-        XY camPos = MapView.TileCoordToWorldCoord(new XY(2, 3));
-        MapView.SpriteCamera.transform.position = new Vector3(camPos.X, camPos.Y, SpriteCamera.transform.position.z);
+        XY camPos = MapView.TileCoordToWorldCoord(new XY(0, 0));
+        MapView.SpriteCamera.transform.position = new Vector3(camPos.X - (TILE_SIZE / 2), camPos.Y - (TILE_SIZE / 2), SpriteCamera.transform.position.z);
 
         MapView.ShowMap();
     }
@@ -25,17 +27,19 @@ public class MapTestScene : MonoBehaviour {
         float hAxis = Input.GetAxis("Horizontal");
         float vAxis = Input.GetAxis("Vertical");
 
+        Debug.Log(MapView.HorizontalTileCount);
+
         if(hAxis > 0)
-            TileCamera.Move(TileCamera.transform.position + new Vector3(32, 0, 0));
+            TileCamera.Move(new Vector3(TILE_SIZE * MapView.HorizontalTileCount, 0, 0));
 
         if(hAxis < 0)
-            TileCamera.Move(TileCamera.transform.position - new Vector3(32, 0, 0));
+            TileCamera.Move(new Vector3(-TILE_SIZE * MapView.HorizontalTileCount, 0, 0));
 
         if(vAxis > 0)
-            TileCamera.Move(TileCamera.transform.position + new Vector3(0, 32, 0));
+            TileCamera.Move(new Vector3(0, TILE_SIZE * MapView.VerticalTileCount, 0));
 
         if(vAxis < 0)
-            TileCamera.Move(TileCamera.transform.position - new Vector3(0, 32, 0));
+            TileCamera.Move(new Vector3(0, -TILE_SIZE * MapView.VerticalTileCount, 0));
     }
 
     private Map CreateMap() {
@@ -43,7 +47,8 @@ public class MapTestScene : MonoBehaviour {
 
         for(int x = 0; x < 100; x++) {
             for(int y = 0; y < 100; y++) {
-                map.AddMapTile(x, y, 0);
+                int sprite = ((x == 0 || x == 100 || y == 0 || y == 100) ? 1 : 0);
+                map.AddMapTile(x, y, sprite);
             }
         }
 
