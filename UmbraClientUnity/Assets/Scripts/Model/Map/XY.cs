@@ -10,6 +10,10 @@ public class XY {
         Y = y;
     }
 
+    public override string ToString() {
+        return string.Format("XY ({0}, {1})", X, Y);
+    }
+
     public static XY operator +(XY a, XY b) {
         return new XY(a.X + b.X, a.Y + b.Y);
     }

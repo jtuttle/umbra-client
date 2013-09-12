@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Map {
     public int Width { get; private set; }
@@ -27,5 +28,16 @@ public class Map {
             return null;
 
         return _mapTiles[x, y];
+    }
+
+    public List<MapTile> GetMapArea(XY bottomLeft, XY topRight) {
+        List<MapTile> mapTiles = new List<MapTile>();
+
+        for(int y = bottomLeft.Y; y <= topRight.Y; y++) {
+            for(int x = bottomLeft.X; x <= topRight.X; x++)
+                mapTiles.Add(_mapTiles[x, y]);
+        }
+
+        return mapTiles;
     }
 }
