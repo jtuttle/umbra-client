@@ -5,64 +5,86 @@ using System;
 
 public class MapView : MonoBehaviour {
     public tk2dCamera SpriteCamera;
+    public MapViewCamera MapViewCamera;
+
+    public MapTileViewBuffer BufferA;
+    public MapTileViewBuffer BufferB;
 
     public int HorizontalTileCount { get { return SpriteCamera.nativeResolutionWidth / _tileSize; } }
     public int VerticalTileCount { get { return SpriteCamera.nativeResolutionHeight / _tileSize; } }
 
-    private Map _map;
+    public Map Map { get; private set; }
     private int _tileSize;
     private tk2dSpriteCollectionData _spriteData;
 
-    private MapTileView[,] _tileViews;
+    private Dictionary<MapTile, MapTileView> _tileViews;
+    private Queue<MapTileView> _tileViewPool;
 
-    protected void Update() {
-        UpdateActive();
-    }
+    private MapTileViewBuffer _activeBuffer;
+    private MapTileViewBuffer _inactiveBuffer;
 
     public void SetMap(Map map, int tileSize, tk2dSpriteCollectionData spriteData) {
-        _map = map;
+        Map = map;
         _tileSize = tileSize;
         _spriteData = spriteData;
 
-        _tileViews = new MapTileView[map.Width, map.Height];
+        BufferA.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
+        BufferB.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
+
+        _activeBuffer = BufferA;
+        _inactiveBuffer = BufferB;
+
+        MapViewCamera.OnMoveBegin += OnCameraMoveBegin;
+        MapViewCamera.OnMoveEnd += OnCameraMoveEnd;
     }
 
     public void ShowMap() {
-        for(int x = 0; x < _map.Width; x++) {
-            for(int y = 0; y < _map.Width; y++) {
-                GameObject go = new GameObject();
-                go.name = "MapTileView";
-                go.transform.parent = gameObject.transform;
-                go.transform.position = new Vector3(x * _tileSize, y * _tileSize, 0);
-                go.SetActive(false);
-
-                MapTileView mapTileView = go.AddComponent<MapTileView>();
-                mapTileView.Sprite = go.AddComponent<tk2dSprite>();
-                mapTileView.MapTile = _map.GetMapTile(x, y);
-
-                mapTileView.Sprite.SetSprite(_spriteData, mapTileView.MapTile.SpriteIndex);
-
-                _tileViews[x, y] = mapTileView;
-            }
-        }
+        List<MapTile> visibleMapTiles = GetVisibleMap();
+        _activeBuffer.Show(visibleMapTiles);
     }
 
-    public void UpdateActive() {
+    private void OnCameraMoveBegin(XY delta) {
+        Vector3 newPos = GetPositionForNewBuffer(delta);
+
+        _inactiveBuffer.transform.position = newPos;
+
+        XY bottomLeft = WorldCoordToTileCoord(newPos.x, newPos.y);
+        XY topRight = bottomLeft + new XY(HorizontalTileCount - 1, VerticalTileCount - 1);
+
+        _inactiveBuffer.Show(Map.GetMapArea(bottomLeft, topRight));
+    }
+
+    private void OnCameraMoveEnd(XY delta) {
+        MapTileViewBuffer tempBuffer = _activeBuffer;
+
+        _activeBuffer = _inactiveBuffer;
+        _inactiveBuffer = tempBuffer;
+
+        _inactiveBuffer.Hide();
+    }
+
+    private Vector3 GetPositionForNewBuffer(XY delta) {
+        Vector3 activePos = _activeBuffer.gameObject.transform.position;
+
+        if(delta.X > 0)
+            return new Vector3(activePos.x + (HorizontalTileCount * _tileSize), activePos.y, activePos.z);
+        if(delta.X < 0)
+            return new Vector3(activePos.x - (HorizontalTileCount * _tileSize), activePos.y, activePos.z);
+        if(delta.Y > 0)
+            return new Vector3(activePos.x, activePos.y + (VerticalTileCount * _tileSize), activePos.z);
+        if(delta.Y < 0)
+            return new Vector3(activePos.x, activePos.y - (VerticalTileCount * _tileSize), activePos.z);
+
+        throw new Exception("Camera didn't move");
+    }
+
+    private List<MapTile> GetVisibleMap() {
         Vector3 camPos = SpriteCamera.transform.position;
 
         XY bottomLeft = WorldCoordToTileCoord(camPos.x, camPos.y);
-        XY topRight = WorldCoordToTileCoord(camPos.x + SpriteCamera.nativeResolutionWidth, camPos.y + SpriteCamera.nativeResolutionHeight);
+        XY topRight = bottomLeft + new XY(HorizontalTileCount - 1, VerticalTileCount - 1);
 
-        int t = 4;
-
-        for(int x = Math.Max(0, bottomLeft.X - t); x <= Math.Min(topRight.X + t, _map.Width - 1); x++) {
-            for(int y = Math.Max(0, bottomLeft.Y - t); y <= Math.Min(topRight.Y + t, _map.Height - 1); y++) {
-                if(x < bottomLeft.X - 2 || x > topRight.X + 2 || y < bottomLeft.Y - 2 || y > topRight.Y + 2)
-                    _tileViews[x, y].gameObject.SetActive(false);
-                else
-                    _tileViews[x, y].gameObject.SetActive(true);
-            }
-        }
+        return Map.GetMapArea(bottomLeft, topRight);
     }
 
     public XY TileCoordToWorldCoord(XY tileCoord) {

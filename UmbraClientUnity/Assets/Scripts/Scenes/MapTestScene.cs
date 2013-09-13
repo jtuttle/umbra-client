@@ -3,8 +3,7 @@ using System.Collections;
 
 public class MapTestScene : MonoBehaviour {
     // same cam
-    public tk2dCamera SpriteCamera;
-    public TileCamera TileCamera;
+    public MapViewCamera MapViewCamera;
 
     public MapView MapView;
 
@@ -15,10 +14,10 @@ public class MapTestScene : MonoBehaviour {
         
         tk2dSpriteCollectionData spriteData = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
-        MapView.SetMap(map, TILE_SIZE, spriteData);
-
         XY camPos = MapView.TileCoordToWorldCoord(new XY(0, 0));
-        MapView.SpriteCamera.transform.position = new Vector3(camPos.X - (TILE_SIZE / 2), camPos.Y - (TILE_SIZE / 2), SpriteCamera.transform.position.z);
+        MapView.SpriteCamera.transform.position = new Vector3(camPos.X - (TILE_SIZE / 2), camPos.Y - (TILE_SIZE / 2), MapViewCamera.transform.position.z);
+
+        MapView.SetMap(map, TILE_SIZE, spriteData);
 
         MapView.ShowMap();
     }
@@ -27,27 +26,38 @@ public class MapTestScene : MonoBehaviour {
         float hAxis = Input.GetAxis("Horizontal");
         float vAxis = Input.GetAxis("Vertical");
 
-        Debug.Log(MapView.HorizontalTileCount);
+        XY delta = null;
 
         if(hAxis > 0)
-            TileCamera.Move(new Vector3(TILE_SIZE * MapView.HorizontalTileCount, 0, 0));
+            delta = new XY(TILE_SIZE * MapView.HorizontalTileCount, 0);
 
         if(hAxis < 0)
-            TileCamera.Move(new Vector3(-TILE_SIZE * MapView.HorizontalTileCount, 0, 0));
+            delta = new XY(-TILE_SIZE * MapView.HorizontalTileCount, 0);
 
         if(vAxis > 0)
-            TileCamera.Move(new Vector3(0, TILE_SIZE * MapView.VerticalTileCount, 0));
+            delta = new XY(0, TILE_SIZE * MapView.VerticalTileCount);
 
         if(vAxis < 0)
-            TileCamera.Move(new Vector3(0, -TILE_SIZE * MapView.VerticalTileCount, 0));
+            delta = new XY(0, -TILE_SIZE * MapView.VerticalTileCount);
+
+        if(delta != null) {
+            XY camPos = new XY((int)MapViewCamera.transform.position.x, (int)MapViewCamera.transform.position.y) + delta;
+            XY newCamTilePos = MapView.WorldCoordToTileCoord(camPos.X, camPos.Y);
+
+            if(newCamTilePos.X >= 0 && newCamTilePos.X < MapView.Map.Width - 1 && newCamTilePos.Y >= 0 && newCamTilePos.Y < MapView.Map.Height - 1)
+                MapViewCamera.Move(delta);
+        }
     }
 
     private Map CreateMap() {
-        Map map = new Map(100, 100);
+        int width = 96;
+        int height = 48;
 
-        for(int x = 0; x < 100; x++) {
-            for(int y = 0; y < 100; y++) {
-                int sprite = ((x == 0 || x == 100 || y == 0 || y == 100) ? 1 : 0);
+        Map map = new Map(width, height);
+
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                int sprite = ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ? 1 : 0);
                 map.AddMapTile(x, y, sprite);
             }
         }
