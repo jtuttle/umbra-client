@@ -2,14 +2,18 @@
 using System.Collections;
 
 public class MapTile {
-    public int X { get; private set; }
-    public int Y { get; private set; }
-
     public int SpriteIndex { get; private set; }
 
+    public XY Coord { get; private set; }
+    public int X { get { return Coord.X; } }
+    public int Y { get { return Coord.Y; } }
+
     public MapTile(int x, int y, int spriteIndex) {
-        X = x;
-        Y = y;
+        Coord = new XY(x, y);
         SpriteIndex = spriteIndex;
+    }
+
+    public override string ToString() {
+        return string.Format("MapTile ({0}, {1})", X, Y);
     }
 }
