@@ -15,7 +15,6 @@ public class MapView : MonoBehaviour {
 
     public Map Map { get; private set; }
     private int _tileSize;
-    private tk2dSpriteCollectionData _spriteData;
 
     private Dictionary<MapTile, MapTileView> _tileViews;
     private Queue<MapTileView> _tileViewPool;
@@ -26,7 +25,6 @@ public class MapView : MonoBehaviour {
     public void SetMap(Map map, int tileSize, tk2dSpriteCollectionData spriteData) {
         Map = map;
         _tileSize = tileSize;
-        _spriteData = spriteData;
 
         BufferA.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
         BufferB.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
