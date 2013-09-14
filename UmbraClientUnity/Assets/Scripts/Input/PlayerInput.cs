@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerView : MonoBehaviour {
-    public delegate void PlayerMoveDelegate(Vector3 position);
-    public event PlayerMoveDelegate OnPlayerMove = delegate { };
-
+public class PlayerInput : MonoBehaviour {
     private float _speed = 4.0f;
 
     protected void Update() {
@@ -18,8 +15,5 @@ public class PlayerView : MonoBehaviour {
             v = (v < 0 ? -1 : 1);
 
         gameObject.transform.position += new Vector3(h * _speed, v * _speed, 0);
-
-        if(h != 0 || v != 0)
-            OnPlayerMove(gameObject.transform.position);
     }
 }
