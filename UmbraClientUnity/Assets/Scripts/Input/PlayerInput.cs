@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class PlayerInput : MonoBehaviour {
+    public delegate void PlayerMoveDelegate(Vector3 newPos);
+    public event PlayerMoveDelegate OnPlayerMove = delegate { };
+
     private float _speed = 4.0f;
 
     protected void Update() {
@@ -15,5 +18,7 @@ public class PlayerInput : MonoBehaviour {
             v = (v < 0 ? -1 : 1);
 
         gameObject.transform.position += new Vector3(h * _speed, v * _speed, 0);
+
+        OnPlayerMove(gameObject.transform.position);
     }
 }
