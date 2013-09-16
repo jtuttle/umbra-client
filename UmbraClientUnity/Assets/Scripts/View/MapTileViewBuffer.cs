@@ -19,6 +19,10 @@ public class MapTileViewBuffer : MonoBehaviour {
                 mapTileView.Sprite = go.AddComponent<tk2dSprite>();
                 mapTileView.Sprite.SetSprite(spriteData, 0);
 
+                Rigidbody tileRigidbody = go.AddComponent<Rigidbody>();
+                tileRigidbody.useGravity = false;
+                tileRigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+                
                 _mapTileViews.Add(mapTileView);
             }
         }
