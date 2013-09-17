@@ -7,17 +7,17 @@ public class PlayerView : MonoBehaviour {
     private PlayerInput _playerInputRef;
 
     protected void Awake() {
-        _playerInputRef = gameObject.GetComponent<PlayerInput>();
-
-        MapViewCamera.OnMoveBegin += OnCameraMoveBegin;
-        MapViewCamera.OnMoveEnd += OnCameraMoveEnd;
+        if(MapViewCamera != null) {
+            MapViewCamera.OnMoveBegin += OnCameraMoveBegin;
+            MapViewCamera.OnMoveEnd += OnCameraMoveEnd;
+        }
     }
 
     private void OnCameraMoveBegin(XY delta) {
-        _playerInputRef.enabled = false;
+        gameObject.GetComponent<PlayerInput>().Disable();
     }
 
     private void OnCameraMoveEnd(XY delta) {
-        _playerInputRef.enabled = true;
+        gameObject.GetComponent<PlayerInput>().Enable();
     }
 }
