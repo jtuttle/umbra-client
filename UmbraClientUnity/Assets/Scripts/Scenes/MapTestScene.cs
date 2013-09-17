@@ -2,10 +2,10 @@
 using System.Collections;
 
 public class MapTestScene : MonoBehaviour {
-    // same cam
-    public MapViewCamera MapViewCamera;
-
+    public GameObject PlayerView;
     public MapView MapView;
+
+    public MapViewCamera MapViewCamera;
 
     private int TILE_SIZE = 32;
 
@@ -20,33 +20,6 @@ public class MapTestScene : MonoBehaviour {
         MapView.SetMap(map, TILE_SIZE, spriteData);
 
         MapView.ShowMap();
-    }
-
-    protected void Update() {
-        float hAxis = Input.GetAxis("Horizontal");
-        float vAxis = Input.GetAxis("Vertical");
-
-        XY delta = null;
-
-        if(hAxis > 0)
-            delta = new XY(TILE_SIZE * MapView.HorizontalTileCount, 0);
-
-        if(hAxis < 0)
-            delta = new XY(-TILE_SIZE * MapView.HorizontalTileCount, 0);
-
-        if(vAxis > 0)
-            delta = new XY(0, TILE_SIZE * MapView.VerticalTileCount);
-
-        if(vAxis < 0)
-            delta = new XY(0, -TILE_SIZE * MapView.VerticalTileCount);
-
-        if(delta != null) {
-            XY camPos = new XY((int)MapViewCamera.transform.position.x, (int)MapViewCamera.transform.position.y) + delta;
-            XY newCamTilePos = MapView.WorldCoordToTileCoord(camPos.X, camPos.Y);
-
-            if(newCamTilePos.X >= 0 && newCamTilePos.X < MapView.Map.Width - 1 && newCamTilePos.Y >= 0 && newCamTilePos.Y < MapView.Map.Height - 1)
-                MapViewCamera.Move(delta);
-        }
     }
 
     private Map CreateMap() {

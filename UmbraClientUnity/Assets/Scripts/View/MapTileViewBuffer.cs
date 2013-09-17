@@ -19,6 +19,10 @@ public class MapTileViewBuffer : MonoBehaviour {
                 mapTileView.Sprite = go.AddComponent<tk2dSprite>();
                 mapTileView.Sprite.SetSprite(spriteData, 0);
 
+                Rigidbody tileRigidbody = go.AddComponent<Rigidbody>();
+                tileRigidbody.useGravity = false;
+                tileRigidbody.constraints = RigidbodyConstraints.FreezePosition | RigidbodyConstraints.FreezeRotation;
+                
                 _mapTileViews.Add(mapTileView);
             }
         }
@@ -28,6 +32,11 @@ public class MapTileViewBuffer : MonoBehaviour {
         for(int i = 0; i < mapTiles.Count; i++) {
             MapTileView mapTileView = _mapTileViews[i];
             mapTileView.Sprite.SetSprite(mapTiles[i].SpriteIndex);
+
+            tk2dSpriteDefinition.ColliderType colliderType = mapTileView.Sprite.GetCurrentSpriteDef().colliderType;
+
+            if(mapTileView.collider != null && colliderType != tk2dSpriteDefinition.ColliderType.Box)
+                mapTileView.collider.enabled = false;
         }
 
         gameObject.SetActive(true);
