@@ -10,21 +10,21 @@ public class MapView : MonoBehaviour {
     public MapTileViewBuffer BufferA;
     public MapTileViewBuffer BufferB;
 
-    public int HorizontalTileCount { get { return SpriteCamera.nativeResolutionWidth / _tileSize; } }
-    public int VerticalTileCount { get { return SpriteCamera.nativeResolutionHeight / _tileSize; } }
-
     public Map Map { get; private set; }
-    private int _tileSize;
+    public int TileSize { get; private set; }
 
-    private Dictionary<MapTile, MapTileView> _tileViews;
-    private Queue<MapTileView> _tileViewPool;
+    public int HorizontalTileCount { get; private set; }
+    public int VerticalTileCount { get; private set; }
 
     private MapTileViewBuffer _activeBuffer;
     private MapTileViewBuffer _inactiveBuffer;
 
     public void SetMap(Map map, int tileSize, tk2dSpriteCollectionData spriteData) {
         Map = map;
-        _tileSize = tileSize;
+        TileSize = tileSize;
+
+        HorizontalTileCount = SpriteCamera.nativeResolutionWidth / TileSize;
+        VerticalTileCount = SpriteCamera.nativeResolutionHeight / TileSize;
 
         BufferA.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
         BufferB.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
@@ -65,15 +65,15 @@ public class MapView : MonoBehaviour {
         Vector3 activePos = _activeBuffer.gameObject.transform.position;
 
         if(delta.X > 0)
-            return new Vector3(activePos.x + (HorizontalTileCount * _tileSize), activePos.y, activePos.z);
+            return new Vector3(activePos.x + SpriteCamera.nativeResolutionWidth, activePos.y, activePos.z);
         if(delta.X < 0)
-            return new Vector3(activePos.x - (HorizontalTileCount * _tileSize), activePos.y, activePos.z);
+            return new Vector3(activePos.x - SpriteCamera.nativeResolutionWidth, activePos.y, activePos.z);
         if(delta.Y > 0)
-            return new Vector3(activePos.x, activePos.y + (VerticalTileCount * _tileSize), activePos.z);
+            return new Vector3(activePos.x, activePos.y + SpriteCamera.nativeResolutionHeight, activePos.z);
         if(delta.Y < 0)
-            return new Vector3(activePos.x, activePos.y - (VerticalTileCount * _tileSize), activePos.z);
+            return new Vector3(activePos.x, activePos.y - SpriteCamera.nativeResolutionHeight, activePos.z);
 
-        throw new Exception("Camera didn't move");
+        throw new Exception("Camera didn't move.");
     }
 
     private List<MapTile> GetVisibleMap() {
@@ -86,12 +86,12 @@ public class MapView : MonoBehaviour {
     }
 
     public XY TileCoordToWorldCoord(XY tileCoord) {
-        return new XY(tileCoord.X * _tileSize, tileCoord.Y * _tileSize);
+        return new XY(tileCoord.X * TileSize, tileCoord.Y * TileSize);
     }
 
     public XY WorldCoordToTileCoord(float worldX, float worldY) {
-        int x = (int)(worldX / _tileSize) * _tileSize;
-        int y = (int)(worldY / _tileSize) * _tileSize;
-        return new XY(x / _tileSize, y / _tileSize);
+        int x = (int)(worldX / TileSize) * TileSize;
+        int y = (int)(worldY / TileSize) * TileSize;
+        return new XY(x / TileSize, y / TileSize);
     }
 }
