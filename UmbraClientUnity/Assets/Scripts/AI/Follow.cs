@@ -6,7 +6,7 @@ public class Follow : MonoBehaviour {
     public float Speed;
 	
     protected void Awake() {
-        Speed = 0.5f;
+        Speed = 10.0f;
     }
 
 	protected void Update () {
@@ -17,6 +17,6 @@ public class Follow : MonoBehaviour {
         float dx = Mathf.Cos(angle) * Speed;
         float dy = Mathf.Sin(angle) * Speed;
 
-        transform.position = transform.position + new Vector3(dx, dy, 0);
+        rigidbody.velocity = new Vector3(dx * Speed, dy * Speed, 0);
 	}
 }
