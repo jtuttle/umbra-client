@@ -7,7 +7,7 @@ public class MapTestScene : MonoBehaviour {
 
     public MapViewCamera MapViewCamera;
 
-    private int TILE_SIZE = 32;
+    private int TILE_SIZE = 64;
 
     protected void Awake() {
         Map map = CreateMap();
@@ -23,8 +23,8 @@ public class MapTestScene : MonoBehaviour {
     }
 
     private Map CreateMap() {
-        int width = 96;
-        int height = 48;
+        int width = 48;
+        int height = 24;
 
         Map map = new Map(width, height);
 
