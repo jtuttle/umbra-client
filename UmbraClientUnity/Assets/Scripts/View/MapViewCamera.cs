@@ -52,16 +52,16 @@ public class MapViewCamera : MonoBehaviour {
         OnMoveEnd(delta);
     }
 
-    private void OnPlayerMove(Vector3 newPos) {
+    private void OnPlayerMove(Vector3 position, Vector3 velocity) {
         XY delta = null;
 
-        if(newPos.x > _tk2dCameraRef.transform.position.x + _tk2dCameraRef.nativeResolutionWidth)
+        if(position.x > _tk2dCameraRef.transform.position.x + _tk2dCameraRef.nativeResolutionWidth)
             delta = new XY(MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(newPos.x < _tk2dCameraRef.transform.position.x)
+        else if(position.x < _tk2dCameraRef.transform.position.x)
             delta = new XY(-MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(newPos.y > _tk2dCameraRef.transform.position.y + _tk2dCameraRef.nativeResolutionHeight)
+        else if(position.y > _tk2dCameraRef.transform.position.y + _tk2dCameraRef.nativeResolutionHeight)
             delta = new XY(0, MapView.TileSize * MapView.VerticalTileCount);
-        else if(newPos.y < _tk2dCameraRef.transform.position.y)
+        else if(position.y < _tk2dCameraRef.transform.position.y)
             delta = new XY(0, -MapView.TileSize * MapView.VerticalTileCount);
 
         if(delta != null)
