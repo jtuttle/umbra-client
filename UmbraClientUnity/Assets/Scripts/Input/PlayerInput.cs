@@ -2,12 +2,25 @@
 using System.Collections;
 
 public class PlayerInput : MonoBehaviour {
-    public delegate void PlayerMoveDelegate(Vector3 newPos);
+    public delegate void PlayerMoveDelegate(Vector3 position, Vector3 velocity);
     public event PlayerMoveDelegate OnPlayerMove = delegate { };
+
+    public delegate void PlayerAttackDelegate();
+    public event PlayerAttackDelegate OnPlayerAttack = delegate { };
 
     private float _speed = 300.0f;
 
+    private bool _attacking;
+
     protected void Update() {
+        bool attackPressed = Input.GetButton("Attack");
+        if(!attackPressed) _attacking = false;
+
+        if(attackPressed && !_attacking) {
+            _attacking = true;
+            OnPlayerAttack();
+        }
+
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -19,7 +32,8 @@ public class PlayerInput : MonoBehaviour {
 
         rigidbody.velocity = new Vector3(h * _speed, v * _speed, 0);
 
-        OnPlayerMove(gameObject.transform.position);
+        if(rigidbody.velocity != Vector3.zero)
+            OnPlayerMove(gameObject.transform.position, rigidbody.velocity);
     }
 
     public void Disable() {
