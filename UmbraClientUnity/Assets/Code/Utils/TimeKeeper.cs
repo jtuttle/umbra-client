@@ -32,7 +32,7 @@ public class TimeKeeper : MonoBehaviour {
         return timer;
     }
 
-    protected void Update() {
+    void Update() {
         if(!Running) return;
 
         ElapsedSeconds += Time.deltaTime;
