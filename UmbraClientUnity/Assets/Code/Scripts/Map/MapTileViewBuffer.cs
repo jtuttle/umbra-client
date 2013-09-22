@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MapTileViewBuffer : MonoBehaviour {
     private List<MapTileView> _mapTileViews;
 
-    public void Setup(int width, int height, int tileSize, tk2dSpriteCollectionData spriteData) {
+    public void Setup(int width, int height, int tileSize, tk2dSpriteCollectionData tileset) {
         _mapTileViews = new List<MapTileView>();
 
         for(int y = 0; y < height; y++) {
@@ -17,7 +17,7 @@ public class MapTileViewBuffer : MonoBehaviour {
 
                 MapTileView mapTileView = go.AddComponent<MapTileView>();
                 mapTileView.Sprite = go.AddComponent<tk2dSprite>();
-                mapTileView.Sprite.SetSprite(spriteData, 0);
+                mapTileView.Sprite.SetSprite(tileset, 0);
 
                 Rigidbody tileRigidbody = go.AddComponent<Rigidbody>();
                 tileRigidbody.useGravity = false;
@@ -31,7 +31,7 @@ public class MapTileViewBuffer : MonoBehaviour {
     public void Show(List<MapTile> mapTiles) {
         for(int i = 0; i < mapTiles.Count; i++) {
             MapTileView mapTileView = _mapTileViews[i];
-            mapTileView.Sprite.SetSprite(mapTiles[i].SpriteIndex);
+            mapTileView.UpdateMapTile(mapTiles[i]);
 
             tk2dSpriteDefinition.ColliderType colliderType = mapTileView.Sprite.GetCurrentSpriteDef().colliderType;
 
