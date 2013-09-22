@@ -9,7 +9,7 @@ public class MapTestScene : MonoBehaviour {
 
     private int TILE_SIZE = 64;
 
-    protected void Awake() {
+    void Awake() {
         Map map = CreateMap();
         
         tk2dSpriteCollectionData spriteData = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
