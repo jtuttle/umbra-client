@@ -12,7 +12,7 @@ public class PlayerInput : MonoBehaviour {
 
     private bool _attacking;
 
-    protected void Update() {
+    void Update() {
         bool attackPressed = Input.GetButton("Attack");
         if(!attackPressed) _attacking = false;
 

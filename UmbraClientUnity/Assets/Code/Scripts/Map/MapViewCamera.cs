@@ -11,11 +11,11 @@ public class MapViewCamera : MonoBehaviour {
     public GameObject Player;
     public MapView MapView;
 
-    public bool Moving;
+    public bool Moving { get; private set; }
 
     private tk2dCamera _tk2dCameraRef;
 
-    protected void Awake() {
+    void Awake() {
         Moving = false;
 
         _tk2dCameraRef = gameObject.GetComponent<tk2dCamera>();
@@ -23,7 +23,7 @@ public class MapViewCamera : MonoBehaviour {
         Player.GetComponent<PlayerInput>().OnPlayerMove += OnPlayerMove;
     }
 
-    protected void Destroy() {
+    void Destroy() {
         Player.GetComponent<PlayerInput>().OnPlayerMove -= OnPlayerMove;
     }
     
