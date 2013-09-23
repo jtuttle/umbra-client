@@ -19,12 +19,23 @@ public class MapViewCamera : MonoBehaviour {
         Moving = false;
 
         _tk2dCameraRef = gameObject.GetComponent<tk2dCamera>();
+    }
+
+    void Destroy() {
+        if(Player != null)
+            Player.GetComponent<PlayerInput>().OnPlayerMove -= OnPlayerMove;
+    }
+
+    public void AttachToPlayer(GameObject player) {
+        Player = player;
 
         Player.GetComponent<PlayerInput>().OnPlayerMove += OnPlayerMove;
     }
 
-    void Destroy() {
+    public void DetachFromPlayer() {
         Player.GetComponent<PlayerInput>().OnPlayerMove -= OnPlayerMove;
+
+        Player = null;
     }
     
     public void Move(XY delta) {
