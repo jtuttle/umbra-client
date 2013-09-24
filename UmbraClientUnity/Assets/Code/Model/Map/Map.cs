@@ -40,4 +40,17 @@ public class Map {
 
         return mapTiles;
     }
+
+    public static Map CreateFake(int width, int height) {
+        Map map = new Map(width, height);
+
+        for(int x = 0; x < width; x++) {
+            for(int y = 0; y < height; y++) {
+                int sprite = ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ? 1 : 0);
+                map.AddMapTile(x, y, sprite);
+            }
+        }
+
+        return map;
+    }
 }
