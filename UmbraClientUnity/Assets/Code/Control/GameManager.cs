@@ -9,8 +9,13 @@ public class GameManager : UnitySingleton<GameManager> {
 
     public Map CurrentMap { get; private set; }
 
+    private InputManager _inputManager;
+    public InputManager Input { get { return _inputManager; } }
+
     public override void Awake() {
         _states = new GameState();
+
+        _inputManager = GetComponent<InputManager>();
     }
 
     void Start() {
@@ -22,7 +27,7 @@ public class GameManager : UnitySingleton<GameManager> {
         // grab appropriate tileset from somewhere...
         tk2dSpriteCollectionData tileset = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
-        _states.ChangeGameState(new GameEnterState(map, tileset, 64));
+        _states.ChangeGameState(new MapEnterState(map, tileset, 64));
     }
 
     void Update() {
@@ -32,7 +37,11 @@ public class GameManager : UnitySingleton<GameManager> {
 
     private void OnExitState(BaseGameState state) {
         switch(state.GameState) {
-            case GameStates.GameEnter:
+            case GameStates.MapEnter:
+                _states.ChangeGameState(new MapWalkState());
+
+                break;
+            case GameStates.MapWalk:
 
                 break;
             default:

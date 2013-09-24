@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 
 public enum GameStates {
-    Loading, MainMenu, GameEnter, GameExit, Shop, Combat, Design, MiniMap
+    Loading, MainMenu, MapEnter, MapWalk, MapExit, Shop, Design, MiniMap
 }
 
 public class GameState {
