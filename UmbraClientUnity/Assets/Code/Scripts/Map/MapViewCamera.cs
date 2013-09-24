@@ -8,7 +8,6 @@ public class MapViewCamera : MonoBehaviour {
     public MapViewCameraMoveDelegate OnMoveBegin = delegate { };
     public MapViewCameraMoveDelegate OnMoveEnd = delegate { };
 
-    public GameObject Player;
     public MapView MapView;
 
     public bool Moving { get; private set; }
@@ -21,23 +20,22 @@ public class MapViewCamera : MonoBehaviour {
         _tk2dCameraRef = gameObject.GetComponent<tk2dCamera>();
     }
 
-    void Destroy() {
-        if(Player != null)
-            Player.GetComponent<PlayerInput>().OnPlayerMove -= OnPlayerMove;
+    public void CoverPosition(Vector3 position) {
+        XY delta = null;
+
+        if(position.x > _tk2dCameraRef.transform.position.x + _tk2dCameraRef.nativeResolutionWidth)
+            delta = new XY(MapView.TileSize * MapView.HorizontalTileCount, 0);
+        else if(position.x < _tk2dCameraRef.transform.position.x)
+            delta = new XY(-MapView.TileSize * MapView.HorizontalTileCount, 0);
+        else if(position.y > _tk2dCameraRef.transform.position.y + _tk2dCameraRef.nativeResolutionHeight)
+            delta = new XY(0, MapView.TileSize * MapView.VerticalTileCount);
+        else if(position.y < _tk2dCameraRef.transform.position.y)
+            delta = new XY(0, -MapView.TileSize * MapView.VerticalTileCount);
+
+        if(delta != null)
+            Move(delta);
     }
 
-    public void AttachToPlayer(GameObject player) {
-        Player = player;
-
-        Player.GetComponent<PlayerInput>().OnPlayerMove += OnPlayerMove;
-    }
-
-    public void DetachFromPlayer() {
-        Player.GetComponent<PlayerInput>().OnPlayerMove -= OnPlayerMove;
-
-        Player = null;
-    }
-    
     public void Move(XY delta) {
         if(Moving) return;
 
@@ -61,21 +59,5 @@ public class MapViewCamera : MonoBehaviour {
         XY delta = (XY)e.parms[0];
 
         OnMoveEnd(delta);
-    }
-
-    private void OnPlayerMove(Vector3 position, Vector3 velocity) {
-        XY delta = null;
-
-        if(position.x > _tk2dCameraRef.transform.position.x + _tk2dCameraRef.nativeResolutionWidth)
-            delta = new XY(MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.x < _tk2dCameraRef.transform.position.x)
-            delta = new XY(-MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.y > _tk2dCameraRef.transform.position.y + _tk2dCameraRef.nativeResolutionHeight)
-            delta = new XY(0, MapView.TileSize * MapView.VerticalTileCount);
-        else if(position.y < _tk2dCameraRef.transform.position.y)
-            delta = new XY(0, -MapView.TileSize * MapView.VerticalTileCount);
-
-        if(delta != null)
-            Move(delta);
     }
 }

@@ -2,15 +2,15 @@
 using System.Collections;
 using System;
 
-public class GameEnterState : BaseGameState {
+public class MapEnterState : BaseGameState {
     private Map _map;
     private tk2dSpriteCollectionData _tileset;
     private int _tileSize;
 
     private MapView _mapView;
 
-    public GameEnterState(Map map, tk2dSpriteCollectionData tileset, int tileSize) 
-        : base(GameStates.GameEnter) {
+    public MapEnterState(Map map, tk2dSpriteCollectionData tileset, int tileSize) 
+        : base(GameStates.MapEnter) {
 
         _map = map;
         _tileset = tileset;
