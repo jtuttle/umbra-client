@@ -1,29 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerInput : MonoBehaviour {
+public class PlayerView : MonoBehaviour {
     public delegate void PlayerMoveDelegate(Vector3 position, Vector3 velocity);
     public event PlayerMoveDelegate OnPlayerMove = delegate { };
 
     public delegate void PlayerAttackDelegate();
     public event PlayerAttackDelegate OnPlayerAttack = delegate { };
 
+    private MeleeAttacker _meleeAttacker;
+
     private float _speed = 300.0f;
 
-    private bool _attacking;
+    void Awake() {
+        _meleeAttacker = GetComponent<MeleeAttacker>() as MeleeAttacker;
+    }
 
-    void Update() {
-        bool attackPressed = Input.GetButton("Attack");
-        if(!attackPressed) _attacking = false;
+    void Destroy() {
+        
+    }
 
-        if(attackPressed && !_attacking) {
-            _attacking = true;
-            OnPlayerAttack();
-        }
-
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
+    public void Move(float h, float v) {
         if(h != 0)
             h = (h < 0 ? -1 : 1);
 
@@ -34,14 +31,21 @@ public class PlayerInput : MonoBehaviour {
 
         if(rigidbody.velocity != Vector3.zero)
             OnPlayerMove(gameObject.transform.position, rigidbody.velocity);
+
+        _meleeAttacker.UpdateAttackColliderPosition(transform.position, rigidbody.velocity);
     }
 
-    public void Disable() {
-        enabled = false;
+    public void Attack() {
+        _meleeAttacker.Attack();
+    }
+
+    public void Freeze() {
         rigidbody.velocity = Vector3.zero;
+
+        // probably freeze animation too
     }
 
-    public void Enable() {
-        enabled = true;
+    public void Unfreeze() {
+        // kick animation to a neutral frame
     }
 }
