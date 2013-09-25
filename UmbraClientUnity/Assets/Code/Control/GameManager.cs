@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 public class GameManager : UnitySingleton<GameManager> {
-    private GameState _states;
+    private GameStateMachine _states;
 
     public Camera GameCamera;
 
@@ -13,7 +13,7 @@ public class GameManager : UnitySingleton<GameManager> {
     public InputManager Input { get { return _inputManager; } }
 
     public override void Awake() {
-        _states = new GameState();
+        _states = new GameStateMachine();
 
         _inputManager = GetComponent<InputManager>();
     }
@@ -38,10 +38,20 @@ public class GameManager : UnitySingleton<GameManager> {
     private void OnExitState(BaseGameState state) {
         switch(state.GameState) {
             case GameStates.MapEnter:
-                _states.ChangeGameState(new MapWalkState());
+                PlayerView playerView = (state as MapEnterState).PlayerView;
+                _states.ChangeGameState(new MapWalkState(playerView));
 
                 break;
             case GameStates.MapWalk:
+
+                if(state.NextState == GameStates.MapDesign) {
+                    MapDesignState mapDesignState = new MapDesignState((state as MapWalkState).PlayerView);
+                    _states.ChangeGameState(mapDesignState, true);
+                }
+
+                break;
+            case GameStates.MapDesign:
+                _states.RestorePreviousState();
 
                 break;
             default:
