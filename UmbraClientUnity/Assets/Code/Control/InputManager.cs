@@ -7,8 +7,10 @@ public class InputManager : MonoBehaviour {
 
     public delegate void ButtonInputDelegate();
     public event ButtonInputDelegate OnAttackPress = delegate { };
+    public event ButtonInputDelegate OnSpecialPress = delegate { };
 
-    private bool _attacking;
+    private bool _attack;
+    private bool _special;
 
 	void Update() {
         // axial
@@ -16,11 +18,20 @@ public class InputManager : MonoBehaviour {
 
         // attack
         bool attackPressed = Input.GetButton("Attack");
-        if(!attackPressed) _attacking = false;
+        if(!attackPressed) _attack = false;
 
-        if(attackPressed && !_attacking) {
-            _attacking = true;
+        if(attackPressed && !_attack) {
+            _attack = true;
             OnAttackPress();
+        }
+
+        // special
+        bool specialPressed = Input.GetButton("Special");
+        if(!specialPressed) _special = false;
+
+        if(specialPressed && !_special) {
+            _special = true;
+            OnSpecialPress();
         }
 	}
 }

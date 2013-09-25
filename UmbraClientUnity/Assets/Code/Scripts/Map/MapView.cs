@@ -31,6 +31,7 @@ public class MapView : MonoBehaviour {
 
         _activeBuffer = BufferA;
         _inactiveBuffer = BufferB;
+        _inactiveBuffer.gameObject.SetActive(false);
 
         MapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         MapViewCamera.OnMoveEnd += OnCameraMoveEnd;

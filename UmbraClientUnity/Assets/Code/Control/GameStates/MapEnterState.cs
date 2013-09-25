@@ -3,6 +3,8 @@ using System.Collections;
 using System;
 
 public class MapEnterState : BaseGameState {
+    public PlayerView PlayerView { get; private set; }
+
     private Map _map;
     private tk2dSpriteCollectionData _tileset;
     private int _tileSize;
@@ -32,13 +34,14 @@ public class MapEnterState : BaseGameState {
     }
 
     public override void ExitState() {
-        base.ExitState();
 
+        base.ExitState();
     }
 
     public override void Dispose() {
         base.Dispose();
 
+        PlayerView = null;
         _mapView = null;
         _tileset = null;
         _map = null;
@@ -64,5 +67,8 @@ public class MapEnterState : BaseGameState {
 
         GameObject player = UnityUtils.LoadResource<GameObject>("Prefabs/PlayerView", true);
         player.transform.position = new Vector3(startCoord.X, startCoord.Y, 0);
+
+        // store playerView to pass on to other states
+        PlayerView = player.GetComponent<PlayerView>();
     }
 }
