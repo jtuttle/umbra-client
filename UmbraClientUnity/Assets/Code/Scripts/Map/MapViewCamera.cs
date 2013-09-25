@@ -12,24 +12,27 @@ public class MapViewCamera : MonoBehaviour {
 
     public bool Moving { get; private set; }
 
-    private tk2dCamera _tk2dCameraRef;
+    public XY HalfScreen { get { return new XY(_spriteCamera.nativeResolutionWidth / 2, _spriteCamera.nativeResolutionHeight / 2); } }
+    public XY FullScreen { get { return new XY(_spriteCamera.nativeResolutionWidth, _spriteCamera.nativeResolutionHeight); } }
+
+    private tk2dCamera _spriteCamera;
 
     void Awake() {
         Moving = false;
 
-        _tk2dCameraRef = gameObject.GetComponent<tk2dCamera>();
+        _spriteCamera = gameObject.GetComponent<tk2dCamera>();
     }
 
     public void CoverPosition(Vector3 position) {
         XY delta = null;
 
-        if(position.x > _tk2dCameraRef.transform.position.x + _tk2dCameraRef.nativeResolutionWidth)
+        if(position.x > _spriteCamera.transform.position.x + _spriteCamera.nativeResolutionWidth)
             delta = new XY(MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.x < _tk2dCameraRef.transform.position.x)
+        else if(position.x < _spriteCamera.transform.position.x)
             delta = new XY(-MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.y > _tk2dCameraRef.transform.position.y + _tk2dCameraRef.nativeResolutionHeight)
+        else if(position.y > _spriteCamera.transform.position.y + _spriteCamera.nativeResolutionHeight)
             delta = new XY(0, MapView.TileSize * MapView.VerticalTileCount);
-        else if(position.y < _tk2dCameraRef.transform.position.y)
+        else if(position.y < _spriteCamera.transform.position.y)
             delta = new XY(0, -MapView.TileSize * MapView.VerticalTileCount);
 
         if(delta != null)
@@ -39,13 +42,16 @@ public class MapViewCamera : MonoBehaviour {
     public void Move(XY delta) {
         if(Moving) return;
 
-        OnMoveBegin(delta);
-
         Vector3 goPos = gameObject.transform.position;
+        Vector3 newPos = goPos + new Vector3(delta.X, delta.Y, 0);
 
+        if(OutOfBounds(newPos)) return;
+
+        OnMoveBegin(delta);
+        
         TweenParms parms = new TweenParms();
         parms.Ease(EaseType.Linear);
-        parms.Prop("position", goPos + new Vector3(delta.X, delta.Y, 0));
+        parms.Prop("position", newPos);
         parms.OnComplete(OnMoveComplete, delta);
 
         Moving = true;
@@ -59,5 +65,11 @@ public class MapViewCamera : MonoBehaviour {
         XY delta = (XY)e.parms[0];
 
         OnMoveEnd(delta);
+    }
+
+    // TODO: fix this fracking camera offset issue
+    // i.e. camera has to start at -tilesize / 2,-tilesize / 2 instead of 0,0 because camera is bottom-left anchored and tiles are center-anchored
+    private bool OutOfBounds(Vector3 newPos) {
+        return newPos.x < -(MapView.TileSize / 2) || newPos.x >= (MapView.Map.Width * MapView.TileSize) - (MapView.TileSize / 2) || newPos.y < -(MapView.TileSize / 2) || newPos.y >= (MapView.Map.Height * MapView.TileSize) - (MapView.TileSize / 2);
     }
 }

@@ -8,6 +8,7 @@ public abstract class BaseGameState : ITurnState {
     public event StateChangeDelegate OnExit = delegate { };
 
     public GameStates GameState { get; private set; }
+    public GameStates NextState { get; protected set; }
 
     public BaseGameState(GameStates gameState) {
         GameState = gameState;
