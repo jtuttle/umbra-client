@@ -2,66 +2,83 @@
 using System.Collections;
 
 public class MapWalkState : BaseGameState {
+    public PlayerView PlayerView { get; private set; }
     private MapViewCamera _mapViewCamera;
-    private PlayerView _playerView;
 
-    public MapWalkState()
+    public MapWalkState(PlayerView playerView)
         : base(GameStates.MapWalk) {
 
+        PlayerView = playerView;
 
+        _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
     }
 
     public override void EnterState() {
         base.EnterState();
 
-        _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
-        _playerView = GameObject.FindObjectOfType(typeof(PlayerView)) as PlayerView;
+        PlayerView.gameObject.SetActive(true);
+
+        // can't find disabled objects, rawr
+        //PlayerView = GameObject.FindObjectOfType(typeof(PlayerView)) as PlayerView;
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        _playerView.OnPlayerMove += OnPlayerMove;
+        PlayerView.OnPlayerMove += OnPlayerMove;
 
         AddPlayerInput();
     }
 
     public override void ExitState() {
-        base.ExitState();
+        _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
+        _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
+
+        PlayerView.OnPlayerMove -= OnPlayerMove;
 
         RemovePlayerInput();
+
+        base.ExitState();
     }
 
     public override void Dispose() {
         base.Dispose();
 
-        _playerView = null;
+        PlayerView = null;
+        _mapViewCamera = null;
     }
 
     private void AddPlayerInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput += _playerView.Move;
-        input.OnAttackPress += _playerView.Attack;
+        input.OnAxialInput += PlayerView.Move;
+        input.OnAttackPress += PlayerView.Attack;
+        input.OnSpecialPress += OnSpecialPress;
     }
 
     private void RemovePlayerInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput -= _playerView.Move;
-        input.OnAttackPress -= _playerView.Attack;
+        input.OnAxialInput -= PlayerView.Move;
+        input.OnAttackPress -= PlayerView.Attack;
+        input.OnSpecialPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(XY delta) {
         RemovePlayerInput();
-        _playerView.Freeze();
+        PlayerView.Freeze();
     }
 
     private void OnCameraMoveEnd(XY delta) {
-        _playerView.Unfreeze();
+        PlayerView.Unfreeze();
         AddPlayerInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
         _mapViewCamera.CoverPosition(position);
+    }
+
+    private void OnSpecialPress() {
+        NextState = GameStates.MapDesign;
+        ExitState();
     }
 }

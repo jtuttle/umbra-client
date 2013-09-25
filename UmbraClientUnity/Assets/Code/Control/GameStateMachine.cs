@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 
 public enum GameStates {
-    Loading, MainMenu, MapEnter, MapWalk, MapExit, Shop, Design, MiniMap
+    Loading, MainMenu,
+    Shop, 
+    MapEnter, MapWalk, MapDesign, MapExit, 
+    MiniMap
 }
 
-public class GameState {
+public class GameStateMachine {
     public delegate void StateChangeDelegate(BaseGameState state);
     public event StateChangeDelegate OnStateExit = delegate { };
 
@@ -12,7 +15,7 @@ public class GameState {
 
     private Stack _stateStack;
 
-    public GameState() {
+    public GameStateMachine() {
         _stateStack = new Stack();
     }
 
