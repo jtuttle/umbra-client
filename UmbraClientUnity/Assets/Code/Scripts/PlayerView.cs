@@ -37,6 +37,8 @@ public class PlayerView : MonoBehaviour {
 
     public void Attack() {
         _meleeAttacker.Attack();
+
+        OnPlayerAttack();
     }
 
     public void Freeze() {

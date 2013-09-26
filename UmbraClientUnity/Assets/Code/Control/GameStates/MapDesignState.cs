@@ -41,8 +41,6 @@ public class MapDesignState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        Debug.Log("dispose");
-
         PlayerView = null;
         _mapViewCamera = null;
     }
