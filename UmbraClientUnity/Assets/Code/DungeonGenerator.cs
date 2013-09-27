@@ -5,11 +5,8 @@ using System.Collections.Generic;
 public class DungeonGenerator {
     public Dungeon Dungeon { get; private set; }
 
-    private List<DungeonRoom> _openRooms;
-
     public Dungeon Generate(int numRooms) {
         Dungeon = new Dungeon();
-        _openRooms = new List<DungeonRoom>();
 
         CreateEntrance();
 
@@ -19,9 +16,8 @@ public class DungeonGenerator {
     }
 
     private void CreateEntrance() {
-        DungeonRoom entrance = new DungeonRoom(new XY(0, 0), null, null);
-        Dungeon.AddRoom(entrance);
-        _openRooms.Add(entrance);
+        DungeonRoom entrance = new DungeonRoom(null);
+        Dungeon.AddRoom(new XY(0, 0), entrance);
     }
 
     private void CreateRoomTree(int numRooms) {
@@ -30,25 +26,27 @@ public class DungeonGenerator {
     }
 
     private void AddRoom() {
-        DungeonRoom openRoom = _openRooms[Random.Range(0, _openRooms.Count)];
+        GridGraph<DungeonRoom, DungeonPath> Rooms = Dungeon.Rooms;
 
-        List<DungeonDirections> openEdges = openRoom.OpenEdges;
-        DungeonDirections openEdgeDirection = openEdges[Random.Range(0, openEdges.Count)];
+        // choose random vertex with open edges
+        List<GridVertex<DungeonRoom>> openVertices = Rooms.OpenVertices;
+        GridVertex<DungeonRoom> openVertex = openVertices[Random.Range(0, openVertices.Count)];
 
-        DungeonEdge edge = new DungeonEdge();
-        DungeonRoom newRoom = new DungeonRoom(openRoom.GetCoordForDirection(openEdgeDirection), openRoom, edge);
+        // choose random open edge direction
+        List<GridDirection> openEdges = Rooms.OpenEdges(openVertex);
+        GridDirection newRoomDirection = openEdges[Random.Range(0, openEdges.Count)];
 
-        openRoom.AddChild(newRoom, edge, openEdgeDirection);
-        Dungeon.AddRoom(newRoom);
+        // create new graph vertex
+        XY nextCoord = Rooms.GetCoordForNextVertex(openVertex, newRoomDirection);
+        GridVertex<DungeonRoom> newVertex = new GridVertex<DungeonRoom>(nextCoord, new DungeonRoom(openVertex.Value));
 
-        // remove old open room if we juse used its last edge
-        if(openEdges.Count == 1)
-            _openRooms.Remove(openRoom);
+        // add new vertex and edge to graph
+        Rooms.AddVertex(newVertex);
+        Rooms.AddEdge(openVertex, newVertex, new DungeonPath());
 
-        // add new open room if it has empty edges
-        if(newRoom.OpenEdges.Count > 0)
-            _openRooms.Add(newRoom);
+        // TODO: may not want to add edge back, but for now it's necessary to prevent the algorithm from backtracking
+        Rooms.AddEdge(newVertex, openVertex, new DungeonPath());
 
-        Debug.Log("added room @ " + newRoom.Coords);
+        Debug.Log("added room @ " + nextCoord);
     }
 }

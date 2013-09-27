@@ -5,15 +5,19 @@ using System.Collections.Generic;
 public enum DungeonDirections { N, E, S, W }
 
 public class Dungeon {
-    public Dictionary<XY, DungeonRoom> Rooms { get; private set; }
+    public DungeonRoom Entrance { get; private set; }
 
-    public int RoomCount { get { return Rooms.Keys.Count; } }
-
+    public GridGraph<DungeonRoom, DungeonPath> Rooms { get; private set; }
+    public int RoomCount { get { return Rooms.VertexCount; } }
+    
     public Dungeon() {
-        Rooms = new Dictionary<XY, DungeonRoom>();
+        Rooms = new GridGraph<DungeonRoom, DungeonPath>();
     }
 
-    public void AddRoom(DungeonRoom room) {
-        Rooms[room.Coords] = room;
+    public void AddRoom(XY coord, DungeonRoom room) {
+        if(RoomCount == 0)
+            Entrance = room;
+
+        Rooms.AddVertex(new GridVertex<DungeonRoom>(coord, room));
     }
 }
