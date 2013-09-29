@@ -2,22 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum DungeonDirections { N, E, S, W }
+using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
 
 public class Dungeon {
-    public DungeonRoom Entrance { get; private set; }
+    public DungeonVertex Entrance { get; set; }
 
-    public GridGraph<DungeonRoom, DungeonPath> Rooms { get; private set; }
-    public int RoomCount { get { return Rooms.VertexCount; } }
+    public GridGraph<DungeonRoom, DungeonPath> Graph { get; private set; }
     
     public Dungeon() {
-        Rooms = new GridGraph<DungeonRoom, DungeonPath>();
-    }
-
-    public void AddRoom(XY coord, DungeonRoom room) {
-        if(RoomCount == 0)
-            Entrance = room;
-
-        Rooms.AddVertex(new GridVertex<DungeonRoom>(coord, room));
+        Graph = new GridGraph<DungeonRoom, DungeonPath>();
     }
 }
