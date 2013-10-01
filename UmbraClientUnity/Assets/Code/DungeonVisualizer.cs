@@ -7,9 +7,13 @@ using System;
 using System.Collections.Generic;
 
 public class DungeonVisualizer {
+    private GameObject _visual;
+
     private float _spacing = 1.5f;
 
     public void RenderDungeon(Dungeon dungeon) {
+        _visual = new GameObject("Dungeon Visual");
+
         foreach(DungeonVertex vertex in dungeon.Graph.BreadthFirstSearch(dungeon.Entrance)) {
             RenderRoom(vertex);
 
@@ -19,18 +23,23 @@ public class DungeonVisualizer {
     }
 
     private void RenderRoom(DungeonVertex vertex) {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.position = VertexPosition(vertex);
+        GameObject vertexGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+        vertexGo.name = vertex.ToString();
+        vertexGo.transform.parent = _visual.transform;
+        vertexGo.transform.position = VertexPosition(vertex);
     }
 
     private void RenderEdge(DungeonEdge edge) {
-        GameObject cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        GameObject edgeGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         bool horizontal = (edge.Direction == GridDirection.E || edge.Direction == GridDirection.W);
         float rotation = (horizontal ? (90.0f * Mathf.Deg2Rad) : 0);
 
-        cylinder.transform.localScale = new Vector3(0.1f, _spacing / 2, 0.1f);
-        cylinder.transform.position = EdgePosition(edge);
-        cylinder.transform.rotation = Quaternion.EulerAngles(0, 0, rotation);
+        edgeGo.name = edge.ToString();
+        edgeGo.transform.parent = _visual.transform;
+        edgeGo.transform.localScale = new Vector3(0.1f, _spacing / 2, 0.1f);
+        edgeGo.transform.position = EdgePosition(edge);
+        edgeGo.transform.rotation = Quaternion.EulerAngles(0, 0, rotation);
     }
 
     private Vector3 VertexPosition(DungeonVertex vertex) {
@@ -45,17 +54,13 @@ public class DungeonVisualizer {
         float edgeSpacing = _spacing / 8;
         float halfSpacing = _spacing / 2;
 
-        switch(direction) {
-            case GridDirection.N:
-                return vertexPos + new Vector3(-edgeSpacing, halfSpacing, 0);
-            case GridDirection.E:
-                return vertexPos + new Vector3(halfSpacing, edgeSpacing, 0);
-            case GridDirection.S:
-                return vertexPos + new Vector3(edgeSpacing, -halfSpacing, 0);
-            case GridDirection.W:
-                return vertexPos + new Vector3(-halfSpacing, -edgeSpacing, 0);
-        }
+        Vector3 adjust = Vector3.zero;
 
-        throw new Exception("Could not determine edge position");
+        if(direction == GridDirection.N) adjust = new Vector3(-edgeSpacing, halfSpacing, 0);
+        if(direction == GridDirection.E) adjust = new Vector3(halfSpacing, edgeSpacing, 0);
+        if(direction == GridDirection.S) adjust = new Vector3(edgeSpacing, -halfSpacing, 0);
+        if(direction == GridDirection.W) adjust = new Vector3(-halfSpacing, -edgeSpacing, 0);
+
+        return vertexPos + adjust;
     }
 }
