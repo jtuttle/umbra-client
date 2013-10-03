@@ -2,7 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+
 public class MapTileViewBuffer : MonoBehaviour {
+    public DungeonVertex DungeonVertex { get; private set; }
+
     private List<MapTileView> _mapTileViews;
 
     public void Setup(int width, int height, int tileSize, tk2dSpriteCollectionData tileset) {
@@ -28,7 +32,9 @@ public class MapTileViewBuffer : MonoBehaviour {
         }
     }
 
-    public void Show(List<MapTile> mapTiles) {
+    public void Show(List<MapTile> mapTiles, DungeonVertex dungeonVertex) {
+        DungeonVertex = dungeonVertex;
+
         for(int i = 0; i < mapTiles.Count; i++) {
             MapTileView mapTileView = _mapTileViews[i];
             mapTileView.UpdateMapTile(mapTiles[i]);
