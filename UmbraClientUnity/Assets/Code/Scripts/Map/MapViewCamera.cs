@@ -45,8 +45,6 @@ public class MapViewCamera : MonoBehaviour {
         Vector3 goPos = gameObject.transform.position;
         Vector3 newPos = goPos + new Vector3(delta.X, delta.Y, 0);
 
-        //if(OutOfBounds(newPos)) return;
-
         OnMoveBegin(delta);
         
         TweenParms parms = new TweenParms();
@@ -66,10 +64,4 @@ public class MapViewCamera : MonoBehaviour {
 
         OnMoveEnd(delta);
     }
-
-    // TODO: fix this fracking camera offset issue
-    // i.e. camera has to start at -tilesize / 2,-tilesize / 2 instead of 0,0 because camera is bottom-left anchored and tiles are center-anchored
-    //private bool OutOfBounds(Vector3 newPos) {
-    //    return newPos.x < -(MapView.TileSize / 2) || newPos.x >= (MapView.Map.Width * MapView.TileSize) - (MapView.TileSize / 2) || newPos.y < -(MapView.TileSize / 2) || newPos.y >= (MapView.Map.Height * MapView.TileSize) - (MapView.TileSize / 2);
-    //}
 }

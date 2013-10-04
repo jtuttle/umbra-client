@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
 
 public class MapTileViewBuffer : MonoBehaviour {
-    public DungeonVertex DungeonVertex { get; private set; }
-
     private List<MapTileView> _mapTileViews;
 
     public void Setup(int width, int height, int tileSize, tk2dSpriteCollectionData tileset) {
@@ -32,17 +30,15 @@ public class MapTileViewBuffer : MonoBehaviour {
         }
     }
 
-    public void Show(List<MapTile> mapTiles, DungeonVertex dungeonVertex) {
-        DungeonVertex = dungeonVertex;
-
+    public void Show(List<MapTile> mapTiles) {
         for(int i = 0; i < mapTiles.Count; i++) {
             MapTileView mapTileView = _mapTileViews[i];
             mapTileView.UpdateMapTile(mapTiles[i]);
 
             tk2dSpriteDefinition.ColliderType colliderType = mapTileView.Sprite.GetCurrentSpriteDef().colliderType;
 
-            if(mapTileView.collider != null && colliderType != tk2dSpriteDefinition.ColliderType.Box)
-                mapTileView.collider.enabled = false;
+            if(mapTileView.collider != null)
+                mapTileView.collider.enabled = (colliderType == tk2dSpriteDefinition.ColliderType.Box);
         }
 
         gameObject.SetActive(true);

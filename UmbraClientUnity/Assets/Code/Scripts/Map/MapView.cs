@@ -21,7 +21,7 @@ public class MapView : MonoBehaviour {
     private MapTileViewBuffer _activeBuffer;
     private MapTileViewBuffer _inactiveBuffer;
 
-    private DungeonVertex _currentDungeonVertex;
+    private XY _currentVertexPosition;
 
     public void SetSpriteData(int tileSize, tk2dSpriteCollectionData spriteData) {
         TileSize = tileSize;
@@ -45,12 +45,12 @@ public class MapView : MonoBehaviour {
 
         ShowDungeonRoom(Dungeon.Entrance, _activeBuffer);
 
-        _currentDungeonVertex = Dungeon.Entrance;
+        _currentVertexPosition = Dungeon.Entrance.Coord;
     }
 
     public void ShowDungeonRoom(DungeonVertex dungeonVertex, MapTileViewBuffer buffer) {
         List<MapTile> roomTiles = TilesForDungeonVertex(dungeonVertex);
-        buffer.Show(roomTiles, dungeonVertex);
+        buffer.Show(roomTiles);
     }
 
     private void OnCameraMoveBegin(XY delta) {
@@ -58,11 +58,11 @@ public class MapView : MonoBehaviour {
 
         _inactiveBuffer.transform.position = newPos;
 
-        XY bottomLeft = WorldCoordToTileCoord(newPos.x, newPos.y);
-        XY topRight = bottomLeft + new XY(HorizontalTileCount - 1, VerticalTileCount - 1);
+        GridDirection moveDirection = DirectionFromDelta(delta);
+        DungeonVertex nextVertex = Dungeon.Graph.GetVertexByCoord(NextCoord(_currentVertexPosition, moveDirection));
 
-        DungeonVertex nextVertex = _activeBuffer.DungeonVertex.Neighbors[DirectionFromDelta(delta)];
-        ShowDungeonRoom(nextVertex, _inactiveBuffer);
+        if(nextVertex != null)
+            ShowDungeonRoom(nextVertex, _inactiveBuffer);
     }
 
     private void OnCameraMoveEnd(XY delta) {
@@ -73,7 +73,7 @@ public class MapView : MonoBehaviour {
 
         _inactiveBuffer.Hide();
 
-        _currentDungeonVertex = _activeBuffer.DungeonVertex;
+        _currentVertexPosition = NextCoord(_currentVertexPosition, DirectionFromDelta(delta));
     }
 
     private Vector3 GetPositionForNewBuffer(GridDirection direction) {
@@ -88,19 +88,8 @@ public class MapView : MonoBehaviour {
         if(direction == GridDirection.W)
             return new Vector3(activePos.x - SpriteCamera.nativeResolutionWidth, activePos.y, activePos.z);
 
-        throw new Exception("Camera didn't move.");
+        throw new Exception("Camera didn't move");
     }
-
-    /*
-    private List<MapTile> GetVisibleMap() {
-        Vector3 camPos = SpriteCamera.transform.position;
-
-        XY bottomLeft = WorldCoordToTileCoord(camPos.x, camPos.y);
-        XY topRight = bottomLeft + new XY(HorizontalTileCount - 1, VerticalTileCount - 1);
-
-        return Map.GetMapArea(bottomLeft, topRight);
-    }
-    */
 
     public XY TileCoordToWorldCoord(XY tileCoord) {
         return new XY(tileCoord.X * TileSize, tileCoord.Y * TileSize);
@@ -118,6 +107,14 @@ public class MapView : MonoBehaviour {
         if(delta.Y < 0) return GridDirection.S;
         if(delta.X < 0) return GridDirection.W;
         throw new Exception("Unable to get direction from delta");
+    }
+
+    private XY NextCoord(XY coord, GridDirection direction) {
+        if(direction == GridDirection.N) return coord + new XY(0, 1);
+        if(direction == GridDirection.E) return coord + new XY(1, 0);
+        if(direction == GridDirection.S) return coord - new XY(0, 1);
+        if(direction == GridDirection.W) return coord - new XY(1, 0);
+        throw new Exception("Unable to get next coord");
     }
 
     private List<MapTile> TilesForDungeonVertex(DungeonVertex vertex) {
