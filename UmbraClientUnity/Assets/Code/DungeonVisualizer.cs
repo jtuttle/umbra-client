@@ -7,27 +7,35 @@ using System;
 using System.Collections.Generic;
 
 public class DungeonVisualizer {
+    private Dungeon _dungeon;
     private GameObject _visual;
 
     private float _spacing = 1.5f;
 
     public void RenderDungeon(Dungeon dungeon) {
+        _dungeon = dungeon;
+
         _visual = new GameObject("Dungeon Visual");
 
-        foreach(DungeonVertex vertex in dungeon.Graph.BreadthFirstSearch(dungeon.Entrance)) {
-            RenderRoom(vertex);
+        foreach(DungeonVertex vertex in _dungeon.Graph.BreadthFirstSearch(dungeon.Entrance)) {
+            Color color = Color.white;
+
+            if(vertex == _dungeon.Entrance) color = Color.blue;
+                
+            RenderRoom(vertex, color);
 
             foreach(DungeonEdge edge in vertex.Edges.Values)
                 RenderEdge(edge);
         }
     }
 
-    private void RenderRoom(DungeonVertex vertex) {
+    private void RenderRoom(DungeonVertex vertex, Color color) {
         GameObject vertexGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
         vertexGo.name = vertex.ToString();
         vertexGo.transform.parent = _visual.transform;
         vertexGo.transform.position = VertexPosition(vertex);
+        vertexGo.renderer.material.color = color;
     }
 
     private void RenderEdge(DungeonEdge edge) {
@@ -62,5 +70,9 @@ public class DungeonVisualizer {
         if(direction == GridDirection.W) adjust = new Vector3(-halfSpacing, -edgeSpacing, 0);
 
         return vertexPos + adjust;
+    }
+
+    public void UpdatePosition(XY delta) {
+
     }
 }

@@ -11,17 +11,15 @@ public class MapEnterState : BaseGameState {
 
     private MapView _mapView;
 
-    public MapEnterState(Dungeon dungeon, tk2dSpriteCollectionData tileset, int tileSize) 
+    public MapEnterState(tk2dSpriteCollectionData tileset, int tileSize) 
         : base(GameStates.MapEnter) {
 
-        _dungeon = dungeon;
         _tileset = tileset;
         _tileSize = tileSize;
 
+        _dungeon = GameManager.Instance.CurrentDungeon;
+
         _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
-
-
-        new DungeonVisualizer().RenderDungeon(_dungeon);
 
         if(_mapView == null) throw new Exception("Game scene must contain MapView prefab.");
     }

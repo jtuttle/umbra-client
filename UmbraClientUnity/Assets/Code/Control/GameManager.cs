@@ -7,7 +7,7 @@ public class GameManager : UnitySingleton<GameManager> {
 
     public Camera GameCamera;
 
-    public Map CurrentMap { get; private set; }
+    public Dungeon CurrentDungeon { get; private set; }
 
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
@@ -21,15 +21,12 @@ public class GameManager : UnitySingleton<GameManager> {
     void Start() {
         _states.OnStateExit += OnExitState;
 
-        Dungeon dungeon = new DungeonGenerator().Generate(10);
-
-        // grab this map from somewhere...
-        //Map map = Map.CreateFake(48, 24);
+        CurrentDungeon = new DungeonGenerator().Generate(10);
 
         // grab appropriate tileset from somewhere...
         tk2dSpriteCollectionData tileset = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
-        _states.ChangeGameState(new MapEnterState(dungeon, tileset, 64));
+        _states.ChangeGameState(new MapEnterState(tileset, 64));
     }
 
     void Update() {
