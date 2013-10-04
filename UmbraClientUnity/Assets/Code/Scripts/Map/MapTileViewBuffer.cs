@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+
 public class MapTileViewBuffer : MonoBehaviour {
     private List<MapTileView> _mapTileViews;
 
@@ -35,8 +37,8 @@ public class MapTileViewBuffer : MonoBehaviour {
 
             tk2dSpriteDefinition.ColliderType colliderType = mapTileView.Sprite.GetCurrentSpriteDef().colliderType;
 
-            if(mapTileView.collider != null && colliderType != tk2dSpriteDefinition.ColliderType.Box)
-                mapTileView.collider.enabled = false;
+            if(mapTileView.collider != null)
+                mapTileView.collider.enabled = (colliderType == tk2dSpriteDefinition.ColliderType.Box);
         }
 
         gameObject.SetActive(true);

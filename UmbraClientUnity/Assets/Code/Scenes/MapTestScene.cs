@@ -17,9 +17,8 @@ public class MapTestScene : MonoBehaviour {
         XY camPos = MapView.TileCoordToWorldCoord(new XY(0, 0));
         MapView.SpriteCamera.transform.position = new Vector3(camPos.X - (TILE_SIZE / 2), camPos.Y - (TILE_SIZE / 2), MapViewCamera.transform.position.z);
 
-        MapView.SetMap(map, TILE_SIZE, spriteData);
-
-        MapView.ShowMap();
+        MapView.SetSpriteData(TILE_SIZE, spriteData);
+        MapView.SetDungeon(new DungeonGenerator().Generate(10));
     }
 
     private Map CreateMap() {

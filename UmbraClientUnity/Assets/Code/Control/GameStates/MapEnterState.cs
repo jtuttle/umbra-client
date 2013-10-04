@@ -5,18 +5,19 @@ using System;
 public class MapEnterState : BaseGameState {
     public PlayerView PlayerView { get; private set; }
 
-    private Map _map;
+    private Dungeon _dungeon;
     private tk2dSpriteCollectionData _tileset;
     private int _tileSize;
 
     private MapView _mapView;
 
-    public MapEnterState(Map map, tk2dSpriteCollectionData tileset, int tileSize) 
+    public MapEnterState(tk2dSpriteCollectionData tileset, int tileSize) 
         : base(GameStates.MapEnter) {
 
-        _map = map;
         _tileset = tileset;
         _tileSize = tileSize;
+
+        _dungeon = GameManager.Instance.CurrentDungeon;
 
         _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
 
@@ -44,7 +45,7 @@ public class MapEnterState : BaseGameState {
         PlayerView = null;
         _mapView = null;
         _tileset = null;
-        _map = null;
+        _dungeon = null;
     }
 
     private void AdjustCamera() {
@@ -55,8 +56,8 @@ public class MapEnterState : BaseGameState {
     }
 
     private void ShowMap() {
-        _mapView.SetMap(_map, 64, _tileset);
-        _mapView.ShowMap();
+        _mapView.SetSpriteData(64, _tileset);
+        _mapView.SetDungeon(_dungeon);
     }
 
     private void PlacePlayer() {
