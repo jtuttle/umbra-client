@@ -5,21 +5,24 @@ public class MapWalkState : BaseGameState {
     public PlayerView PlayerView { get; private set; }
     private MapViewCamera _mapViewCamera;
 
+    // TODO: this will probably be a minimap at some point
+    private DungeonVisualizer _visualizer;
+
     public MapWalkState(PlayerView playerView)
         : base(GameStates.MapWalk) {
 
         PlayerView = playerView;
 
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
+
+        _visualizer = new DungeonVisualizer();
+        _visualizer.RenderDungeon(GameManager.Instance.CurrentDungeon);
     }
 
     public override void EnterState() {
         base.EnterState();
 
         PlayerView.gameObject.SetActive(true);
-
-        // can't find disabled objects, rawr
-        //PlayerView = GameObject.FindObjectOfType(typeof(PlayerView)) as PlayerView;
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
