@@ -2,9 +2,8 @@
 
 public enum GameStates {
     Loading, MainMenu,
-    Shop, 
-    MapEnter, MapWalk, MapDesign, MapExit, 
-    MiniMap
+    Shop,
+    MapEnter, MapWalk, MapView, MapDesign, MapExit, 
 }
 
 public class GameStateMachine {
