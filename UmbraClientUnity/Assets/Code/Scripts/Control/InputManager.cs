@@ -14,9 +14,18 @@ public class InputManager : MonoBehaviour {
     private bool _special;
     private bool _mapView;
 
+    private float _dead = 0.2f;
+
 	void Update() {
+        // manual deadzones because built-in ones aren't working
+        float h = Input.GetAxis("Horizontal");
+        h = (Mathf.Abs(h) < _dead ? 0 : h);
+
+        float v = Input.GetAxis("Vertical");
+        v = (Mathf.Abs(v) < _dead ? 0 : v);
+
         // axial
-        OnAxialInput(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        OnAxialInput(h, v);
 
         // attack
         bool attackPressed = Input.GetButton("Attack");
