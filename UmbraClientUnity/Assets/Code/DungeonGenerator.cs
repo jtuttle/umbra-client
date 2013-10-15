@@ -50,7 +50,7 @@ public class DungeonGenerator {
         XY nextCoord = Rooms.GetCoordForNeighbor(openVertex, newRoomDirection);
         
         // add new vertex and edges to graph
-        DungeonVertex newVertex = Rooms.AddVertex(nextCoord, new DungeonRoom(openVertex.Value));
+        DungeonVertex newVertex = Rooms.AddVertex(nextCoord, new DungeonRoom());
         Rooms.AddEdge(openVertex, newVertex, new DungeonPath());
         Rooms.AddEdge(newVertex, openVertex, new DungeonPath());
 
