@@ -7,14 +7,14 @@ public enum SearchColor { White, Gray, Black }
 
 public class GridVertex<T, U> {
     public XY Coord { get; private set; }
-    public T Value { get; private set; }
+    public T Data { get; private set; }
 
     public Dictionary<GridDirection, GridEdge<T, U>> Edges { get; private set; }
     public Dictionary<GridDirection, GridVertex<T, U>> Neighbors { get; private set; }
     
-    public GridVertex(XY coord, T value) {
+    public GridVertex(XY coord, T data) {
         Coord = coord;
-        Value = value;
+        Data = data;
 
         Edges = new Dictionary<GridDirection,GridEdge<T, U>>();
         Neighbors = new Dictionary<GridDirection, GridVertex<T, U>>();
@@ -28,12 +28,12 @@ public class GridVertex<T, U> {
 public class GridEdge<T, U> {
     public GridVertex<T, U> From { get; private set; }
     public GridVertex<T, U> To { get; private set; }
-    public U Value { get; private set; }
+    public U Data { get; private set; }
 
-    public GridEdge(GridVertex<T, U> from, GridVertex<T, U> to, U value) {
+    public GridEdge(GridVertex<T, U> from, GridVertex<T, U> to, U data) {
         From = from;
         To = to;
-        Value = value;
+        Data = data;
     }
 
     public GridDirection Direction {
@@ -57,7 +57,7 @@ public class GridEdge<T, U> {
 
 public class GridGraph<T, U> {
     private Dictionary<XY, GridVertex<T, U>> _coordIndex;
-    private Dictionary<T, GridVertex<T, U>> _valueIndex;
+    private Dictionary<T, GridVertex<T, U>> _dataIndex;
     public int VertexCount { get { return _coordIndex.Count; } }
 
     private int _edgeCount;
@@ -65,15 +65,15 @@ public class GridGraph<T, U> {
 
     public GridGraph() {
         _coordIndex = new Dictionary<XY, GridVertex<T, U>>();
-        _valueIndex = new Dictionary<T, GridVertex<T, U>>();
+        _dataIndex = new Dictionary<T, GridVertex<T, U>>();
         _edgeCount = 0;
     }
 
-    public GridVertex<T, U> AddVertex(XY coord, T value) {
-        GridVertex<T, U> newVertex = new GridVertex<T, U>(coord, value);
+    public GridVertex<T, U> AddVertex(XY coord, T data) {
+        GridVertex<T, U> newVertex = new GridVertex<T, U>(coord, data);
 
         _coordIndex[newVertex.Coord] = newVertex;
-        _valueIndex[newVertex.Value] = newVertex;
+        _dataIndex[newVertex.Data] = newVertex;
 
         UpdateNeighbors(newVertex);
 
@@ -84,12 +84,12 @@ public class GridGraph<T, U> {
         return (_coordIndex.ContainsKey(coord) ? _coordIndex[coord] : null);
     }
 
-    public GridVertex<T, U> GetVertexByValue(T value) {
-        return (_valueIndex.ContainsKey(value) ? _valueIndex[value] : null);
+    public GridVertex<T, U> GetVertexByData(T data) {
+        return (_dataIndex.ContainsKey(data) ? _dataIndex[data] : null);
     }
 
-    public GridEdge<T, U> AddEdge(GridVertex<T, U> from, GridVertex<T, U> to, U edgeValue) {
-        GridEdge<T, U> newEdge = new GridEdge<T, U>(from, to, edgeValue);
+    public GridEdge<T, U> AddEdge(GridVertex<T, U> from, GridVertex<T, U> to, U data) {
+        GridEdge<T, U> newEdge = new GridEdge<T, U>(from, to, data);
         from.Edges[newEdge.Direction] = newEdge;
         _edgeCount++;
 

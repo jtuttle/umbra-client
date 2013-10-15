@@ -1,11 +1,31 @@
 ﻿using System;
-public class XY {
+using System.Collections;
+
+public class XY : IJsonable {
     public int X { get; private set; }
     public int Y { get; private set; }
 
     public XY(int x, int y) {
         X = x;
         Y = y;
+    }
+
+    public XY(Hashtable json) {
+        FromJson(json);
+    }
+
+    public void FromJson(Hashtable json) {
+        X = int.Parse(json["X"].ToString());
+        Y = int.Parse(json["Y"].ToString());
+    }
+
+    public Hashtable ToJson() {
+        Hashtable json = new Hashtable();
+
+        json["X"] = X;
+        json["Y"] = Y;
+
+        return json;
     }
 
     public override string ToString() {
