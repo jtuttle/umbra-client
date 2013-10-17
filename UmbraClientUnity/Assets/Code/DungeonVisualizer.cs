@@ -41,13 +41,13 @@ public class DungeonVisualizer {
     private void RenderEdge(DungeonEdge edge) {
         GameObject edgeGo = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         bool horizontal = (edge.Direction == GridDirection.E || edge.Direction == GridDirection.W);
-        float rotation = (horizontal ? (90.0f * Mathf.Deg2Rad) : 0);
+        float rotation = (horizontal ? 90.0f : 0);
 
         edgeGo.name = edge.ToString();
         edgeGo.transform.parent = _visual.transform;
         edgeGo.transform.localScale = new Vector3(0.1f, _spacing / 2, 0.1f);
         edgeGo.transform.position = EdgePosition(edge);
-        edgeGo.transform.rotation = Quaternion.EulerAngles(0, 0, rotation);
+        edgeGo.transform.rotation = Quaternion.Euler(0, 0, rotation);
     }
 
     private Vector3 VertexPosition(DungeonVertex vertex) {

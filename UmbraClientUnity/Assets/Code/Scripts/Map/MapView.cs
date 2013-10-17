@@ -119,7 +119,7 @@ public class MapView : MonoBehaviour {
 
     private List<MapTile> TilesForDungeonVertex(DungeonVertex vertex) {
         List<MapTile> tiles = new List<MapTile>();
-
+        
         for(int y = 0; y < 12; y++) {
             for(int x = 0; x < 16; x++) {
                 int spriteIndex = 0;
