@@ -14,21 +14,33 @@ public class Dungeon : IJsonable {
         Graph = new GridGraph<DungeonRoom, DungeonPath>();
     }
 
+    public Dungeon(Hashtable json)
+        : this() {
+
+        FromJson(json);
+    }
+
     public void FromJson(Hashtable json) {
         ArrayList nodes = json["Nodes"] as ArrayList;
 
         foreach(Hashtable nodeHash in nodes) {
             XY coord = new XY(nodeHash["Coord"] as Hashtable);
             DungeonRoom room = new DungeonRoom(nodeHash["Room"] as Hashtable);
+
             Graph.AddVertex(coord, room);
         }
 
         ArrayList edges = json["Edges"] as ArrayList;
 
         foreach(Hashtable edgeHash in edges) {
-            DungeonPath path = new DungeonPath(edgeHash);
-            //Graph.AddEdge(
+            DungeonVertex from = Graph.GetVertexByCoord(new XY(edgeHash["From"] as Hashtable));
+            DungeonVertex to = Graph.GetVertexByCoord(new XY(edgeHash["To"] as Hashtable));
+            DungeonPath path = new DungeonPath(edgeHash["Path"] as Hashtable);
+
+            Graph.AddEdge(from, to, path);
         }
+
+        Entrance = Graph.GetVertexByCoord(new XY(json["Entrance"] as Hashtable));
     }
 
     public Hashtable ToJson() {
@@ -47,14 +59,29 @@ public class Dungeon : IJsonable {
 
             Hashtable edgeHash = new Hashtable();
 
-            foreach(KeyValuePair<GridDirection, DungeonEdge> edge in node.Edges) {
-                DungeonPath path = edge.Value.Data;
-                edgeHash[edge.Key] = path.ToJson();
+            Debug.Log(node);
+
+            foreach(KeyValuePair<GridDirection, DungeonEdge> entry in node.Edges) {
+                DungeonEdge edge = entry.Value;
+
+                Debug.Log(edge);
+
+                XY from = edge.From.Coord;
+                XY to = edge.To.Coord;
+                DungeonPath path = edge.Data;
+
+                edgeHash["From"] = from.ToJson();
+                edgeHash["To"] = to.ToJson();
+                edgeHash["Path"] = path.ToJson();
+
+                edges.Add(edgeHash);
             }
         }
 
         json["Nodes"] = nodes;
         json["Edges"] = edges;
+
+        json["Entrance"] = Entrance.Coord.ToJson();
 
         return json;
     }
