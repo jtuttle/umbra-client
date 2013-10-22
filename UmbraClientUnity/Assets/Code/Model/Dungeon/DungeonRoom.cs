@@ -4,9 +4,19 @@ using System.Collections.Generic;
 using System;
 
 public class DungeonRoom {
-    public DungeonRoom Parent { get; private set; }
+    public DungeonRoom() { }
 
-    public DungeonRoom(DungeonRoom parent) {
-        Parent = parent;
+    public DungeonRoom(Hashtable json) {
+        FromJson(json);
+    }
+
+    public void FromJson(Hashtable json) {
+
+    }
+
+    public Hashtable ToJson() {
+        Hashtable json = new Hashtable();
+
+        return json;
     }
 }
