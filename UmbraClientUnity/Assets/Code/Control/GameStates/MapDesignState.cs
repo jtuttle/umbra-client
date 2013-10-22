@@ -16,7 +16,7 @@ public class MapDesignState : BaseGameState {
         base.EnterState();
 
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
-
+        
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
