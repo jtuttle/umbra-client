@@ -1,4 +1,4 @@
-﻿public interface ITurnState {
+﻿public interface IGameState {
     void EnterState();
     void ExitState();
     void Update();

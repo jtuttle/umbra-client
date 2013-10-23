@@ -11,7 +11,7 @@ public class Follow : MonoBehaviour {
     private float _accelerationMax = 10.0f;
     private float _jerk = 2.0f;
 
-    protected void Awake() {
+    public void Awake() {
         _velocity = _velocityMax;
         _acceleration = _accelerationMax;
     }

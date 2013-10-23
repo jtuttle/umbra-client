@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class BaseGameState : ITurnState {
+public abstract class BaseGameState : IGameState {
     public delegate void StateChangeDelegate(BaseGameState state);
 
     public event StateChangeDelegate OnEnter = delegate { };

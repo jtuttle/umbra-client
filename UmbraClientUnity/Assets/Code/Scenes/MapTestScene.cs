@@ -9,7 +9,7 @@ public class MapTestScene : MonoBehaviour {
 
     private int TILE_SIZE = 64;
 
-    void Awake() {
+    public virtual void Awake() {
         tk2dSpriteCollectionData spriteData = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
         XY camPos = MapView.TileCoordToWorldCoord(new XY(0, 0));

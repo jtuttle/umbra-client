@@ -12,7 +12,7 @@ public class PlayerView : MonoBehaviour {
 
     private float _speed = 300.0f;
 
-    void Awake() {
+    public virtual void Awake() {
         _meleeAttacker = GetComponent<MeleeAttacker>() as MeleeAttacker;
     }
 
