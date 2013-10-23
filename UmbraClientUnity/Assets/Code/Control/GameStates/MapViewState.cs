@@ -5,6 +5,7 @@ public class MapViewState : BaseGameState {
     public MapViewState() 
         : base(GameStates.MapView) {
 
+            UnityUtils.LoadResource<GameObject>("Prefabs/MapOverlay", true);
     }
 
     public override void EnterState() {

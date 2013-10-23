@@ -7,12 +7,12 @@ public class MeleeAttacker : MonoBehaviour {
 
     private TimeKeeper _attackTimer;
 
-	void Awake() {
+    public virtual void Awake() {
         _attackTimer = TimeKeeper.GetTimer(AttackDuration, 1.0f, "AttackTimer");
         _attackTimer.OnTimerComplete += OnAttackTimerComplete;
 	}
 
-    void Destroy() {
+    public virtual void Destroy() {
         _attackTimer.OnTimerComplete -= OnAttackTimerComplete;
     }
 
