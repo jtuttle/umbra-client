@@ -42,14 +42,20 @@ public class GameManager : UnitySingleton<GameManager> {
 
                 break;
             case GameStates.MapWalk:
-
                 if(state.NextState == GameStates.MapDesign) {
                     MapDesignState mapDesignState = new MapDesignState((state as MapWalkState).PlayerView);
                     _states.ChangeGameState(mapDesignState, true);
+                } else if(state.NextState == GameStates.MapView) {
+                    MapViewState mapViewState = new MapViewState();
+                    _states.ChangeGameState(mapViewState, true);
                 }
 
                 break;
             case GameStates.MapDesign:
+                _states.RestorePreviousState();
+
+                break;
+            case GameStates.MapView:
                 _states.RestorePreviousState();
 
                 break;

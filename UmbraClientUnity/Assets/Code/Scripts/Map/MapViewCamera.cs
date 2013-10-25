@@ -17,7 +17,7 @@ public class MapViewCamera : MonoBehaviour {
 
     private tk2dCamera _spriteCamera;
 
-    void Awake() {
+    public virtual void Awake() {
         Moving = false;
 
         _spriteCamera = gameObject.GetComponent<tk2dCamera>();

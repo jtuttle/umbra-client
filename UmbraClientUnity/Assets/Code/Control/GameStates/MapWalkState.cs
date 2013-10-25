@@ -57,6 +57,7 @@ public class MapWalkState : BaseGameState {
         input.OnAxialInput += PlayerView.Move;
         input.OnAttackPress += PlayerView.Attack;
         input.OnSpecialPress += OnSpecialPress;
+        input.OnMapViewPress += OnMapViewPress;
     }
 
     private void RemovePlayerInput() {
@@ -64,6 +65,7 @@ public class MapWalkState : BaseGameState {
         input.OnAxialInput -= PlayerView.Move;
         input.OnAttackPress -= PlayerView.Attack;
         input.OnSpecialPress -= OnSpecialPress;
+        input.OnMapViewPress -= OnMapViewPress;
     }
 
     private void OnCameraMoveBegin(XY delta) {
@@ -82,6 +84,11 @@ public class MapWalkState : BaseGameState {
 
     private void OnSpecialPress() {
         NextState = GameStates.MapDesign;
+        ExitState();
+    }
+
+    private void OnMapViewPress() {
+        NextState = GameStates.MapView;
         ExitState();
     }
 }
