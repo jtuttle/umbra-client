@@ -14,8 +14,33 @@ public class PrototypeScene : MonoBehaviour {
         Dungeon dungeon = new DungeonGenerator().Generate(10);
 
         DrawDungeon(dungeon);
+
+        SetCamera();
 	}
 
+    private void Update() {
+        // can use this to make camera always point at center of room, good for moving 
+        // cam around in editor window to determine a nice-looking y/z coordinate 
+        // pair, might also want to try pointing camera at different part of room
+        //Camera cam = Camera.main;
+        //float lookX = -(BLOCK_SIZE / 2) + (ROOM_WIDTH * BLOCK_SIZE) / 2;
+        //float lookZ = -(BLOCK_SIZE / 2) + (ROOM_HEIGHT * BLOCK_SIZE) / 2;
+        //cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
+    }
+
+    private void SetCamera() {
+        Camera cam = Camera.main;
+
+        float camX = -(BLOCK_SIZE / 2) + (ROOM_WIDTH * BLOCK_SIZE) / 2;
+        float camY = 180.0f;
+        float camZ = 10.0f;
+
+        float lookX = camX;
+        float lookZ = -(BLOCK_SIZE / 2) + (ROOM_HEIGHT * BLOCK_SIZE) / 2;
+
+        cam.transform.position = new Vector3(camX, camY, camZ);
+        cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
+    }
 
     private void DrawDungeon(Dungeon dungeon) {
         _dungeon = new GameObject("Dungeon");
@@ -56,7 +81,6 @@ public class PrototypeScene : MonoBehaviour {
     }
 
     private void DrawWall(int x, int z) {
-        Debug.Log("draw wall");
         for(int i = 0; i < 4; i++) {
             GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.transform.position = new Vector3(x, i * BLOCK_SIZE, z);
