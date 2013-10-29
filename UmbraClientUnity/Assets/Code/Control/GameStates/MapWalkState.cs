@@ -32,8 +32,6 @@ public class MapWalkState : BaseGameState {
         PlayerView.OnPlayerMove += OnPlayerMove;
 
         AddPlayerInput();
-
-        Debug.Log(MiniJSON.jsonEncode(GameManager.Instance.CurrentDungeon.ToJson()));
     }
 
     public override void ExitState() {
