@@ -57,14 +57,10 @@ public class Dungeon : IJsonable {
 
             nodes.Add(nodeHash);
 
-            Hashtable edgeHash = new Hashtable();
-
-            Debug.Log(node);
-
             foreach(KeyValuePair<GridDirection, DungeonEdge> entry in node.Edges) {
-                DungeonEdge edge = entry.Value;
+                Hashtable edgeHash = new Hashtable();
 
-                Debug.Log(edge);
+                DungeonEdge edge = entry.Value;
 
                 XY from = edge.From.Coord;
                 XY to = edge.To.Coord;
