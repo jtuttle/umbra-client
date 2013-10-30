@@ -4,6 +4,7 @@ using System.Collections;
 public class MapDesignState : BaseGameState {
     public PlayerView PlayerView { get; private set; }
 
+    private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
     public MapDesignState(PlayerView playerView)
@@ -15,6 +16,7 @@ public class MapDesignState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
+        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
         
         // set up camera transition response
@@ -57,11 +59,11 @@ public class MapDesignState : BaseGameState {
         input.OnSpecialPress -= OnSpecialPress;
     }
 
-    private void OnCameraMoveBegin(XY delta) {
+    private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         RemovePlayerInput();
     }
 
-    private void OnCameraMoveEnd(XY delta) {
+    private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         AddPlayerInput();
     }
 
