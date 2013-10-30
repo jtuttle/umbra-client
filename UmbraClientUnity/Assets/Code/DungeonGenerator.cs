@@ -38,19 +38,19 @@ public class DungeonGenerator {
 
     private void AddRoom() {
         GridGraph<DungeonRoom, DungeonPath> Rooms = Dungeon.Graph;
-
+        
         // choose random vertex with open edges
         DungeonVertex openVertex = _openVertices[Random.Range(0, _openVertices.Count)];
 
         // choose random open edge direction
         List<GridDirection> emptyNeighbors = GetEmptyNeighbors(openVertex.Neighbors);
         GridDirection newRoomDirection = emptyNeighbors[Random.Range(0, emptyNeighbors.Count)];
-
+        
         // add new room
         XY nextCoord = Rooms.GetCoordForNeighbor(openVertex, newRoomDirection);
         
         // add new vertex and edges to graph
-        DungeonVertex newVertex = Rooms.AddVertex(nextCoord, new DungeonRoom(openVertex.Value));
+        DungeonVertex newVertex = Rooms.AddVertex(nextCoord, new DungeonRoom());
         Rooms.AddEdge(openVertex, newVertex, new DungeonPath());
         Rooms.AddEdge(newVertex, openVertex, new DungeonPath());
 

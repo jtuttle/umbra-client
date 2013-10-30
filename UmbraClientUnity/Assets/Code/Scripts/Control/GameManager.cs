@@ -22,7 +22,7 @@ public class GameManager : UnitySingleton<GameManager> {
         _states.OnStateExit += OnExitState;
 
         CurrentDungeon = new DungeonGenerator().Generate(10);
-
+        
         // grab appropriate tileset from somewhere...
         tk2dSpriteCollectionData tileset = UnityUtils.LoadResource<tk2dSpriteCollectionData>("SpriteCollectionData/TestTileSet");
 
