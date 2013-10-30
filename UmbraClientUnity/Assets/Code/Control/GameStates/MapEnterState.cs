@@ -5,19 +5,14 @@ using System;
 public class MapEnterState : BaseGameState {
     public PlayerView PlayerView { get; private set; }
 
-    private Dungeon _dungeon;
-    private tk2dSpriteCollectionData _tileset;
-    private int _tileSize;
-
     private MapView _mapView;
 
-    public MapEnterState(tk2dSpriteCollectionData tileset, int tileSize) 
+    private Dungeon _dungeon;
+
+    public MapEnterState(Dungeon dungeon) 
         : base(GameStates.MapEnter) {
 
-        _tileset = tileset;
-        _tileSize = tileSize;
-
-        _dungeon = GameManager.Instance.CurrentDungeon;
+        _dungeon = dungeon;
 
         _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
 
@@ -27,7 +22,7 @@ public class MapEnterState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        AdjustCamera();
+        SetCamera();
         ShowMap();
         PlacePlayer();
 
@@ -44,32 +39,39 @@ public class MapEnterState : BaseGameState {
 
         PlayerView = null;
         _mapView = null;
-        _tileset = null;
         _dungeon = null;
     }
 
-    private void AdjustCamera() {
-        Camera camera = GameManager.Instance.GameCamera;
+    private void SetCamera() {
+        int blockSize = GameConfig.BLOCK_SIZE;
 
-        XY camPos = _mapView.TileCoordToWorldCoord(new XY(0, 0));
-        camera.transform.position = new Vector3(camPos.X - (_tileSize / 2), camPos.Y - (_tileSize / 2), camera.transform.position.z);
+        Camera cam = Camera.main;
+
+        float camX = -(blockSize / 2) + (GameConfig.ROOM_WIDTH * blockSize) / 2;
+        float camY = 180.0f;
+        float camZ = 10.0f;
+
+        float lookX = camX;
+        float lookZ = -(blockSize / 2) + (GameConfig.ROOM_HEIGHT * blockSize) / 2;
+
+        cam.transform.position = new Vector3(camX, camY, camZ);
+        cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
     }
 
     private void ShowMap() {
-        _mapView.SetSpriteData(64, _tileset);
         _mapView.SetDungeon(_dungeon);
     }
 
     private void PlacePlayer() {
-        tk2dCamera camera = GameManager.Instance.GameCamera.GetComponent<tk2dCamera>();
+        int blockSize = GameConfig.BLOCK_SIZE;
 
-        // map will specify some kind of starting position, for now just use dead center
-        XY startCoord = new XY(camera.nativeResolutionWidth / 2, camera.nativeResolutionHeight / 2);
+        PlayerView = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true).GetComponent<PlayerView>();
 
-        GameObject player = UnityUtils.LoadResource<GameObject>("Prefabs/PlayerView", true);
-        player.transform.position = new Vector3(startCoord.X, startCoord.Y, 0);
+        float playerX = -(blockSize / 2) + (GameConfig.ROOM_WIDTH * blockSize) / 2;
+        float playerZ = -(blockSize / 2) + (GameConfig.ROOM_HEIGHT * blockSize) / 2;
+        float playerY = blockSize;
 
-        // store playerView to pass on to other states
-        PlayerView = player.GetComponent<PlayerView>();
+        PlayerView.transform.position = new Vector3(playerX, playerY, playerZ);
+        PlayerView.renderer.material.color = Color.blue;
     }
 }
