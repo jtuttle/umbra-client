@@ -10,7 +10,7 @@ public class PlayerView : MonoBehaviour {
 
     private MeleeAttacker _meleeAttacker;
 
-    private float _speed = 300.0f;
+    private float _speed = 100.0f;
 
     void Awake() {
         _meleeAttacker = GetComponent<MeleeAttacker>() as MeleeAttacker;
@@ -27,12 +27,14 @@ public class PlayerView : MonoBehaviour {
         if(v != 0)
             v = (v < 0 ? -1 : 1);
 
-        rigidbody.velocity = new Vector3(h * _speed, v * _speed, 0);
+        //rigidbody.velocity = new Vector3(h * _speed, v * _speed, 0);
+        rigidbody.velocity = new Vector3(h * _speed, 0, v * _speed);
 
         if(rigidbody.velocity != Vector3.zero)
             OnPlayerMove(gameObject.transform.position, rigidbody.velocity);
 
-        _meleeAttacker.UpdateAttackColliderPosition(transform.position, rigidbody.velocity);
+        if(_meleeAttacker != null)
+            _meleeAttacker.UpdateAttackColliderPosition(transform.position, rigidbody.velocity);
     }
 
     public void Attack() {
