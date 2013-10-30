@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
 using DungeonEdge = GridEdge<DungeonRoom, DungeonPath>;
 
 public class Dungeon : IJsonable {
-    public DungeonVertex Entrance { get; set; }
+    public DungeonNode Entrance { get; set; }
 
     public GridGraph<DungeonRoom, DungeonPath> Graph { get; private set; }
     
@@ -27,20 +27,20 @@ public class Dungeon : IJsonable {
             XY coord = new XY(nodeHash["Coord"] as Hashtable);
             DungeonRoom room = new DungeonRoom(nodeHash["Room"] as Hashtable);
 
-            Graph.AddVertex(coord, room);
+            Graph.AddNode(coord, room);
         }
 
         ArrayList edges = json["Edges"] as ArrayList;
 
         foreach(Hashtable edgeHash in edges) {
-            DungeonVertex from = Graph.GetVertexByCoord(new XY(edgeHash["From"] as Hashtable));
-            DungeonVertex to = Graph.GetVertexByCoord(new XY(edgeHash["To"] as Hashtable));
+            DungeonNode from = Graph.GetNodeByCoord(new XY(edgeHash["From"] as Hashtable));
+            DungeonNode to = Graph.GetNodeByCoord(new XY(edgeHash["To"] as Hashtable));
             DungeonPath path = new DungeonPath(edgeHash["Path"] as Hashtable);
 
             Graph.AddEdge(from, to, path);
         }
 
-        Entrance = Graph.GetVertexByCoord(new XY(json["Entrance"] as Hashtable));
+        Entrance = Graph.GetNodeByCoord(new XY(json["Entrance"] as Hashtable));
     }
 
     public Hashtable ToJson() {
@@ -49,7 +49,7 @@ public class Dungeon : IJsonable {
         ArrayList nodes = new ArrayList();
         ArrayList edges = new ArrayList();
 
-        foreach(DungeonVertex node in Graph.BreadthFirstSearch(Entrance)) {
+        foreach(DungeonNode node in Graph.BreadthFirstSearch(Entrance)) {
             Hashtable nodeHash = new Hashtable();
 
             nodeHash["Coord"] = node.Coord.ToJson();

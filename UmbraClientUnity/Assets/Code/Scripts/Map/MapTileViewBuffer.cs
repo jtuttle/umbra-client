@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
 
 public class MapTileViewBuffer : MonoBehaviour {
     private List<MapTileView> _mapTileViews;

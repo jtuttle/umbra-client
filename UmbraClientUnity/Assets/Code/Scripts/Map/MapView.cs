@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
 
 public class MapView : MonoBehaviour {
     public tk2dCamera SpriteCamera;
@@ -21,7 +21,7 @@ public class MapView : MonoBehaviour {
     private MapTileViewBuffer _activeBuffer;
     private MapTileViewBuffer _inactiveBuffer;
 
-    private XY _currentVertexPosition;
+    private XY _currentNodePosition;
 
     public void SetSpriteData(int tileSize, tk2dSpriteCollectionData spriteData) {
         TileSize = tileSize;
@@ -45,11 +45,11 @@ public class MapView : MonoBehaviour {
 
         ShowDungeonRoom(Dungeon.Entrance, _activeBuffer);
 
-        _currentVertexPosition = Dungeon.Entrance.Coord;
+        _currentNodePosition = Dungeon.Entrance.Coord;
     }
 
-    public void ShowDungeonRoom(DungeonVertex dungeonVertex, MapTileViewBuffer buffer) {
-        List<MapTile> roomTiles = TilesForDungeonVertex(dungeonVertex);
+    public void ShowDungeonRoom(DungeonNode dungeonNode, MapTileViewBuffer buffer) {
+        List<MapTile> roomTiles = TilesForDungeonNode(dungeonNode);
         buffer.Show(roomTiles);
     }
 
@@ -59,10 +59,10 @@ public class MapView : MonoBehaviour {
         _inactiveBuffer.transform.position = newPos;
 
         GridDirection moveDirection = DirectionFromDelta(delta);
-        DungeonVertex nextVertex = Dungeon.Graph.GetVertexByCoord(NextCoord(_currentVertexPosition, moveDirection));
+        DungeonNode nextNode = Dungeon.Graph.GetNodeByCoord(NextCoord(_currentNodePosition, moveDirection));
 
-        if(nextVertex != null)
-            ShowDungeonRoom(nextVertex, _inactiveBuffer);
+        if(nextNode != null)
+            ShowDungeonRoom(nextNode, _inactiveBuffer);
     }
 
     private void OnCameraMoveEnd(XY delta) {
@@ -73,7 +73,7 @@ public class MapView : MonoBehaviour {
 
         _inactiveBuffer.Hide();
 
-        _currentVertexPosition = NextCoord(_currentVertexPosition, DirectionFromDelta(delta));
+        _currentNodePosition = NextCoord(_currentNodePosition, DirectionFromDelta(delta));
     }
 
     private Vector3 GetPositionForNewBuffer(GridDirection direction) {
@@ -117,7 +117,7 @@ public class MapView : MonoBehaviour {
         throw new Exception("Unable to get next coord");
     }
 
-    private List<MapTile> TilesForDungeonVertex(DungeonVertex vertex) {
+    private List<MapTile> TilesForDungeonNode(DungeonNode node) {
         List<MapTile> tiles = new List<MapTile>();
         
         for(int y = 0; y < 12; y++) {
@@ -125,18 +125,18 @@ public class MapView : MonoBehaviour {
                 int spriteIndex = 0;
 
                 if(y == 0) {
-                    if(x < 6 || x > 9 || !vertex.Edges.ContainsKey(GridDirection.S))
+                    if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.S))
                         spriteIndex = 1;
                 } else if(y == 11) {
-                    if(x < 6 || x > 9 || !vertex.Edges.ContainsKey(GridDirection.N))
+                    if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.N))
                         spriteIndex = 1;
                 }
 
                 if(x == 0) {
-                    if(y < 4 || y > 7 || !vertex.Edges.ContainsKey(GridDirection.W))
+                    if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.W))
                         spriteIndex = 1;
                 } else if(x == 15) {
-                    if(y < 4 || y > 7 || !vertex.Edges.ContainsKey(GridDirection.E))
+                    if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.E))
                         spriteIndex = 1;
                 }
 
