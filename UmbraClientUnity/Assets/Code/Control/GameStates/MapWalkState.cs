@@ -7,9 +7,6 @@ public class MapWalkState : BaseGameState {
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
-    private XY _roomCoord;
-    private Rect _roomBounds;
-
     // TODO: this will probably be a minimap at some point
     private DungeonVisualizer _visualizer;
 
@@ -28,10 +25,10 @@ public class MapWalkState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        _roomCoord = new XY(0, 0);
-        _roomBounds = GetRoomBounds();
-
         PlayerView.gameObject.SetActive(true);
+
+        // make sure room bounds are set
+        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
@@ -81,43 +78,28 @@ public class MapWalkState : BaseGameState {
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
-        // probably a nicer way to go about updating coordinate
-        int dx = to.x < from.x ? -1 : (to.x > from.x ? 1 : 0);
-        int dy = to.z < from.z ? -1 : (to.z > from.z ? 1 : 0);
-        _roomCoord = _roomCoord + new XY(dx, dy);
+        GameManager.Instance.UpdateCurrentCoord(from, to);
+        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        _roomBounds = GetRoomBounds();
-        
         PlayerView.Unfreeze();
         AddPlayerInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
-        if(position.x < _roomBounds.xMin)
-            _mapViewCamera.Move(new XY((int)-_roomBounds.width, 0));
-        else if(position.x > _roomBounds.xMax)
-            _mapViewCamera.Move(new XY((int)_roomBounds.width, 0));
-        else if(position.z < _roomBounds.yMin)
-            _mapViewCamera.Move(new XY(0, -(int)_roomBounds.height));
-        else if(position.z > _roomBounds.yMax)
-            _mapViewCamera.Move(new XY(0, (int)_roomBounds.height));
+        Rect roomBounds = _mapView.RoomBounds;
+
+        if(position.x < roomBounds.xMin)
+            _mapViewCamera.Move(new XY((int)-roomBounds.width, 0));
+        else if(position.x > roomBounds.xMax)
+            _mapViewCamera.Move(new XY((int)roomBounds.width, 0));
+        else if(position.z < roomBounds.yMin)
+            _mapViewCamera.Move(new XY(0, -(int)roomBounds.height));
+        else if(position.z > roomBounds.yMax)
+            _mapViewCamera.Move(new XY(0, (int)roomBounds.height));
     }
 
     private void OnSpecialPress() {
         NextState = GameStates.MapDesign;
         ExitState();
-    }
-
-    // this should perhaps go in mapview
-    private Rect GetRoomBounds() {
-        int blockSize = GameConfig.BLOCK_SIZE;
-
-        float roomWidth = (GameConfig.ROOM_WIDTH * blockSize);
-        float roomHeight = (GameConfig.ROOM_HEIGHT * blockSize);
-
-        float left = _roomCoord.X * roomWidth - (blockSize / 2);
-        float top = _roomCoord.Y * roomHeight - (blockSize / 2);
-
-        return new Rect(left, top, roomWidth, roomHeight);
     }
 }
