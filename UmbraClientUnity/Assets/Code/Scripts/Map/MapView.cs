@@ -6,7 +6,7 @@ using System;
 using DungeonNode = GridVertex<DungeonRoom, DungeonPath>;
 
 public class MapView : MonoBehaviour {
-    public Dungeon Dungeon { get; private set; }
+    public Rect RoomBounds { get; private set; }
 
     private Dungeon _dungeon;
     private GameObject _dungeonView;
@@ -15,6 +15,18 @@ public class MapView : MonoBehaviour {
         _dungeon = dungeon;
 
         DrawDungeon();
+    }
+
+    public void UpdateRoomBounds(XY coord) {
+        int blockSize = GameConfig.BLOCK_SIZE;
+
+        float roomWidth = (GameConfig.ROOM_WIDTH * blockSize);
+        float roomHeight = (GameConfig.ROOM_HEIGHT * blockSize);
+
+        float left = coord.X * roomWidth - (blockSize / 2);
+        float top = coord.Y * roomHeight - (blockSize / 2);
+
+        RoomBounds = new Rect(left, top, roomWidth, roomHeight);
     }
 
     private void DrawDungeon() {
