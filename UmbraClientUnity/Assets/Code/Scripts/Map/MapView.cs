@@ -3,148 +3,81 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridVertex<DungeonRoom, DungeonPath>;
 
 public class MapView : MonoBehaviour {
-    public tk2dCamera SpriteCamera;
-    public MapViewCamera MapViewCamera;
+    public Rect RoomBounds { get; private set; }
 
-    public MapTileViewBuffer BufferA;
-    public MapTileViewBuffer BufferB;
-
-    public Dungeon Dungeon { get; private set; }
-    public int TileSize { get; private set; }
-
-    public int HorizontalTileCount { get; private set; }
-    public int VerticalTileCount { get; private set; }
-
-    private MapTileViewBuffer _activeBuffer;
-    private MapTileViewBuffer _inactiveBuffer;
-
-    private XY _currentVertexPosition;
-
-    public void SetSpriteData(int tileSize, tk2dSpriteCollectionData spriteData) {
-        TileSize = tileSize;
-
-        HorizontalTileCount = SpriteCamera.nativeResolutionWidth / TileSize;
-        VerticalTileCount = SpriteCamera.nativeResolutionHeight / TileSize;
-
-        BufferA.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
-        BufferB.Setup(HorizontalTileCount, VerticalTileCount, tileSize, spriteData);
-
-        _activeBuffer = BufferA;
-        _inactiveBuffer = BufferB;
-        _inactiveBuffer.gameObject.SetActive(false);
-
-        MapViewCamera.OnMoveBegin += OnCameraMoveBegin;
-        MapViewCamera.OnMoveEnd += OnCameraMoveEnd;
-    }
+    private Dungeon _dungeon;
+    private GameObject _dungeonView;
 
     public void SetDungeon(Dungeon dungeon) {
-        Dungeon = dungeon;
+        _dungeon = dungeon;
 
-        ShowDungeonRoom(Dungeon.Entrance, _activeBuffer);
-
-        _currentVertexPosition = Dungeon.Entrance.Coord;
+        DrawDungeon();
     }
 
-    public void ShowDungeonRoom(DungeonVertex dungeonVertex, MapTileViewBuffer buffer) {
-        List<MapTile> roomTiles = TilesForDungeonVertex(dungeonVertex);
-        buffer.Show(roomTiles);
+    public void UpdateRoomBounds(XY coord) {
+        int blockSize = GameConfig.BLOCK_SIZE;
+
+        float roomWidth = (GameConfig.ROOM_WIDTH * blockSize);
+        float roomHeight = (GameConfig.ROOM_HEIGHT * blockSize);
+
+        float left = coord.X * roomWidth - (blockSize / 2);
+        float top = coord.Y * roomHeight - (blockSize / 2);
+
+        RoomBounds = new Rect(left, top, roomWidth, roomHeight);
     }
 
-    private void OnCameraMoveBegin(XY delta) {
-        Vector3 newPos = GetPositionForNewBuffer(DirectionFromDelta(delta));
+    private void DrawDungeon() {
+        _dungeonView = new GameObject("Dungeon");
 
-        _inactiveBuffer.transform.position = newPos;
-
-        GridDirection moveDirection = DirectionFromDelta(delta);
-        DungeonVertex nextVertex = Dungeon.Graph.GetVertexByCoord(NextCoord(_currentVertexPosition, moveDirection));
-
-        if(nextVertex != null)
-            ShowDungeonRoom(nextVertex, _inactiveBuffer);
+        foreach(DungeonNode node in _dungeon.Graph.BreadthFirstSearch(_dungeon.Entrance))
+            DrawRoom(node);
     }
 
-    private void OnCameraMoveEnd(XY delta) {
-        MapTileViewBuffer tempBuffer = _activeBuffer;
+    private void DrawRoom(DungeonNode node) {
+        int roomWidth = GameConfig.ROOM_WIDTH;
+        int roomHeight = GameConfig.ROOM_HEIGHT;
+        int blockSize = GameConfig.BLOCK_SIZE;
 
-        _activeBuffer = _inactiveBuffer;
-        _inactiveBuffer = tempBuffer;
+        XY start = new XY(node.Coord.X * roomWidth * blockSize, node.Coord.Y * roomHeight * blockSize);
 
-        _inactiveBuffer.Hide();
+        for(int y = 0; y < roomHeight; y++) {
+            for(int x = 0; x < roomWidth; x++) {
+                int blockX = start.X + x * blockSize;
+                int blockZ = start.Y + y * blockSize;
 
-        _currentVertexPosition = NextCoord(_currentVertexPosition, DirectionFromDelta(delta));
-    }
-
-    private Vector3 GetPositionForNewBuffer(GridDirection direction) {
-        Vector3 activePos = _activeBuffer.gameObject.transform.position;
-
-        if(direction == GridDirection.N)
-            return new Vector3(activePos.x, activePos.y + SpriteCamera.nativeResolutionHeight, activePos.z);
-        if(direction == GridDirection.E)
-            return new Vector3(activePos.x + SpriteCamera.nativeResolutionWidth, activePos.y, activePos.z);
-        if(direction == GridDirection.S)
-            return new Vector3(activePos.x, activePos.y - SpriteCamera.nativeResolutionHeight, activePos.z);
-        if(direction == GridDirection.W)
-            return new Vector3(activePos.x - SpriteCamera.nativeResolutionWidth, activePos.y, activePos.z);
-
-        throw new Exception("Camera didn't move");
-    }
-
-    public XY TileCoordToWorldCoord(XY tileCoord) {
-        return new XY(tileCoord.X * TileSize, tileCoord.Y * TileSize);
-    }
-
-    public XY WorldCoordToTileCoord(float worldX, float worldY) {
-        int x = (int)(worldX / TileSize) * TileSize;
-        int y = (int)(worldY / TileSize) * TileSize;
-        return new XY(x / TileSize, y / TileSize);
-    }
-
-    private GridDirection DirectionFromDelta(XY delta) {
-        if(delta.Y > 0) return GridDirection.N;
-        if(delta.X > 0) return GridDirection.E;
-        if(delta.Y < 0) return GridDirection.S;
-        if(delta.X < 0) return GridDirection.W;
-        throw new Exception("Unable to get direction from delta");
-    }
-
-    private XY NextCoord(XY coord, GridDirection direction) {
-        if(direction == GridDirection.N) return coord + new XY(0, 1);
-        if(direction == GridDirection.E) return coord + new XY(1, 0);
-        if(direction == GridDirection.S) return coord - new XY(0, 1);
-        if(direction == GridDirection.W) return coord - new XY(1, 0);
-        throw new Exception("Unable to get next coord");
-    }
-
-    private List<MapTile> TilesForDungeonVertex(DungeonVertex vertex) {
-        List<MapTile> tiles = new List<MapTile>();
-        
-        for(int y = 0; y < 12; y++) {
-            for(int x = 0; x < 16; x++) {
-                int spriteIndex = 0;
+                GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                block.transform.position = new Vector3(blockX, 0, blockZ);
+                block.transform.localScale = new Vector3(blockSize - 1, blockSize / 2, blockSize - 1);
+                block.transform.parent = _dungeonView.transform;
 
                 if(y == 0) {
-                    if(x < 6 || x > 9 || !vertex.Edges.ContainsKey(GridDirection.S))
-                        spriteIndex = 1;
-                } else if(y == 11) {
-                    if(x < 6 || x > 9 || !vertex.Edges.ContainsKey(GridDirection.N))
-                        spriteIndex = 1;
+                    if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.S))
+                        DrawWall(blockX, blockZ);
+                } else if(y == roomHeight - 1) {
+                    if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.N))
+                        DrawWall(blockX, blockZ);
+                } else if(x == 0) {
+                    if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.W))
+                        DrawWall(blockX, blockZ);
+                } else if(x == roomWidth - 1) {
+                    if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.E))
+                        DrawWall(blockX, blockZ);
                 }
-
-                if(x == 0) {
-                    if(y < 4 || y > 7 || !vertex.Edges.ContainsKey(GridDirection.W))
-                        spriteIndex = 1;
-                } else if(x == 15) {
-                    if(y < 4 || y > 7 || !vertex.Edges.ContainsKey(GridDirection.E))
-                        spriteIndex = 1;
-                }
-
-                
-                tiles.Add(new MapTile(x, y, spriteIndex));
             }
         }
+    }
 
-        return tiles;
+    private void DrawWall(int x, int z) {
+        int blockSize = GameConfig.BLOCK_SIZE;
+
+        for(int i = 0; i < 4; i++) {
+            GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            block.transform.position = new Vector3(x, i * blockSize, z);
+            block.transform.localScale = new Vector3(blockSize - 1, blockSize - 1, blockSize - 1);
+            block.transform.parent = _dungeonView.transform;
+        }
     }
 }

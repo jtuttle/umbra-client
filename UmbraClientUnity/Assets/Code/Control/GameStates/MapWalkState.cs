@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MapWalkState : BaseGameState {
     public PlayerView PlayerView { get; private set; }
+
+    private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
     // TODO: this will probably be a minimap at some point
@@ -13,6 +15,7 @@ public class MapWalkState : BaseGameState {
 
         PlayerView = playerView;
 
+        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
 
         _visualizer = new DungeonVisualizer();
@@ -23,6 +26,9 @@ public class MapWalkState : BaseGameState {
         base.EnterState();
 
         PlayerView.gameObject.SetActive(true);
+
+        // make sure room bounds are set
+        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
@@ -66,18 +72,30 @@ public class MapWalkState : BaseGameState {
         input.OnSpecialPress -= OnSpecialPress;
     }
 
-    private void OnCameraMoveBegin(XY delta) {
+    private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         RemovePlayerInput();
         PlayerView.Freeze();
     }
 
-    private void OnCameraMoveEnd(XY delta) {
+    private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
+        GameManager.Instance.UpdateCurrentCoord(from, to);
+        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
+
         PlayerView.Unfreeze();
         AddPlayerInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
-        _mapViewCamera.CoverPosition(position);
+        Rect roomBounds = _mapView.RoomBounds;
+
+        if(position.x < roomBounds.xMin)
+            _mapViewCamera.Move(new XY((int)-roomBounds.width, 0));
+        else if(position.x > roomBounds.xMax)
+            _mapViewCamera.Move(new XY((int)roomBounds.width, 0));
+        else if(position.z < roomBounds.yMin)
+            _mapViewCamera.Move(new XY(0, -(int)roomBounds.height));
+        else if(position.z > roomBounds.yMax)
+            _mapViewCamera.Move(new XY(0, (int)roomBounds.height));
     }
 
     private void OnSpecialPress() {
