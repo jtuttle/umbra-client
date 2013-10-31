@@ -3,54 +3,34 @@ using System.Collections;
 using Holoville.HOTween;
 
 public class MapViewCamera : MonoBehaviour {
-    public delegate void MapViewCameraMoveDelegate(XY delta);
+    public delegate void MapViewCameraMoveDelegate(Vector3 from, Vector3 to);
 
     public MapViewCameraMoveDelegate OnMoveBegin = delegate { };
     public MapViewCameraMoveDelegate OnMoveEnd = delegate { };
 
-    public MapView MapView;
-
     public bool Moving { get; private set; }
 
-    public XY HalfScreen { get { return new XY(_spriteCamera.nativeResolutionWidth / 2, _spriteCamera.nativeResolutionHeight / 2); } }
-    public XY FullScreen { get { return new XY(_spriteCamera.nativeResolutionWidth, _spriteCamera.nativeResolutionHeight); } }
-
-    private tk2dCamera _spriteCamera;
-
-    void Awake() {
+    public void Awake() {
         Moving = false;
-
-        _spriteCamera = gameObject.GetComponent<tk2dCamera>();
-    }
-
-    public void CoverPosition(Vector3 position) {
-        XY delta = null;
-
-        if(position.x > _spriteCamera.transform.position.x + _spriteCamera.nativeResolutionWidth)
-            delta = new XY(MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.x < _spriteCamera.transform.position.x)
-            delta = new XY(-MapView.TileSize * MapView.HorizontalTileCount, 0);
-        else if(position.y > _spriteCamera.transform.position.y + _spriteCamera.nativeResolutionHeight)
-            delta = new XY(0, MapView.TileSize * MapView.VerticalTileCount);
-        else if(position.y < _spriteCamera.transform.position.y)
-            delta = new XY(0, -MapView.TileSize * MapView.VerticalTileCount);
-
-        if(delta != null)
-            Move(delta);
     }
 
     public void Move(XY delta) {
+        Vector3 pos = gameObject.transform.position;
+        Vector3 target = new Vector3(pos.x + delta.X, pos.y, pos.z + delta.Y);
+        Move(target);
+    }
+
+    public void Move(Vector3 target) {
         if(Moving) return;
 
-        Vector3 goPos = gameObject.transform.position;
-        Vector3 newPos = goPos + new Vector3(delta.X, delta.Y, 0);
+        Vector3 from = gameObject.transform.position;
 
-        OnMoveBegin(delta);
+        OnMoveBegin(from, target);
         
         TweenParms parms = new TweenParms();
         parms.Ease(EaseType.Linear);
-        parms.Prop("position", newPos);
-        parms.OnComplete(OnMoveComplete, delta);
+        parms.Prop("position", target);
+        parms.OnComplete(OnMoveComplete, from, target);
 
         Moving = true;
 
@@ -58,10 +38,11 @@ public class MapViewCamera : MonoBehaviour {
     }
 
     private void OnMoveComplete(TweenEvent e) {
+        Vector3 from = (Vector3)e.parms[0];
+        Vector3 to = (Vector3)e.parms[1];
+
+        OnMoveEnd(from, to);
+
         Moving = false;
-
-        XY delta = (XY)e.parms[0];
-
-        OnMoveEnd(delta);
     }
 }
