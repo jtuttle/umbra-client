@@ -13,27 +13,34 @@ public class GameManager : UnitySingleton<GameManager> {
 
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
-	
-	public UmbraApi Api { get; private set; }
-	public UmbraClient Client { get; private set; }
+
+    public UmbraApi Api { get; private set; }
+    public UmbraClient Client { get; private set; }
+    public string AuthKey { get; private set; }
 
     public override void Awake() {
         _states = new GameStateMachine();
 
         _inputManager = GetComponent<InputManager>();
-		
-		Api = new UmbraApi("localhost", 3000);
-		
-		/* TODO RT: this wont work long run, since you have to use the API to
-		 * join an "island", so you cant connect until doing that whole negotiation
-		 * but this will work for now... */
-		string authkey = Api.DoSignIn("rtortora@craw.cc", "fish");
-		Client = new UmbraClient("localhost", 9000);
-		Client.Start();
-		Client.SendAuth(authkey, 0, 0);
+
+        // TODO RT: move this to a config
+        string host = "10.0.0.4";
+
+        Api = new UmbraApi(host, 3000);
+
+        /* TODO RT: this wont work long run, since you have to use the API to
+         * join an "island", so you cant connect until doing that whole negotiation
+         * but this will work for now... */
+        AuthKey = Api.DoSignIn("rtortora@craw.cc", "fish");
+        Util.Log("Auth key: " + AuthKey);
+        Client = new UmbraClient(host, 9000);
     }
 
     public void Start() {
+        Client.Start(); // TODO RT: we need a place to call Stop so we can terminate the thread
+        Client.SendAuth(AuthKey, 0, 0, 0);
+        Util.Log("Sent Auth");
+
         _states.OnStateExit += OnExitState;
 
         CurrentDungeon = new DungeonGenerator().Generate(10);

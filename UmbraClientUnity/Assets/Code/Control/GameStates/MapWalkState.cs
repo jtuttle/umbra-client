@@ -96,6 +96,8 @@ public class MapWalkState : BaseGameState {
             _mapViewCamera.Move(new XY(0, -(int)roomBounds.height));
         else if(position.z > roomBounds.yMax)
             _mapViewCamera.Move(new XY(0, (int)roomBounds.height));
+
+        GameManager.Instance.Client.SendSetPosition("noroom", position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
     }
 
     private void OnSpecialPress() {
