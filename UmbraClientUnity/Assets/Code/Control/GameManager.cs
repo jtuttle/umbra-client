@@ -14,8 +14,8 @@ public class GameManager : UnitySingleton<GameManager> {
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
 
-    public UmbraApi Api { get; private set; }
-    public UmbraClient Client { get; private set; }
+    public MpApi Api { get; private set; }
+    public MpClient Client { get; private set; }
     public string AuthKey { get; private set; }
 
     public override void Awake() {
@@ -26,20 +26,20 @@ public class GameManager : UnitySingleton<GameManager> {
         // TODO RT: move this to a config
         string host = "10.0.0.4";
 
-        Api = new UmbraApi(host, 3000);
+        Api = new MpApi(host, 3000);
 
         /* TODO RT: this wont work long run, since you have to use the API to
          * join an "island", so you cant connect until doing that whole negotiation
          * but this will work for now... */
         AuthKey = Api.DoSignIn("rtortora@craw.cc", "fish");
-        Util.Log("Auth key: " + AuthKey);
-        Client = new UmbraClient(host, 9000);
+        MpUtil.Log("Auth key: " + AuthKey);
+        Client = new MpClient(host, 9000);
     }
 
     public void Start() {
         Client.Start(); // TODO RT: we need a place to call Stop so we can terminate the thread
         Client.SendAuth(AuthKey, 0, 0, 0);
-        Util.Log("Sent Auth");
+        MpUtil.Log("Sent Auth");
 
         _states.OnStateExit += OnExitState;
 

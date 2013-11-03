@@ -5,12 +5,12 @@ using System.IO;
 
 namespace ClientLib
 {
-    public class UmbraApi
+    public class MpApi
     {
         public string Host { get; private set; }
         public int Port { get; private set; }
 
-        public UmbraApi (string host, int port)
+        public MpApi (string host, int port)
         {
             Host = host;
             Port = port;
@@ -43,7 +43,7 @@ namespace ClientLib
                 string val = Uri.EscapeUriString(p[i+1].ToString());
                 pairs.Add(string.Format("{0}={1}", key, val));
             }
-            string pdata = Util.Join("&", pairs);
+            string pdata = MpUtil.Join("&", pairs);
             if (!url.StartsWith("/"))
                 url = "/" + url;
             string fullurl = "http://" + Host + ":" + Port.ToString() + url;
