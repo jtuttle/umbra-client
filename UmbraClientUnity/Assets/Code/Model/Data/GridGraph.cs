@@ -5,32 +5,32 @@ using System;
 
 public enum SearchColor { White, Gray, Black }
 
-public class GridVertex<T, U> {
+public class GridNode<T, U> {
     public XY Coord { get; private set; }
     public T Data { get; private set; }
 
     public Dictionary<GridDirection, GridEdge<T, U>> Edges { get; private set; }
-    public Dictionary<GridDirection, GridVertex<T, U>> Neighbors { get; private set; }
+    public Dictionary<GridDirection, GridNode<T, U>> Neighbors { get; private set; }
     
-    public GridVertex(XY coord, T data) {
+    public GridNode(XY coord, T data) {
         Coord = coord;
         Data = data;
 
         Edges = new Dictionary<GridDirection,GridEdge<T, U>>();
-        Neighbors = new Dictionary<GridDirection, GridVertex<T, U>>();
+        Neighbors = new Dictionary<GridDirection, GridNode<T, U>>();
     }
 
     public override string ToString() {
-        return "Vertex @ " + Coord;
+        return "Node @ " + Coord;
     }
 }
 
 public class GridEdge<T, U> {
-    public GridVertex<T, U> From { get; private set; }
-    public GridVertex<T, U> To { get; private set; }
+    public GridNode<T, U> From { get; private set; }
+    public GridNode<T, U> To { get; private set; }
     public U Data { get; private set; }
 
-    public GridEdge(GridVertex<T, U> from, GridVertex<T, U> to, U data) {
+    public GridEdge(GridNode<T, U> from, GridNode<T, U> to, U data) {
         From = from;
         To = to;
         Data = data;
@@ -56,39 +56,39 @@ public class GridEdge<T, U> {
 }
 
 public class GridGraph<T, U> {
-    private Dictionary<XY, GridVertex<T, U>> _coordIndex;
-    private Dictionary<T, GridVertex<T, U>> _dataIndex;
-    public int VertexCount { get { return _coordIndex.Count; } }
+    private Dictionary<XY, GridNode<T, U>> _coordIndex;
+    private Dictionary<T, GridNode<T, U>> _dataIndex;
+    public int NodeCount { get { return _coordIndex.Count; } }
 
     private int _edgeCount;
     public int EdgeCount { get { return _edgeCount; } }
 
     public GridGraph() {
-        _coordIndex = new Dictionary<XY, GridVertex<T, U>>();
-        _dataIndex = new Dictionary<T, GridVertex<T, U>>();
+        _coordIndex = new Dictionary<XY, GridNode<T, U>>();
+        _dataIndex = new Dictionary<T, GridNode<T, U>>();
         _edgeCount = 0;
     }
 
-    public GridVertex<T, U> AddVertex(XY coord, T data) {
-        GridVertex<T, U> newVertex = new GridVertex<T, U>(coord, data);
+    public GridNode<T, U> AddNode(XY coord, T data) {
+        GridNode<T, U> newNode = new GridNode<T, U>(coord, data);
 
-        _coordIndex[newVertex.Coord] = newVertex;
-        _dataIndex[newVertex.Data] = newVertex;
+        _coordIndex[newNode.Coord] = newNode;
+        _dataIndex[newNode.Data] = newNode;
 
-        UpdateNeighbors(newVertex);
+        UpdateNeighbors(newNode);
 
-        return newVertex;
+        return newNode;
     }
 
-    public GridVertex<T, U> GetVertexByCoord(XY coord) {
+    public GridNode<T, U> GetNodeByCoord(XY coord) {
         return (_coordIndex.ContainsKey(coord) ? _coordIndex[coord] : null);
     }
 
-    public GridVertex<T, U> GetVertexByData(T data) {
+    public GridNode<T, U> GetNodeByData(T data) {
         return (_dataIndex.ContainsKey(data) ? _dataIndex[data] : null);
     }
 
-    public GridEdge<T, U> AddEdge(GridVertex<T, U> from, GridVertex<T, U> to, U data) {
+    public GridEdge<T, U> AddEdge(GridNode<T, U> from, GridNode<T, U> to, U data) {
         GridEdge<T, U> newEdge = new GridEdge<T, U>(from, to, data);
         from.Edges[newEdge.Direction] = newEdge;
         _edgeCount++;
@@ -96,7 +96,7 @@ public class GridGraph<T, U> {
         return newEdge;
     }
 
-    public XY GetCoordForNeighbor(GridVertex<T, U> from, GridDirection direction) {
+    public XY GetCoordForNeighbor(GridNode<T, U> from, GridDirection direction) {
         XY step = null;
 
         if(direction == GridDirection.N) step = new XY(0, 1);
@@ -107,11 +107,11 @@ public class GridGraph<T, U> {
         return from.Coord + step;
     }
 
-    public Dictionary<GridDirection, GridVertex<T, U>> GetNeighbors(GridVertex<T, U> vertex) {
-        Dictionary<GridDirection, GridVertex<T, U>> neighbors = new Dictionary<GridDirection, GridVertex<T, U>>();
+    public Dictionary<GridDirection, GridNode<T, U>> GetNeighbors(GridNode<T, U> node) {
+        Dictionary<GridDirection, GridNode<T, U>> neighbors = new Dictionary<GridDirection, GridNode<T, U>>();
 
         foreach(GridDirection direction in GridDirection.All) {
-            XY coord = GetCoordForNeighbor(vertex, direction);
+            XY coord = GetCoordForNeighbor(node, direction);
 
             if(_coordIndex.ContainsKey(coord))
                 neighbors[direction] = _coordIndex[coord];
@@ -120,25 +120,25 @@ public class GridGraph<T, U> {
         return neighbors;
     }
 
-    public IEnumerable<GridVertex<T, U>> BreadthFirstSearch(GridVertex<T, U> root) {
-        Dictionary<GridVertex<T, U>, SearchColor> visited = new Dictionary<GridVertex<T, U>, SearchColor>();
+    public IEnumerable<GridNode<T, U>> BreadthFirstSearch(GridNode<T, U> root) {
+        Dictionary<GridNode<T, U>, SearchColor> visited = new Dictionary<GridNode<T, U>, SearchColor>();
 
-        foreach(GridVertex<T, U> vertex in _coordIndex.Values)
-            visited[vertex] = SearchColor.White;
+        foreach(GridNode<T, U> node in _coordIndex.Values)
+            visited[node] = SearchColor.White;
 
-        Queue<GridVertex<T, U>> queue = new Queue<GridVertex<T, U>>();
+        Queue<GridNode<T, U>> queue = new Queue<GridNode<T, U>>();
 
         queue.Enqueue(root);
         visited[root] = SearchColor.Gray;
 
         while(queue.Count > 0) {
-            GridVertex<T, U> next = queue.Dequeue();
+            GridNode<T, U> next = queue.Dequeue();
 
             yield return next;
 
-            List<GridVertex<T, U>> neighbors = new List<GridVertex<T, U>>(GetNeighbors(next).Values);
+            List<GridNode<T, U>> neighbors = new List<GridNode<T, U>>(GetNeighbors(next).Values);
 
-            foreach(GridVertex<T, U> neighbor in neighbors) {
+            foreach(GridNode<T, U> neighbor in neighbors) {
                 if(visited[neighbor] == SearchColor.White) {
                     visited[neighbor] = SearchColor.Gray;
                     queue.Enqueue(neighbor);
@@ -149,15 +149,15 @@ public class GridGraph<T, U> {
         }
     }
 
-    private void UpdateNeighbors(GridVertex<T, U> vertex) {
-        Dictionary<GridDirection, GridVertex<T, U>> neighbors = GetNeighbors(vertex);
+    private void UpdateNeighbors(GridNode<T, U> node) {
+        Dictionary<GridDirection, GridNode<T, U>> neighbors = GetNeighbors(node);
 
-        foreach(KeyValuePair<GridDirection, GridVertex<T, U>> entry in neighbors) {
+        foreach(KeyValuePair<GridDirection, GridNode<T, U>> entry in neighbors) {
             GridDirection direction = entry.Key;
-            GridVertex<T, U> neighbor = entry.Value;
+            GridNode<T, U> neighbor = entry.Value;
 
-            vertex.Neighbors[direction] = neighbor;
-            neighbor.Neighbors[direction.Reverse()] = vertex;
+            node.Neighbors[direction] = neighbor;
+            neighbor.Neighbors[direction.Reverse()] = node;
         }
     }
 }

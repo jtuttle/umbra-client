@@ -17,7 +17,7 @@ public class GameManager : UnitySingleton<GameManager> {
 	public UmbraApi Api { get; private set; }
 	public UmbraClient Client { get; private set; }
 
-    new public void Awake() {
+    public override void Awake() {
         _states = new GameStateMachine();
 
         _inputManager = GetComponent<InputManager>();
