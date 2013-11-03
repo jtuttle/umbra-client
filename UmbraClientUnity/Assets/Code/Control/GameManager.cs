@@ -13,7 +13,7 @@ public class GameManager : UnitySingleton<GameManager> {
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
 
-    public void Awake() {
+    public override void Awake() {
         _states = new GameStateMachine();
 
         _inputManager = GetComponent<InputManager>();

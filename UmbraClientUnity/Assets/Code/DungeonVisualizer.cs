@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-
-using DungeonVertex = GridVertex<DungeonRoom, DungeonPath>;
-using DungeonEdge = GridEdge<DungeonRoom, DungeonPath>;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
+using DungeonEdge = GridEdge<DungeonRoom, DungeonPath>;
 
 public class DungeonVisualizer {
     private Dungeon _dungeon;
@@ -17,25 +17,25 @@ public class DungeonVisualizer {
 
         _visual = new GameObject("Dungeon Visual");
 
-        foreach(DungeonVertex vertex in _dungeon.Graph.BreadthFirstSearch(dungeon.Entrance)) {
+        foreach(DungeonNode node in _dungeon.Graph.BreadthFirstSearch(dungeon.Entrance)) {
             Color color = Color.white;
 
-            if(vertex == _dungeon.Entrance) color = Color.blue;
+            if(node == _dungeon.Entrance) color = Color.blue;
                 
-            RenderRoom(vertex, color);
+            RenderRoom(node, color);
 
-            foreach(DungeonEdge edge in vertex.Edges.Values)
+            foreach(DungeonEdge edge in node.Edges.Values)
                 RenderEdge(edge);
         }
     }
 
-    private void RenderRoom(DungeonVertex vertex, Color color) {
-        GameObject vertexGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    private void RenderRoom(DungeonNode node, Color color) {
+        GameObject nodeGo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
-        vertexGo.name = vertex.ToString();
-        vertexGo.transform.parent = _visual.transform;
-        vertexGo.transform.position = VertexPosition(vertex);
-        vertexGo.renderer.material.color = color;
+        nodeGo.name = node.ToString();
+        nodeGo.transform.parent = _visual.transform;
+        nodeGo.transform.position = NodePosition(node);
+        nodeGo.renderer.material.color = color;
     }
 
     private void RenderEdge(DungeonEdge edge) {
@@ -50,12 +50,12 @@ public class DungeonVisualizer {
         edgeGo.transform.rotation = Quaternion.Euler(0, 0, rotation);
     }
 
-    private Vector3 VertexPosition(DungeonVertex vertex) {
-        return new Vector3(vertex.Coord.X * _spacing, vertex.Coord.Y * _spacing, 0);
+    private Vector3 NodePosition(DungeonNode node) {
+        return new Vector3(node.Coord.X * _spacing, node.Coord.Y * _spacing, 0);
     }
 
     private Vector3 EdgePosition(DungeonEdge edge) {
-        Vector3 vertexPos = VertexPosition(edge.From);
+        Vector3 nodePos = NodePosition(edge.From);
 
         GridDirection direction = edge.Direction;
 
@@ -69,10 +69,6 @@ public class DungeonVisualizer {
         if(direction == GridDirection.S) adjust = new Vector3(edgeSpacing, -halfSpacing, 0);
         if(direction == GridDirection.W) adjust = new Vector3(-halfSpacing, -edgeSpacing, 0);
 
-        return vertexPos + adjust;
-    }
-
-    public void UpdatePosition(XY delta) {
-
+        return nodePos + adjust;
     }
 }

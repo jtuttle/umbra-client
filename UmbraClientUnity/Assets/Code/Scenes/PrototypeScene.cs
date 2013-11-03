@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-using DungeonNode = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
 using Holoville.HOTween;
 
 public class PrototypeScene : MonoBehaviour {
@@ -95,7 +95,7 @@ public class PrototypeScene : MonoBehaviour {
         int dx = delta.X > 0 ? 1 : (delta.X < 0 ? -1 : 0);
         int dy = delta.Y > 0 ? 1 : (delta.Y < 0 ? -1 : 0);
 
-        _currentRoom = _dungeon.Graph.GetVertexByCoord(new XY(_currentRoom.Coord.X + dx, _currentRoom.Coord.Y + dy));
+        _currentRoom = _dungeon.Graph.GetNodeByCoord(new XY(_currentRoom.Coord.X + dx, _currentRoom.Coord.Y + dy));
 
         _camMoving = false;
         _player.Unfreeze();
