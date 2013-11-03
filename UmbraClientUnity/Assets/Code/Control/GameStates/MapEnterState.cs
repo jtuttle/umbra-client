@@ -72,6 +72,5 @@ public class MapEnterState : BaseGameState {
         float playerY = blockSize;
 
         PlayerView.transform.position = new Vector3(playerX, playerY, playerZ);
-        PlayerView.renderer.material.color = Color.blue;
     }
 }

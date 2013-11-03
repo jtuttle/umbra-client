@@ -10,6 +10,8 @@ public class MapWalkState : BaseGameState {
     // TODO: this will probably be a minimap at some point
     private DungeonVisualizer _visualizer;
 
+    private GameObject _otherDude;
+
     public MapWalkState(PlayerView playerView)
         : base(GameStates.MapWalk) {
 
@@ -37,7 +39,16 @@ public class MapWalkState : BaseGameState {
         // set up player move response
         PlayerView.OnPlayerMove += OnPlayerMove;
 
+        // hack for other dude
+        _otherDude = UnityUtils.LoadResource<GameObject>("Prefabs/OtherDude", true);
+        _otherDude.transform.position = PlayerView.transform.position + new Vector3(40, 0, 0);
+        GameManager.Instance.Client.PositionUpdate += UpdateOtherDudePosition;
+
         AddPlayerInput();
+    }
+
+    private void UpdateOtherDudePosition(string cid, string room, float px, float py, float pz, float vx, float vy, float vz) {
+        _otherDude.transform.position = new Vector3(px, py, pz);
     }
 
     public override void ExitState() {
@@ -47,6 +58,9 @@ public class MapWalkState : BaseGameState {
         PlayerView.OnPlayerMove -= OnPlayerMove;
 
         RemovePlayerInput();
+
+        // hack for other dude
+        GameManager.Instance.Client.PositionUpdate -= UpdateOtherDudePosition;
 
         base.ExitState();
     }
