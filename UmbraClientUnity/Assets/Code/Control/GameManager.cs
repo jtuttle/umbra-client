@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using ClientLib;
 
 public class GameManager : UnitySingleton<GameManager> {
     private GameStateMachine _states;
@@ -12,11 +13,24 @@ public class GameManager : UnitySingleton<GameManager> {
 
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
+	
+	public UmbraApi Api { get; private set; }
+	public UmbraClient Client { get; private set; }
 
-    public void Awake() {
+    new public void Awake() {
         _states = new GameStateMachine();
 
         _inputManager = GetComponent<InputManager>();
+		
+		Api = new UmbraApi("localhost", 3000);
+		
+		/* TODO RT: this wont work long run, since you have to use the API to
+		 * join an "island", so you cant connect until doing that whole negotiation
+		 * but this will work for now... */
+		string authkey = Api.DoSignIn("rtortora@craw.cc", "fish");
+		Client = new UmbraClient("localhost", 9000);
+		Client.Start();
+		Client.SendAuth(authkey, 0, 0);
     }
 
     public void Start() {
