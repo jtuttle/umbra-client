@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ClientLib
 {
-    public class UmbraClient
+    public class MpClient
     {
         public string Host { get; private set; }
         public int Port { get; private set; }
@@ -16,7 +16,7 @@ namespace ClientLib
         private TcpClient Tcp { get; set; }
         private NetworkStream Stream { get; set; }
 
-        public UmbraClient(string host, int port)
+        public MpClient(string host, int port)
         {
             Tcp = new TcpClient();
             Host = host;
@@ -58,7 +58,7 @@ namespace ClientLib
 
         public void Send(params object[] p)
         {
-            string msg = Util.Join(" ", p);
+            string msg = MpUtil.Join(" ", p);
             if (!msg.EndsWith("\n"))
             {
                 msg += "\n";

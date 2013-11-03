@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace ClientLib
 {
-    public static class Util
+    public static class MpUtil
     {
         public static string Join<T>(string separator, IList<T> values)
         {
-            return Util.Join(separator, (IEnumerable<T>)values);
+            return MpUtil.Join(separator, (IEnumerable<T>)values);
         }
 
         public static string Join<T>(string separator, IEnumerable<T> values)

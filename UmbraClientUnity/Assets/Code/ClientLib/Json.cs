@@ -84,7 +84,7 @@ namespace ClientLib
             List<string> pairs = new List<string>();
             foreach (object key in Keys)
                 pairs.Add(string.Format("{0}: {1}", key, this[key]));
-            return "{" + Util.Join(", ", pairs) + "}";
+            return "{" + MpUtil.Join(", ", pairs) + "}";
         }
     }
 
@@ -92,7 +92,7 @@ namespace ClientLib
     {
         public override string ToString()
         {
-            return "[" + Util.Join(", ", this) + "]";
+            return "[" + MpUtil.Join(", ", this) + "]";
         }
     }
 
