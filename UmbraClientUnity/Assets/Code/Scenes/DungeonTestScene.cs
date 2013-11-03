@@ -8,7 +8,7 @@ public class DungeonTestScene : MonoBehaviour {
 
         new DungeonVisualizer().RenderDungeon(dungeon);
 
-        Debug.Log("vertices: " + dungeon.Graph.VertexCount);
+        Debug.Log("nodes: " + dungeon.Graph.NodeCount);
         Debug.Log("edges: " + dungeon.Graph.EdgeCount);
     }
 }
