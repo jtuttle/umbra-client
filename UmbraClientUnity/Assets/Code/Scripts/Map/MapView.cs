@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-using DungeonNode = GridVertex<DungeonRoom, DungeonPath>;
+using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
 
 public class MapView : MonoBehaviour {
     public Rect RoomBounds { get; private set; }
