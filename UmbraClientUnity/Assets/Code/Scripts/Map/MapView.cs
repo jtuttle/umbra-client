@@ -30,8 +30,6 @@ public class MapView : MonoBehaviour {
     }
 
     private void DrawMap() {
-        _mapView = new GameObject("MapView");
-
         foreach(MapNode node in _map.Graph.BreadthFirstSearch(_map.Entrance))
             DrawRoom(node);
     }
@@ -51,8 +49,8 @@ public class MapView : MonoBehaviour {
                 GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 block.transform.position = new Vector3(blockX, 0, blockZ);
                 block.transform.localScale = new Vector3(blockSize - 1, blockSize / 2, blockSize - 1);
-                block.transform.parent = _mapView.transform;
-
+                block.transform.parent = transform;
+                
                 if(y == 0) {
                     if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.S))
                         DrawWall(blockX, blockZ);
@@ -77,7 +75,7 @@ public class MapView : MonoBehaviour {
             GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.transform.position = new Vector3(x, i * blockSize, z);
             block.transform.localScale = new Vector3(blockSize - 1, blockSize - 1, blockSize - 1);
-            block.transform.parent = _mapView.transform;
+            block.transform.parent = transform;
         }
     }
 }

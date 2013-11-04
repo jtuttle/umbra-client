@@ -3,11 +3,11 @@ using System.Collections;
 using System;
 
 public class MapEnterState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
-
-    private MapView _mapView;
+    public Vector3 PlayerPosition { get; private set; }
 
     private Map _map;
+
+    private MapView _mapView;
 
     public MapEnterState(Map map) 
         : base(GameStates.MapEnter) {
@@ -15,16 +15,20 @@ public class MapEnterState : BaseGameState {
         _map = map;
 
         _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
-
+        
         if(_mapView == null) throw new Exception("Game scene must contain MapView prefab.");
     }
 
     public override void EnterState() {
         base.EnterState();
 
+        _mapView.UpdateRoomBounds(_map.Entrance.Coord);
+
         SetCamera();
         ShowMap();
-        PlacePlayer();
+
+        Vector2 mapCenter = _mapView.RoomBounds.center;
+        PlayerPosition = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
         ExitState();
     }
@@ -37,7 +41,6 @@ public class MapEnterState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        PlayerView = null;
         _mapView = null;
         _map = null;
     }
@@ -60,18 +63,5 @@ public class MapEnterState : BaseGameState {
 
     private void ShowMap() {
         _mapView.SetMap(_map);
-    }
-
-    private void PlacePlayer() {
-        int blockSize = GameConfig.BLOCK_SIZE;
-
-        PlayerView = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true).GetComponent<PlayerView>();
-
-        float playerX = -(blockSize / 2) + (GameConfig.ROOM_WIDTH * blockSize) / 2;
-        float playerZ = -(blockSize / 2) + (GameConfig.ROOM_HEIGHT * blockSize) / 2;
-        float playerY = blockSize;
-
-        PlayerView.transform.position = new Vector3(playerX, playerY, playerZ);
-        PlayerView.renderer.material.color = Color.blue;
     }
 }
