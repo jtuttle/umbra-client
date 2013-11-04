@@ -7,12 +7,12 @@ public class MapEnterState : BaseGameState {
 
     private MapView _mapView;
 
-    private Dungeon _dungeon;
+    private Map _map;
 
-    public MapEnterState(Dungeon dungeon) 
+    public MapEnterState(Map map) 
         : base(GameStates.MapEnter) {
 
-        _dungeon = dungeon;
+        _map = map;
 
         _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
 
@@ -39,7 +39,7 @@ public class MapEnterState : BaseGameState {
 
         PlayerView = null;
         _mapView = null;
-        _dungeon = null;
+        _map = null;
     }
 
     private void SetCamera() {
@@ -59,7 +59,7 @@ public class MapEnterState : BaseGameState {
     }
 
     private void ShowMap() {
-        _mapView.SetDungeon(_dungeon);
+        _mapView.SetMap(_map);
     }
 
     private void PlacePlayer() {

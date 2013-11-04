@@ -7,7 +7,7 @@ public class GameManager : UnitySingleton<GameManager> {
 
     public Camera GameCamera;
 
-    public Dungeon CurrentDungeon { get; private set; }
+    public Map CurrentMap { get; private set; }
     public XY CurrentCoord { get; private set; }
 
     private InputManager _inputManager;
@@ -22,10 +22,10 @@ public class GameManager : UnitySingleton<GameManager> {
     public void Start() {
         _states.OnStateExit += OnExitState;
 
-        CurrentDungeon = new DungeonGenerator().Generate(10);
-        CurrentCoord = CurrentDungeon.Entrance.Coord;
+        CurrentMap = new MapGenerator().Generate(10);
+        CurrentCoord = CurrentMap.Entrance.Coord;
         
-        _states.ChangeGameState(new MapEnterState(CurrentDungeon));
+        _states.ChangeGameState(new MapEnterState(CurrentMap));
     }
 
     public void Update() {

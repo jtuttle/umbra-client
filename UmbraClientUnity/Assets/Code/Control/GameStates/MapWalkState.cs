@@ -8,7 +8,7 @@ public class MapWalkState : BaseGameState {
     private MapViewCamera _mapViewCamera;
 
     // TODO: this will probably be a minimap at some point
-    private DungeonVisualizer _visualizer;
+    private MapVisualizer _visualizer;
 
     public MapWalkState(PlayerView playerView)
         : base(GameStates.MapWalk) {
@@ -18,8 +18,8 @@ public class MapWalkState : BaseGameState {
         _mapView = GameObject.Find("MapView").GetComponent<MapView>();
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
 
-        _visualizer = new DungeonVisualizer();
-        _visualizer.RenderDungeon(GameManager.Instance.CurrentDungeon);
+        _visualizer = new MapVisualizer();
+        _visualizer.RenderMap(GameManager.Instance.CurrentMap);
     }
 
     public override void EnterState() {
