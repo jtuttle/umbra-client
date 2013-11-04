@@ -27,7 +27,7 @@ public class MapDesignState : BaseGameState {
         PlayerView.Freeze();
         PlayerView.gameObject.SetActive(false);
 
-        AddPlayerInput();
+        EnableInput();
     }
 
     public override void ExitState() {
@@ -35,7 +35,7 @@ public class MapDesignState : BaseGameState {
         _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
 
-        RemovePlayerInput();
+        DisableInput();
 
         base.ExitState();
     }
@@ -47,27 +47,27 @@ public class MapDesignState : BaseGameState {
         _mapViewCamera = null;
     }
 
-    private void AddPlayerInput() {
+    private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput += OnAxialInput;
-        input.OnSpecialPress += OnSpecialPress;
+        input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
-    private void RemovePlayerInput() {
+    private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput -= OnAxialInput;
-        input.OnSpecialPress -= OnSpecialPress;
+        input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
-        RemovePlayerInput();
+        DisableInput();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        AddPlayerInput();
+        EnableInput();
     }
 
     // TODO: make this smarter

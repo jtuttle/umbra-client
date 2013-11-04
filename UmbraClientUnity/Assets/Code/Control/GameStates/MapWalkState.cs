@@ -37,7 +37,7 @@ public class MapWalkState : BaseGameState {
         // set up player move response
         PlayerView.OnPlayerMove += OnPlayerMove;
 
-        AddPlayerInput();
+        EnableInput();
     }
 
     public override void ExitState() {
@@ -46,7 +46,7 @@ public class MapWalkState : BaseGameState {
 
         PlayerView.OnPlayerMove -= OnPlayerMove;
 
-        RemovePlayerInput();
+        DisableInput();
 
         base.ExitState();
     }
@@ -58,22 +58,22 @@ public class MapWalkState : BaseGameState {
         _mapViewCamera = null;
     }
 
-    private void AddPlayerInput() {
+    private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput += PlayerView.Move;
-        input.OnAttackPress += PlayerView.Attack;
-        input.OnSpecialPress += OnSpecialPress;
+        input.GetButton(ButtonId.Attack).OnPress += PlayerView.Attack;
+        input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
-    private void RemovePlayerInput() {
+    private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput -= PlayerView.Move;
-        input.OnAttackPress -= PlayerView.Attack;
-        input.OnSpecialPress -= OnSpecialPress;
+        input.GetButton(ButtonId.Attack).OnPress -= PlayerView.Attack;
+        input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
-        RemovePlayerInput();
+        DisableInput();
         PlayerView.Freeze();
     }
 
@@ -82,7 +82,7 @@ public class MapWalkState : BaseGameState {
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         PlayerView.Unfreeze();
-        AddPlayerInput();
+        EnableInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
