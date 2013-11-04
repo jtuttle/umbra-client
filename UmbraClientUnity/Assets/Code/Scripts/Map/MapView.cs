@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-using DungeonNode = GridNode<DungeonRoom, DungeonPath>;
+using MapNode = GridNode<MapRoom, MapPath>;
 
 public class MapView : MonoBehaviour {
     public Rect RoomBounds { get; private set; }
 
-    private Dungeon _dungeon;
-    private GameObject _dungeonView;
+    private Map _map;
+    private GameObject _mapView;
 
-    public void SetDungeon(Dungeon dungeon) {
-        _dungeon = dungeon;
+    public void SetMap(Map map) {
+        _map = map;
 
-        DrawDungeon();
+        DrawMap();
     }
 
     public void UpdateRoomBounds(XY coord) {
@@ -29,14 +29,14 @@ public class MapView : MonoBehaviour {
         RoomBounds = new Rect(left, top, roomWidth, roomHeight);
     }
 
-    private void DrawDungeon() {
-        _dungeonView = new GameObject("Dungeon");
+    private void DrawMap() {
+        _mapView = new GameObject("MapView");
 
-        foreach(DungeonNode node in _dungeon.Graph.BreadthFirstSearch(_dungeon.Entrance))
+        foreach(MapNode node in _map.Graph.BreadthFirstSearch(_map.Entrance))
             DrawRoom(node);
     }
 
-    private void DrawRoom(DungeonNode node) {
+    private void DrawRoom(MapNode node) {
         int roomWidth = GameConfig.ROOM_WIDTH;
         int roomHeight = GameConfig.ROOM_HEIGHT;
         int blockSize = GameConfig.BLOCK_SIZE;
@@ -51,7 +51,7 @@ public class MapView : MonoBehaviour {
                 GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 block.transform.position = new Vector3(blockX, 0, blockZ);
                 block.transform.localScale = new Vector3(blockSize - 1, blockSize / 2, blockSize - 1);
-                block.transform.parent = _dungeonView.transform;
+                block.transform.parent = _mapView.transform;
 
                 if(y == 0) {
                     if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.S))
@@ -77,7 +77,7 @@ public class MapView : MonoBehaviour {
             GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.transform.position = new Vector3(x, i * blockSize, z);
             block.transform.localScale = new Vector3(blockSize - 1, blockSize - 1, blockSize - 1);
-            block.transform.parent = _dungeonView.transform;
+            block.transform.parent = _mapView.transform;
         }
     }
 }
