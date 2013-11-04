@@ -41,19 +41,31 @@ public class ObjectPlaceState : BaseGameState {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput += OnAxialInput;
         input.GetButton(ButtonId.Confirm).OnPress += OnConfirmPress;
+        input.GetButton(ButtonId.Previous).OnPress += OnPreviousPress;
+        input.GetButton(ButtonId.Next).OnPress += OnNextPress;
     }
 
     public void DisableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput -= OnAxialInput;
         input.GetButton(ButtonId.Confirm).OnPress -= OnConfirmPress;
+        input.GetButton(ButtonId.Previous).OnPress -= OnPreviousPress;
+        input.GetButton(ButtonId.Next).OnPress -= OnNextPress;
     }
 
     private void OnAxialInput(float h, float v) {
-
+        // move object around
     }
 
     private void OnConfirmPress() {
+        ExitState();
+    }
 
+    private void OnPreviousPress() {
+        // previous option
+    }
+
+    private void OnNextPress() {
+        // next option
     }
 }
