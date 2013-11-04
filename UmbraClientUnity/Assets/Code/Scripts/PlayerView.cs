@@ -27,7 +27,6 @@ public class PlayerView : MonoBehaviour {
         if(v != 0)
             v = (v < 0 ? -1 : 1);
 
-        //rigidbody.velocity = new Vector3(h * _speed, v * _speed, 0);
         rigidbody.velocity = new Vector3(h * _speed, 0, v * _speed);
 
         if(rigidbody.velocity != Vector3.zero)

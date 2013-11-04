@@ -4,6 +4,7 @@ public enum GameStates {
     Loading, MainMenu,
     Shop, 
     MapEnter, MapWalk, MapDesign, MapExit, 
+    ObjectPlace,
     MiniMap
 }
 
