@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public enum GameStates {
     Loading, MainMenu,
@@ -14,10 +15,14 @@ public class GameStateMachine {
 
     public BaseGameState CurrentState { get; private set; }
 
-    private Stack _stateStack;
+    public BaseGameState PreviousState {
+        get { return _stateStack.Peek(); }
+    }
+
+    private Stack<BaseGameState> _stateStack;
 
     public GameStateMachine() {
-        _stateStack = new Stack();
+        _stateStack = new Stack<BaseGameState>();
     }
 
     public void ChangeGameState(BaseGameState newState, bool pushPreviousState = false) {
@@ -33,6 +38,8 @@ public class GameStateMachine {
 
         // set new state
         CurrentState = newState;
+
+        Debug.Log("Changed state to " + CurrentState.GameState.ToString());
 
         CurrentState.OnExit += OnExit;
         CurrentState.EnterState();

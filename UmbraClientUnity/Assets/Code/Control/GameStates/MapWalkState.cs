@@ -2,18 +2,19 @@
 using System.Collections;
 
 public class MapWalkState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
+    private Vector3 _playerPosition;
 
+    private PlayerView _playerView;
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
     // TODO: this will probably be a minimap at some point
     private MapVisualizer _visualizer;
 
-    public MapWalkState(PlayerView playerView)
+    public MapWalkState(Vector3 playerPosition)
         : base(GameStates.MapWalk) {
 
-        PlayerView = playerView;
+        _playerPosition = playerPosition;
 
         _mapView = GameObject.Find("MapView").GetComponent<MapView>();
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
@@ -25,7 +26,7 @@ public class MapWalkState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        PlayerView.gameObject.SetActive(true);
+        PlacePlayer();
 
         // make sure room bounds are set
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
@@ -35,7 +36,7 @@ public class MapWalkState : BaseGameState {
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        PlayerView.OnPlayerMove += OnPlayerMove;
+        _playerView.OnPlayerMove += OnPlayerMove;
 
         EnableInput();
     }
@@ -44,7 +45,9 @@ public class MapWalkState : BaseGameState {
         _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
 
-        PlayerView.OnPlayerMove -= OnPlayerMove;
+        _playerView.OnPlayerMove -= OnPlayerMove;
+
+        GameObject.DestroyImmediate(_playerView.gameObject);
 
         DisableInput();
 
@@ -54,34 +57,43 @@ public class MapWalkState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        PlayerView = null;
+        _playerView = null;
         _mapViewCamera = null;
+    }
+
+    public void UpdatePlayerPosition(Vector3 position) {
+        _playerPosition = position;
+    }
+
+    private void PlacePlayer() {
+        _playerView = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true).GetComponent<PlayerView>();
+        _playerView.transform.position = _playerPosition;
     }
 
     private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput += PlayerView.Move;
-        input.GetButton(ButtonId.Attack).OnPress += PlayerView.Attack;
+        input.OnAxialInput += _playerView.Move;
+        //input.GetButton(ButtonId.Attack).OnPress += _playerView.Attack;
         input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
     private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput -= PlayerView.Move;
-        input.GetButton(ButtonId.Attack).OnPress -= PlayerView.Attack;
+        input.OnAxialInput -= _playerView.Move;
+        //input.GetButton(ButtonId.Attack).OnPress -= _playerView.Attack;
         input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         DisableInput();
-        PlayerView.Freeze();
+        _playerView.Freeze();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        PlayerView.Unfreeze();
+        _playerView.Unfreeze();
         EnableInput();
     }
 

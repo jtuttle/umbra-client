@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : UnitySingleton<GameManager> {
     private GameStateMachine _states;
@@ -42,19 +43,32 @@ public class GameManager : UnitySingleton<GameManager> {
     private void OnExitState(BaseGameState state) {
         switch(state.GameState) {
             case GameStates.MapEnter:
-                PlayerView playerView = (state as MapEnterState).PlayerView;
-                _states.ChangeGameState(new MapWalkState(playerView));
+                Vector3 initialPlayerPosition = (state as MapEnterState).PlayerPosition;
+                _states.ChangeGameState(new MapWalkState(initialPlayerPosition));
 
                 break;
             case GameStates.MapWalk:
 
                 if(state.NextState == GameStates.MapDesign) {
-                    MapDesignState mapDesignState = new MapDesignState((state as MapWalkState).PlayerView);
+                    MapDesignState mapDesignState = new MapDesignState();
                     _states.ChangeGameState(mapDesignState, true);
                 }
 
                 break;
             case GameStates.MapDesign:
+                //_states.RestorePreviousState();
+
+                if(state.NextState == GameStates.ObjectPlace) {
+                    List<GameObject> options = new List<GameObject>() { UnityUtils.LoadResource<GameObject>("Prefabs/Player") };
+                    ObjectPlaceState objectPlaceState = new ObjectPlaceState(options);
+                    _states.ChangeGameState(objectPlaceState);
+                }
+
+                break;
+            case GameStates.ObjectPlace:
+                MapWalkState walkState = _states.PreviousState as MapWalkState;
+                walkState.UpdatePlayerPosition((state as ObjectPlaceState).Placement);
+
                 _states.RestorePreviousState();
 
                 break;
