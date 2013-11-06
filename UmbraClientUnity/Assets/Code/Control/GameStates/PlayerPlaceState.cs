@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class PlayerPlaceState : MonoBehaviour {
+public class PlayerPlaceState : ObjectPlaceState {
+    public PlayerPlaceState()
+        : base(new List<GameObject> { GameManager.Instance.PlayerView.gameObject }, GameStates.PlayerPlace) {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    }
+
+    protected override void OnConfirmPress() {
+        NextState = GameStates.MapWalk;
+
+        base.OnConfirmPress();
+    }
+
+    protected override void OnCancelPress() {
+        NextState = GameStates.MapDesign;
+
+        base.OnCancelPress();
+    }
 }

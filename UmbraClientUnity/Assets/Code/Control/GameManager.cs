@@ -14,6 +14,10 @@ public class GameManager : UnitySingleton<GameManager> {
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
 
+    // useful references to have available, may be a better place for these
+    public PlayerView PlayerView;
+    public MapView MapView;
+
     public override void Awake() {
         _states = new GameStateMachine();
 
@@ -43,33 +47,24 @@ public class GameManager : UnitySingleton<GameManager> {
     private void OnExitState(BaseGameState state) {
         switch(state.GameState) {
             case GameStates.MapEnter:
-                Vector3 initialPlayerPosition = (state as MapEnterState).PlayerPosition;
-                _states.ChangeGameState(new MapWalkState(initialPlayerPosition));
+                _states.ChangeGameState(new MapWalkState());
 
                 break;
             case GameStates.MapWalk:
 
-                if(state.NextState == GameStates.MapDesign) {
-                    MapDesignState mapDesignState = new MapDesignState();
-                    _states.ChangeGameState(mapDesignState, true);
-                }
+                if(state.NextState == GameStates.MapDesign)
+                    _states.ChangeGameState(new MapDesignState(), true);
 
                 break;
             case GameStates.MapDesign:
                 //_states.RestorePreviousState();
 
-                if(state.NextState == GameStates.ObjectPlace) {
-                    List<GameObject> options = new List<GameObject>() { UnityUtils.LoadResource<GameObject>("Prefabs/Player") };
-                    ObjectPlaceState objectPlaceState = new ObjectPlaceState(options);
-                    _states.ChangeGameState(objectPlaceState);
-                }
+                if(state.NextState == GameStates.PlayerPlace)
+                    _states.ChangeGameState(new PlayerPlaceState(), true);
 
                 break;
-            case GameStates.ObjectPlace:
-                MapWalkState walkState = _states.PreviousState as MapWalkState;
-                walkState.UpdatePlayerPosition((state as ObjectPlaceState).Placement);
-
-                _states.RestorePreviousState();
+            case GameStates.PlayerPlace:
+                _states.RestorePreviousState(state.NextState);
 
                 break;
             default:

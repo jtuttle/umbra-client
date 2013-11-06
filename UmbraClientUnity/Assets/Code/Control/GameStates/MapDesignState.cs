@@ -2,8 +2,7 @@
 using System.Collections;
 
 public class MapDesignState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
-
+    private PlayerView _playerView;
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
@@ -15,15 +14,15 @@ public class MapDesignState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _playerView = GameManager.Instance.PlayerView;
+        _playerView.gameObject.SetActive(false);
+
+        _mapView = GameManager.Instance.MapView;
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
-        
+
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
-
-        //PlayerView.Freeze();
-        //PlayerView.gameObject.SetActive(false);
 
         EnableInput();
     }
@@ -35,15 +34,12 @@ public class MapDesignState : BaseGameState {
 
         DisableInput();
 
-        NextState = GameStates.ObjectPlace;
-
         base.ExitState();
     }
 
     public override void Dispose() {
         base.Dispose();
 
-        PlayerView = null;
         _mapViewCamera = null;
     }
 
@@ -92,12 +88,7 @@ public class MapDesignState : BaseGameState {
     }
 
     private void OnSpecialPress() {
-        NextState = GameStates.MapWalk;
-
-        // TODO: allow player to place themselves in a new state eventually, for now just center on current screen
-        //Vector3 playerPos = PlayerView.transform.position;
-        //Vector2 roomCenter = _mapView.RoomBounds.center;
-        //PlayerView.transform.position = new Vector3(roomCenter.x, playerPos.y, roomCenter.y);
+        NextState = GameStates.PlayerPlace;
 
         ExitState();
     }
