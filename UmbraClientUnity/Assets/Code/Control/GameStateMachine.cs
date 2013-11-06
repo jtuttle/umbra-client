@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameStates {
+    None,
     Loading, MainMenu,
     Shop, 
     MapEnter, MapWalk, MapDesign, MapExit, 
-    ObjectPlace,
+    PlayerPlace,
     MiniMap
 }
 
@@ -14,10 +16,6 @@ public class GameStateMachine {
     public event StateChangeDelegate OnStateExit = delegate { };
 
     public BaseGameState CurrentState { get; private set; }
-
-    public BaseGameState PreviousState {
-        get { return _stateStack.Peek(); }
-    }
 
     private Stack<BaseGameState> _stateStack;
 
@@ -45,13 +43,23 @@ public class GameStateMachine {
         CurrentState.EnterState();
     }
 
-    public void RestorePreviousState() {
-        if(CurrentState != null) {
+    public void RestorePreviousState(GameStates state = GameStates.None) {
+        if(_stateStack.Count == 0) throw new Exception("No previous states available");
+
+        // set target state to the previous state if none specified
+        if(state == GameStates.None)
+            state = (_stateStack.Peek() as BaseGameState).GameState;
+
+        while(_stateStack.Count > 0 && CurrentState.GameState != state) {
             CurrentState.OnExit -= OnExit;
             CurrentState.Dispose();
+
+            CurrentState = (BaseGameState)_stateStack.Pop();
         }
 
-        CurrentState = (BaseGameState)_stateStack.Pop();
+        if(CurrentState == null) throw new Exception("Previous state not found: " + state.ToString());
+
+        Debug.Log("Restored state to " + CurrentState.GameState.ToString());
 
         CurrentState.OnExit += OnExit;
         CurrentState.EnterState();

@@ -3,46 +3,28 @@ using System.Collections;
 using System;
 
 public class MapEnterState : BaseGameState {
-    public Vector3 PlayerPosition { get; private set; }
-
     private Map _map;
-
-    private MapView _mapView;
 
     public MapEnterState(Map map) 
         : base(GameStates.MapEnter) {
 
         _map = map;
-
-        _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
-        
-        if(_mapView == null) throw new Exception("Game scene must contain MapView prefab.");
     }
 
     public override void EnterState() {
         base.EnterState();
 
-        _mapView.UpdateRoomBounds(_map.Entrance.Coord);
-
         SetCamera();
-        ShowMap();
-
-        Vector2 mapCenter = _mapView.RoomBounds.center;
-        PlayerPosition = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
+        CreateMap();
+        PlacePlayer();
 
         ExitState();
     }
 
-    public override void ExitState() {
-
-        base.ExitState();
-    }
-
     public override void Dispose() {
-        base.Dispose();
-
-        _mapView = null;
         _map = null;
+
+        base.Dispose();
     }
 
     private void SetCamera() {
@@ -61,7 +43,24 @@ public class MapEnterState : BaseGameState {
         cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
     }
 
-    private void ShowMap() {
-        _mapView.SetMap(_map);
+    private void CreateMap() {
+        MapView mapView = UnityUtils.LoadResource<GameObject>("Prefabs/MapView", true).GetComponent<MapView>();
+        mapView.gameObject.name = "MapView";
+
+        mapView.SetMap(_map);
+        mapView.UpdateRoomBounds(_map.Entrance.Coord);
+
+        GameManager.Instance.MapView = mapView;
+    }
+
+    private void PlacePlayer() {
+        PlayerView playerView = UnityUtils.LoadResource<GameObject>("Prefabs/PlayerView", true).GetComponent<PlayerView>();
+        playerView.gameObject.name = "PlayerView";
+
+        MapView mapView = GameManager.Instance.MapView;
+        Vector2 mapCenter = mapView.RoomBounds.center;
+        playerView.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
+
+        GameManager.Instance.PlayerView = playerView;
     }
 }

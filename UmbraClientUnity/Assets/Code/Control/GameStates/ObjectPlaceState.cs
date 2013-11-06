@@ -3,16 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ObjectPlaceState : BaseGameState {
-    public Vector3 Placement { get; private set; }
-
     private List<GameObject> _options;
 
     private GameObject _currentOption;
+    private Color _currentOptionColor;
+
     private MapView _mapView;
 
-    public ObjectPlaceState(List<GameObject> options) 
-        : base(GameStates.ObjectPlace) {
+    private Rect _placeBounds;
 
+    public ObjectPlaceState(List<GameObject> options, GameStates gameState)
+        : base(gameState) {
+            
         _options = options;
 
         _mapView = GameObject.Find("MapView").GetComponent<MapView>();
@@ -21,30 +23,33 @@ public class ObjectPlaceState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        SetOption(0);
+        SetCurrentOption(0);
+        SetPlacementBoundary();
 
         EnableInput();
     }
 
     public override void ExitState() {
-        Placement = _currentOption.transform.position;
-
-        GameObject.DestroyImmediate(_currentOption);
-
         DisableInput();
 
         base.ExitState();
     }
 
     public override void Dispose() {
-        base.Dispose();
+        _options.Clear();
+        _options = null;
 
+        _currentOption = null;
+        _mapView = null;
+
+        base.Dispose();
     }
 
     public void EnableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput += OnAxialInput;
         input.GetButton(ButtonId.Confirm).OnPress += OnConfirmPress;
+        input.GetButton(ButtonId.Cancel).OnPress += OnCancelPress;
         input.GetButton(ButtonId.Previous).OnPress += OnPreviousPress;
         input.GetButton(ButtonId.Next).OnPress += OnNextPress;
     }
@@ -53,39 +58,82 @@ public class ObjectPlaceState : BaseGameState {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput -= OnAxialInput;
         input.GetButton(ButtonId.Confirm).OnPress -= OnConfirmPress;
+        input.GetButton(ButtonId.Cancel).OnPress -= OnCancelPress;
         input.GetButton(ButtonId.Previous).OnPress -= OnPreviousPress;
         input.GetButton(ButtonId.Next).OnPress -= OnNextPress;
     }
 
-    private void SetOption(int index) {
-        _currentOption = _options[index];
-        _currentOption = (GameObject)GameObject.Instantiate(_currentOption);
+    private void OnAxialInput(float h, float v) {
+        Vector3 oldPos = _currentOption.transform.position;
 
+        float newX = Mathf.Clamp(oldPos.x + h * 2, _placeBounds.xMin, _placeBounds.xMax);
+        float newZ = Mathf.Clamp(oldPos.z + v * 2, _placeBounds.yMin, _placeBounds.yMax);
+
+        _currentOption.transform.position = new Vector3(newX, oldPos.y, newZ);
+
+        // TODO: verify that placement isn't colliding with anything else and then change
+        // material color to Color.red if it is or to _currentOptionColor if not
+    }
+
+    protected virtual void OnConfirmPress() {
+        _currentOption.renderer.material.color = _currentOptionColor;
+
+        // TODO: shouldn't exit if we're placing multiple items
+
+        ExitState();
+    }
+
+    protected virtual void OnCancelPress() {
+        // TODO: shouldn't exit if we're placing multiple items
+
+        ExitState();
+    }
+
+    private void OnPreviousPress() {
+        if(_options.Count < 2) return;
+
+        // previous option
+    }
+
+    private void OnNextPress() {
+        if(_options.Count < 2) return;
+
+        // next option
+    }
+
+    private void SetCurrentOption(int index) {
+        _currentOption = _options[index];
+        _currentOption.SetActive(true);
+
+        // instantiate game object if not already instantiated
+        if(!_currentOption.activeInHierarchy)
+            _currentOption = (GameObject)GameObject.Instantiate(_currentOption);
+
+        // turn off physics while placing
         if(_currentOption.rigidbody) {
             _currentOption.rigidbody.detectCollisions = false;
             _currentOption.rigidbody.useGravity = false;
         }
 
+        // start in center of room
         Vector2 center = _mapView.RoomBounds.center;
         _currentOption.transform.position = new Vector3(center.x, GameConfig.BLOCK_SIZE, center.y);
 
-        Color color = _currentOption.renderer.material.color;
-        _currentOption.renderer.material.SetColor("_Color", new Color(color.r, color.g, color.b, 0.5f));
+        // store current color for later use in placement validation
+        _currentOptionColor = _currentOption.renderer.material.color;
+
+        // give object some transparency
+        Color placeColor = new Color(_currentOptionColor.r, _currentOptionColor.g, _currentOptionColor.b, 0.5f);
+        _currentOption.renderer.material.color = placeColor;
     }
 
-    private void OnAxialInput(float h, float v) {
-        _currentOption.transform.position += new Vector3(h, 0, v);
-    }
+    private void SetPlacementBoundary() {
+        Rect roomBounds = _mapView.RoomBounds;
+        float margin = GameConfig.BLOCK_SIZE;
 
-    private void OnConfirmPress() {
-        ExitState();
-    }
-
-    private void OnPreviousPress() {
-        // previous option
-    }
-
-    private void OnNextPress() {
-        // next option
+        _placeBounds = new Rect(roomBounds.xMin + margin * 1.5f,
+                                roomBounds.yMin + margin * 1.5f,
+                                roomBounds.width - margin * 3,
+                                roomBounds.height - margin * 3);
     }
 }

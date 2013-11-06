@@ -2,8 +2,6 @@
 using System.Collections;
 
 public class MapWalkState : BaseGameState {
-    private Vector3 _playerPosition;
-
     private PlayerView _playerView;
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
@@ -11,12 +9,11 @@ public class MapWalkState : BaseGameState {
     // TODO: this will probably be a minimap at some point
     private MapVisualizer _visualizer;
 
-    public MapWalkState(Vector3 playerPosition)
+    public MapWalkState()
         : base(GameStates.MapWalk) {
 
-        _playerPosition = playerPosition;
-
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _playerView = GameManager.Instance.PlayerView;
+        _mapView = GameManager.Instance.MapView;
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
 
         _visualizer = new MapVisualizer();
@@ -25,11 +22,6 @@ public class MapWalkState : BaseGameState {
 
     public override void EnterState() {
         base.EnterState();
-
-        PlacePlayer();
-
-        // make sure room bounds are set
-        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
@@ -47,8 +39,6 @@ public class MapWalkState : BaseGameState {
 
         _playerView.OnPlayerMove -= OnPlayerMove;
 
-        GameObject.DestroyImmediate(_playerView.gameObject);
-
         DisableInput();
 
         base.ExitState();
@@ -59,15 +49,6 @@ public class MapWalkState : BaseGameState {
 
         _playerView = null;
         _mapViewCamera = null;
-    }
-
-    public void UpdatePlayerPosition(Vector3 position) {
-        _playerPosition = position;
-    }
-
-    private void PlacePlayer() {
-        _playerView = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true).GetComponent<PlayerView>();
-        _playerView.transform.position = _playerPosition;
     }
 
     private void EnableInput() {
