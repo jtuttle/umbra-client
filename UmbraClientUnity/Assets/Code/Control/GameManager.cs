@@ -1,17 +1,22 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : UnitySingleton<GameManager> {
     private GameStateMachine _states;
 
     public Camera GameCamera;
 
-    public Dungeon CurrentDungeon { get; private set; }
+    public Map CurrentMap { get; private set; }
     public XY CurrentCoord { get; private set; }
 
     private InputManager _inputManager;
     public InputManager Input { get { return _inputManager; } }
+
+    // useful references to have available, may be a better place for these
+    public PlayerView PlayerView;
+    public MapView MapView;
 
     public override void Awake() {
         _states = new GameStateMachine();
@@ -22,10 +27,10 @@ public class GameManager : UnitySingleton<GameManager> {
     public void Start() {
         _states.OnStateExit += OnExitState;
 
-        CurrentDungeon = new DungeonGenerator().Generate(10);
-        CurrentCoord = CurrentDungeon.Entrance.Coord;
+        CurrentMap = new MapGenerator().Generate(10);
+        CurrentCoord = CurrentMap.Entrance.Coord;
         
-        _states.ChangeGameState(new MapEnterState(CurrentDungeon));
+        _states.ChangeGameState(new MapEnterState(CurrentMap));
     }
 
     public void Update() {
@@ -42,20 +47,24 @@ public class GameManager : UnitySingleton<GameManager> {
     private void OnExitState(BaseGameState state) {
         switch(state.GameState) {
             case GameStates.MapEnter:
-                PlayerView playerView = (state as MapEnterState).PlayerView;
-                _states.ChangeGameState(new MapWalkState(playerView));
+                _states.ChangeGameState(new MapWalkState());
 
                 break;
             case GameStates.MapWalk:
 
-                if(state.NextState == GameStates.MapDesign) {
-                    MapDesignState mapDesignState = new MapDesignState((state as MapWalkState).PlayerView);
-                    _states.ChangeGameState(mapDesignState, true);
-                }
+                if(state.NextState == GameStates.MapDesign)
+                    _states.ChangeGameState(new MapDesignState(), true);
 
                 break;
             case GameStates.MapDesign:
-                _states.RestorePreviousState();
+                //_states.RestorePreviousState();
+
+                if(state.NextState == GameStates.PlayerPlace)
+                    _states.ChangeGameState(new PlayerPlaceState(), true);
+
+                break;
+            case GameStates.PlayerPlace:
+                _states.RestorePreviousState(state.NextState);
 
                 break;
             default:
