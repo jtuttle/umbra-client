@@ -2,51 +2,44 @@
 using System.Collections;
 
 public class MapWalkState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
-
+    private PlayerView _playerView;
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
     // TODO: this will probably be a minimap at some point
-    private DungeonVisualizer _visualizer;
+    private MapVisualizer _visualizer;
 
-    public MapWalkState(PlayerView playerView)
+    public MapWalkState()
         : base(GameStates.MapWalk) {
 
-        PlayerView = playerView;
-
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _playerView = GameManager.Instance.PlayerView;
+        _mapView = GameManager.Instance.MapView;
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
 
-        _visualizer = new DungeonVisualizer();
-        _visualizer.RenderDungeon(GameManager.Instance.CurrentDungeon);
+        _visualizer = new MapVisualizer();
+        _visualizer.RenderMap(GameManager.Instance.CurrentMap);
     }
 
     public override void EnterState() {
         base.EnterState();
-
-        PlayerView.gameObject.SetActive(true);
-
-        // make sure room bounds are set
-        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        PlayerView.OnPlayerMove += OnPlayerMove;
+        _playerView.OnPlayerMove += OnPlayerMove;
 
-        AddPlayerInput();
+        EnableInput();
     }
 
     public override void ExitState() {
         _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
 
-        PlayerView.OnPlayerMove -= OnPlayerMove;
+        _playerView.OnPlayerMove -= OnPlayerMove;
 
-        RemovePlayerInput();
+        DisableInput();
 
         base.ExitState();
     }
@@ -54,35 +47,35 @@ public class MapWalkState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        PlayerView = null;
+        _playerView = null;
         _mapViewCamera = null;
     }
 
-    private void AddPlayerInput() {
+    private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput += PlayerView.Move;
-        input.OnAttackPress += PlayerView.Attack;
-        input.OnSpecialPress += OnSpecialPress;
+        input.OnAxialInput += _playerView.Move;
+        //input.GetButton(ButtonId.Attack).OnPress += _playerView.Attack;
+        input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
-    private void RemovePlayerInput() {
+    private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput -= PlayerView.Move;
-        input.OnAttackPress -= PlayerView.Attack;
-        input.OnSpecialPress -= OnSpecialPress;
+        input.OnAxialInput -= _playerView.Move;
+        //input.GetButton(ButtonId.Attack).OnPress -= _playerView.Attack;
+        input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
-        RemovePlayerInput();
-        PlayerView.Freeze();
+        DisableInput();
+        _playerView.Freeze();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        PlayerView.Unfreeze();
-        AddPlayerInput();
+        _playerView.Unfreeze();
+        EnableInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {

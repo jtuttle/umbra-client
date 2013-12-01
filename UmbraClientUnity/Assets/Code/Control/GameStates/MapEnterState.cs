@@ -3,43 +3,28 @@ using System.Collections;
 using System;
 
 public class MapEnterState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
+    private Map _map;
 
-    private MapView _mapView;
-
-    private Dungeon _dungeon;
-
-    public MapEnterState(Dungeon dungeon) 
+    public MapEnterState(Map map) 
         : base(GameStates.MapEnter) {
 
-        _dungeon = dungeon;
-
-        _mapView = GameObject.FindObjectOfType(typeof(MapView)) as MapView;
-
-        if(_mapView == null) throw new Exception("Game scene must contain MapView prefab.");
+        _map = map;
     }
 
     public override void EnterState() {
         base.EnterState();
 
         SetCamera();
-        ShowMap();
+        CreateMap();
         PlacePlayer();
 
         ExitState();
     }
 
-    public override void ExitState() {
-
-        base.ExitState();
-    }
-
     public override void Dispose() {
-        base.Dispose();
+        _map = null;
 
-        PlayerView = null;
-        _mapView = null;
-        _dungeon = null;
+        base.Dispose();
     }
 
     private void SetCamera() {
@@ -58,20 +43,24 @@ public class MapEnterState : BaseGameState {
         cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
     }
 
-    private void ShowMap() {
-        _mapView.SetDungeon(_dungeon);
+    private void CreateMap() {
+        MapView mapView = UnityUtils.LoadResource<GameObject>("Prefabs/MapView", true).GetComponent<MapView>();
+        mapView.gameObject.name = "MapView";
+
+        mapView.SetMap(_map);
+        mapView.UpdateRoomBounds(_map.Entrance.Coord);
+
+        GameManager.Instance.MapView = mapView;
     }
 
     private void PlacePlayer() {
-        int blockSize = GameConfig.BLOCK_SIZE;
+        PlayerView playerView = UnityUtils.LoadResource<GameObject>("Prefabs/PlayerView", true).GetComponent<PlayerView>();
+        playerView.gameObject.name = "PlayerView";
 
-        PlayerView = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true).GetComponent<PlayerView>();
+        MapView mapView = GameManager.Instance.MapView;
+        Vector2 mapCenter = mapView.RoomBounds.center;
+        playerView.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
-        float playerX = -(blockSize / 2) + (GameConfig.ROOM_WIDTH * blockSize) / 2;
-        float playerZ = -(blockSize / 2) + (GameConfig.ROOM_HEIGHT * blockSize) / 2;
-        float playerY = blockSize;
-
-        PlayerView.transform.position = new Vector3(playerX, playerY, playerZ);
-        PlayerView.renderer.material.color = Color.blue;
+        GameManager.Instance.PlayerView = playerView;
     }
 }

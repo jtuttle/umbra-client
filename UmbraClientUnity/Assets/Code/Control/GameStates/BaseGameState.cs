@@ -12,6 +12,7 @@ public abstract class BaseGameState : ITurnState {
 
     public BaseGameState(GameStates gameState) {
         GameState = gameState;
+        NextState = GameStates.None;
     }
 
     public virtual void EnterState() {

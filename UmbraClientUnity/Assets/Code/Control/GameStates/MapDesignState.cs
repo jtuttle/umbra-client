@@ -2,32 +2,29 @@
 using System.Collections;
 
 public class MapDesignState : BaseGameState {
-    public PlayerView PlayerView { get; private set; }
-
+    private PlayerView _playerView;
     private MapView _mapView;
     private MapViewCamera _mapViewCamera;
 
-    public MapDesignState(PlayerView playerView)
+    public MapDesignState()
         : base(GameStates.MapDesign) {
 
-        PlayerView = playerView;
     }
 
     public override void EnterState() {
         base.EnterState();
 
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _playerView = GameManager.Instance.PlayerView;
+        _playerView.gameObject.SetActive(false);
+
+        _mapView = GameManager.Instance.MapView;
         _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
-        
+
         // set up camera transition response
         _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
 
-        //PlayerView = GameObject.FindObjectOfType(typeof(PlayerView)) as PlayerView;
-        PlayerView.Freeze();
-        PlayerView.gameObject.SetActive(false);
-
-        AddPlayerInput();
+        EnableInput();
     }
 
     public override void ExitState() {
@@ -35,7 +32,7 @@ public class MapDesignState : BaseGameState {
         _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
         _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
 
-        RemovePlayerInput();
+        DisableInput();
 
         base.ExitState();
     }
@@ -43,31 +40,30 @@ public class MapDesignState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        PlayerView = null;
         _mapViewCamera = null;
     }
 
-    private void AddPlayerInput() {
+    private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput += OnAxialInput;
-        input.OnSpecialPress += OnSpecialPress;
+        input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
-    private void RemovePlayerInput() {
+    private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
         input.OnAxialInput -= OnAxialInput;
-        input.OnSpecialPress -= OnSpecialPress;
+        input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
-        RemovePlayerInput();
+        DisableInput();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
         _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        AddPlayerInput();
+        EnableInput();
     }
 
     // TODO: make this smarter
@@ -92,12 +88,7 @@ public class MapDesignState : BaseGameState {
     }
 
     private void OnSpecialPress() {
-        NextState = GameStates.MapWalk;
-
-        // TODO: allow player to place themselves in a new state eventually, for now just center on current screen
-        Vector3 playerPos = PlayerView.transform.position;
-        Vector2 roomCenter = _mapView.RoomBounds.center;
-        PlayerView.transform.position = new Vector3(roomCenter.x, playerPos.y, roomCenter.y);
+        NextState = GameStates.PlayerPlace;
 
         ExitState();
     }
