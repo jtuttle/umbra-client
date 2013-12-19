@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerPlaceState : ObjectPlaceState {
     public PlayerPlaceState()
-        : base(new List<GameObject> { GameManager.Instance.PlayerView.gameObject }, GameStates.PlayerPlace) {
+        : base(new List<GameObject> { GameManager.Instance.Player.gameObject }, GameStates.PlayerPlace) {
 
     }
 

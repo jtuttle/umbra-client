@@ -44,7 +44,7 @@ public class MapEnterState : BaseGameState {
     }
 
     private void CreateMap() {
-        MapView mapView = UnityUtils.LoadResource<GameObject>("Prefabs/MapView", true).GetComponent<MapView>();
+        MapEntity mapView = UnityUtils.LoadResource<GameObject>("Prefabs/MapView", true).GetComponent<MapEntity>();
         mapView.gameObject.name = "MapView";
 
         mapView.SetMap(_map);
@@ -54,13 +54,13 @@ public class MapEnterState : BaseGameState {
     }
 
     private void PlacePlayer() {
-        PlayerView playerView = UnityUtils.LoadResource<GameObject>("Prefabs/PlayerView", true).GetComponent<PlayerView>();
-        playerView.gameObject.name = "PlayerView";
+        GameObject player = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true);
+        player.gameObject.name = "Player";
 
-        MapView mapView = GameManager.Instance.MapView;
+        MapEntity mapView = GameManager.Instance.MapView;
         Vector2 mapCenter = mapView.RoomBounds.center;
-        playerView.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
+        player.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
-        GameManager.Instance.PlayerView = playerView;
+        GameManager.Instance.Player = player;
     }
 }

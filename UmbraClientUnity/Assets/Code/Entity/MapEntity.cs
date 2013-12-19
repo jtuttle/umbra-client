@@ -5,7 +5,7 @@ using System;
 
 using MapNode = GridNode<MapRoom, MapPath>;
 
-public class MapView : MonoBehaviour {
+public class MapEntity : MonoBehaviour {
     public Rect RoomBounds { get; private set; }
 
     private Map _map;
