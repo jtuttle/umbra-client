@@ -8,7 +8,7 @@ public class ObjectPlaceState : BaseGameState {
     private GameObject _currentOption;
     private Color _currentOptionColor;
 
-    private MapView _mapView;
+    private MapEntity _mapView;
 
     private Rect _placeBounds;
 
@@ -17,7 +17,7 @@ public class ObjectPlaceState : BaseGameState {
             
         _options = options;
 
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _mapView = GameObject.Find("MapView").GetComponent<MapEntity>();
     }
 
     public override void EnterState() {
