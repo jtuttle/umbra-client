@@ -16,7 +16,7 @@ public class GameManager : UnitySingleton<GameManager> {
 
     // useful references to have available, may be a better place for these
     public GameObject Player;
-    public MapEntity MapView;
+    public GameObject Map;
 
     public override void Awake() {
         _states = new GameStateMachine();

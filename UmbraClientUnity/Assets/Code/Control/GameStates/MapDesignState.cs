@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MapDesignState : BaseGameState {
     private GameObject _player;
-    private MapEntity _map;
+    private MapEntity _mapEntity;
     private TweenMover _cameraMover;
 
     public MapDesignState()
@@ -17,7 +17,7 @@ public class MapDesignState : BaseGameState {
         _player = GameManager.Instance.Player;
         _player.gameObject.SetActive(false);
 
-        _map = GameManager.Instance.MapView;
+        _mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
         _cameraMover = GameManager.Instance.GameCamera.GetComponent<TweenMover>();
 
         // set up camera transition response
@@ -61,8 +61,7 @@ public class MapDesignState : BaseGameState {
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
-        _map.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
-
+        
         EnableInput();
     }
 
@@ -70,7 +69,7 @@ public class MapDesignState : BaseGameState {
     private void OnAxialInput(float h, float v) {
         if(_cameraMover.Moving) return;
 
-        Rect roomBounds = _map.RoomBounds;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
 
         XY delta = null;
 
