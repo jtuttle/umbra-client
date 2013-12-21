@@ -8,7 +8,7 @@ public class ObjectPlaceState : BaseGameState {
     private GameObject _currentOption;
     private Color _currentOptionColor;
 
-    private MapView _mapView;
+    private MapEntity _mapEntity;
 
     private Rect _placeBounds;
 
@@ -17,7 +17,7 @@ public class ObjectPlaceState : BaseGameState {
             
         _options = options;
 
-        _mapView = GameObject.Find("MapView").GetComponent<MapView>();
+        _mapEntity = GameObject.Find("Map").GetComponent<MapEntity>();
     }
 
     public override void EnterState() {
@@ -40,7 +40,7 @@ public class ObjectPlaceState : BaseGameState {
         _options = null;
 
         _currentOption = null;
-        _mapView = null;
+        _mapEntity = null;
 
         base.Dispose();
     }
@@ -77,6 +77,11 @@ public class ObjectPlaceState : BaseGameState {
 
     protected virtual void OnConfirmPress() {
         _currentOption.renderer.material.color = _currentOptionColor;
+
+        if(_currentOption.rigidbody) {
+            _currentOption.rigidbody.detectCollisions = true;
+            _currentOption.rigidbody.useGravity = true;
+        }
 
         // TODO: shouldn't exit if we're placing multiple items
 
@@ -116,7 +121,9 @@ public class ObjectPlaceState : BaseGameState {
         }
 
         // start in center of room
-        Vector2 center = _mapView.RoomBounds.center;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
+
+        Vector2 center = roomBounds.center;
         _currentOption.transform.position = new Vector3(center.x, GameConfig.BLOCK_SIZE, center.y);
 
         // store current color for later use in placement validation
@@ -128,7 +135,7 @@ public class ObjectPlaceState : BaseGameState {
     }
 
     private void SetPlacementBoundary() {
-        Rect roomBounds = _mapView.RoomBounds;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
         float margin = GameConfig.BLOCK_SIZE;
 
         _placeBounds = new Rect(roomBounds.xMin + margin * 1.5f,

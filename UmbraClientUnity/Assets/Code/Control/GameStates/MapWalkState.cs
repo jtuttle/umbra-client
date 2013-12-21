@@ -2,19 +2,21 @@
 using System.Collections;
 
 public class MapWalkState : BaseGameState {
-    private PlayerView _playerView;
-    private MapView _mapView;
-    private MapViewCamera _mapViewCamera;
+    private GameObject _player;
+    private MapEntity _mapEntity;
+    private TweenMover _camMover;
 
     // TODO: this will probably be a minimap at some point
     private MapVisualizer _visualizer;
 
+    private Rect _roomBounds;
+
     public MapWalkState()
         : base(GameStates.MapWalk) {
 
-        _playerView = GameManager.Instance.PlayerView;
-        _mapView = GameManager.Instance.MapView;
-        _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
+        _player = GameManager.Instance.Player;
+        _mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        _camMover = GameManager.Instance.GameCamera.GetComponent<TweenMover>();
 
         _visualizer = new MapVisualizer();
         _visualizer.RenderMap(GameManager.Instance.CurrentMap);
@@ -24,20 +26,20 @@ public class MapWalkState : BaseGameState {
         base.EnterState();
 
         // set up camera transition response
-        _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
-        _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
+        _camMover.OnMoveBegin += OnCameraMoveBegin;
+        _camMover.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        _playerView.OnPlayerMove += OnPlayerMove;
+        _player.GetComponent<AxialInputMover>().OnMove += OnPlayerMove;
 
         EnableInput();
     }
 
     public override void ExitState() {
-        _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
-        _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
+        _camMover.OnMoveBegin -= OnCameraMoveBegin;
+        _camMover.OnMoveEnd -= OnCameraMoveEnd;
 
-        _playerView.OnPlayerMove -= OnPlayerMove;
+        _player.GetComponent<AxialInputMover>().OnMove -= OnPlayerMove;
 
         DisableInput();
 
@@ -47,48 +49,45 @@ public class MapWalkState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        _playerView = null;
-        _mapViewCamera = null;
+        _player = null;
+        _camMover = null;
     }
 
     private void EnableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput += _playerView.Move;
-        //input.GetButton(ButtonId.Attack).OnPress += _playerView.Attack;
+        //input.GetButton(ButtonId.Attack).OnPress += _player.Attack;
         input.GetButton(ButtonId.Special).OnPress += OnSpecialPress;
     }
 
     private void DisableInput() {
         InputManager input = GameManager.Instance.Input;
-        input.OnAxialInput -= _playerView.Move;
-        //input.GetButton(ButtonId.Attack).OnPress -= _playerView.Attack;
+        //input.GetButton(ButtonId.Attack).OnPress -= _player.Attack;
         input.GetButton(ButtonId.Special).OnPress -= OnSpecialPress;
     }
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         DisableInput();
-        _playerView.Freeze();
+        _player.GetComponent<AxialInputMover>().Disable();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
-        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
-        _playerView.Unfreeze();
+        _player.GetComponent<AxialInputMover>().Enable();
         EnableInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
-        Rect roomBounds = _mapView.RoomBounds;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
 
         if(position.x < roomBounds.xMin)
-            _mapViewCamera.Move(new XY((int)-roomBounds.width, 0));
+            _camMover.Move(new XY((int)-roomBounds.width, 0));
         else if(position.x > roomBounds.xMax)
-            _mapViewCamera.Move(new XY((int)roomBounds.width, 0));
+            _camMover.Move(new XY((int)roomBounds.width, 0));
         else if(position.z < roomBounds.yMin)
-            _mapViewCamera.Move(new XY(0, -(int)roomBounds.height));
+            _camMover.Move(new XY(0, -(int)roomBounds.height));
         else if(position.z > roomBounds.yMax)
-            _mapViewCamera.Move(new XY(0, (int)roomBounds.height));
+            _camMover.Move(new XY(0, (int)roomBounds.height));
     }
 
     private void OnSpecialPress() {

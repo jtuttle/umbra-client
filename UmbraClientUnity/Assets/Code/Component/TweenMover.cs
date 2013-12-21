@@ -2,11 +2,11 @@
 using System.Collections;
 using Holoville.HOTween;
 
-public class MapViewCamera : MonoBehaviour {
-    public delegate void MapViewCameraMoveDelegate(Vector3 from, Vector3 to);
+public class TweenMover : MonoBehaviour {
+    public delegate void MoveDelegate(Vector3 from, Vector3 to);
 
-    public MapViewCameraMoveDelegate OnMoveBegin = delegate { };
-    public MapViewCameraMoveDelegate OnMoveEnd = delegate { };
+    public MoveDelegate OnMoveBegin = delegate { };
+    public MoveDelegate OnMoveEnd = delegate { };
 
     public bool Moving { get; private set; }
 
@@ -26,7 +26,7 @@ public class MapViewCamera : MonoBehaviour {
         Vector3 from = gameObject.transform.position;
 
         OnMoveBegin(from, target);
-        
+
         TweenParms parms = new TweenParms();
         parms.Ease(EaseType.Linear);
         parms.Prop("position", target);

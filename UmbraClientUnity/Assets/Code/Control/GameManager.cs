@@ -15,8 +15,8 @@ public class GameManager : UnitySingleton<GameManager> {
     public InputManager Input { get { return _inputManager; } }
 
     // useful references to have available, may be a better place for these
-    public PlayerView PlayerView;
-    public MapView MapView;
+    public GameObject Player;
+    public GameObject Map;
 
     public override void Awake() {
         _states = new GameStateMachine();
