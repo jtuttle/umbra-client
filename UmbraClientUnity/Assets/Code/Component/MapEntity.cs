@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 using MapNode = GridNode<MapRoom, MapPath>;
 
-public class MapView : MonoBehaviour {
-    public Rect RoomBounds { get; private set; }
+public class MapEntity : MonoBehaviour {
+    public Dictionary<XY, MapRoomEntity> MapRooms;
 
     private Map _map;
-    private GameObject _mapView;
+
+    protected void Awake() {
+        MapRooms = new Dictionary<XY, MapRoomEntity>();
+    }
 
     public void SetMap(Map map) {
         _map = map;
@@ -17,7 +19,11 @@ public class MapView : MonoBehaviour {
         DrawMap();
     }
 
-    public void UpdateRoomBounds(XY coord) {
+    public Rect GetBoundsForCoord(XY coord) {
+        // return cached value if possible
+        if(MapRooms.ContainsKey(coord))
+            return MapRooms[coord].RoomBounds;
+
         int blockSize = GameConfig.BLOCK_SIZE;
 
         float roomWidth = (GameConfig.ROOM_WIDTH * blockSize);
@@ -26,7 +32,7 @@ public class MapView : MonoBehaviour {
         float left = coord.X * roomWidth - (blockSize / 2);
         float top = coord.Y * roomHeight - (blockSize / 2);
 
-        RoomBounds = new Rect(left, top, roomWidth, roomHeight);
+        return new Rect(left, top, roomWidth, roomHeight);
     }
 
     private void DrawMap() {
@@ -35,6 +41,12 @@ public class MapView : MonoBehaviour {
     }
 
     private void DrawRoom(MapNode node) {
+        MapRoomEntity mapRoomEntity = UnityUtils.LoadResource<GameObject>("Prefabs/MapRoom", true).GetComponent<MapRoomEntity>();
+        mapRoomEntity.Initialize(node.Coord, GetBoundsForCoord(node.Coord));
+        mapRoomEntity.transform.parent = gameObject.transform;
+
+        MapRooms[mapRoomEntity.Coord] = mapRoomEntity;
+
         int roomWidth = GameConfig.ROOM_WIDTH;
         int roomHeight = GameConfig.ROOM_HEIGHT;
         int blockSize = GameConfig.BLOCK_SIZE;
@@ -49,33 +61,33 @@ public class MapView : MonoBehaviour {
                 GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 block.transform.position = new Vector3(blockX, 0, blockZ);
                 block.transform.localScale = new Vector3(blockSize - 1, blockSize / 2, blockSize - 1);
-                block.transform.parent = transform;
-                
+                block.transform.parent = mapRoomEntity.transform;
+
                 if(y == 0) {
                     if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.S))
-                        DrawWall(blockX, blockZ);
+                        DrawWall(blockX, blockZ, mapRoomEntity.transform);
                 } else if(y == roomHeight - 1) {
                     if(x < 6 || x > 9 || !node.Edges.ContainsKey(GridDirection.N))
-                        DrawWall(blockX, blockZ);
+                        DrawWall(blockX, blockZ, mapRoomEntity.transform);
                 } else if(x == 0) {
                     if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.W))
-                        DrawWall(blockX, blockZ);
+                        DrawWall(blockX, blockZ, mapRoomEntity.transform);
                 } else if(x == roomWidth - 1) {
                     if(y < 4 || y > 7 || !node.Edges.ContainsKey(GridDirection.E))
-                        DrawWall(blockX, blockZ);
+                        DrawWall(blockX, blockZ, mapRoomEntity.transform);
                 }
             }
         }
     }
 
-    private void DrawWall(int x, int z) {
+    private void DrawWall(int x, int z, Transform parent) {
         int blockSize = GameConfig.BLOCK_SIZE;
 
         for(int i = 0; i < 4; i++) {
             GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
             block.transform.position = new Vector3(x, i * blockSize, z);
             block.transform.localScale = new Vector3(blockSize - 1, blockSize - 1, blockSize - 1);
-            block.transform.parent = transform;
+            block.transform.parent = parent;
         }
     }
 }

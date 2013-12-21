@@ -2,9 +2,9 @@
 using System.Collections;
 
 public class MapDesignState : BaseGameState {
-    private PlayerView _playerView;
-    private MapView _mapView;
-    private MapViewCamera _mapViewCamera;
+    private GameObject _player;
+    private MapEntity _mapEntity;
+    private TweenMover _cameraMover;
 
     public MapDesignState()
         : base(GameStates.MapDesign) {
@@ -14,23 +14,23 @@ public class MapDesignState : BaseGameState {
     public override void EnterState() {
         base.EnterState();
 
-        _playerView = GameManager.Instance.PlayerView;
-        _playerView.gameObject.SetActive(false);
+        _player = GameManager.Instance.Player;
+        _player.gameObject.SetActive(false);
 
-        _mapView = GameManager.Instance.MapView;
-        _mapViewCamera = GameManager.Instance.GameCamera.GetComponent<MapViewCamera>();
+        _mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        _cameraMover = GameManager.Instance.GameCamera.GetComponent<TweenMover>();
 
         // set up camera transition response
-        _mapViewCamera.OnMoveBegin += OnCameraMoveBegin;
-        _mapViewCamera.OnMoveEnd += OnCameraMoveEnd;
+        _cameraMover.OnMoveBegin += OnCameraMoveBegin;
+        _cameraMover.OnMoveEnd += OnCameraMoveEnd;
 
         EnableInput();
     }
 
     public override void ExitState() {
         // set up camera transition response
-        _mapViewCamera.OnMoveBegin -= OnCameraMoveBegin;
-        _mapViewCamera.OnMoveEnd -= OnCameraMoveEnd;
+        _cameraMover.OnMoveBegin -= OnCameraMoveBegin;
+        _cameraMover.OnMoveEnd -= OnCameraMoveEnd;
 
         DisableInput();
 
@@ -40,7 +40,7 @@ public class MapDesignState : BaseGameState {
     public override void Dispose() {
         base.Dispose();
 
-        _mapViewCamera = null;
+        _cameraMover = null;
     }
 
     private void EnableInput() {
@@ -61,16 +61,15 @@ public class MapDesignState : BaseGameState {
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
-        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
-
+        
         EnableInput();
     }
 
     // TODO: make this smarter
     private void OnAxialInput(float h, float v) {
-        if(_mapViewCamera.Moving) return;
+        if(_cameraMover.Moving) return;
 
-        Rect roomBounds = _mapView.RoomBounds;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
 
         XY delta = null;
 
@@ -84,7 +83,7 @@ public class MapDesignState : BaseGameState {
             delta = new XY(0, (int)roomBounds.height);
 
         if(delta != null)
-            _mapViewCamera.Move(delta);
+            _cameraMover.Move(delta);
     }
 
     private void OnSpecialPress() {
