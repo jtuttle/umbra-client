@@ -44,21 +44,22 @@ public class MapEnterState : BaseGameState {
     }
 
     private void CreateMap() {
-        MapEntity mapView = UnityUtils.LoadResource<GameObject>("Prefabs/MapView", true).GetComponent<MapEntity>();
-        mapView.gameObject.name = "MapView";
+        GameObject map = UnityUtils.LoadResource<GameObject>("Prefabs/Map", true);
+        map.name = "Map";
 
-        mapView.SetMap(_map);
-        mapView.UpdateRoomBounds(_map.Entrance.Coord);
+        map.GetComponent<MapEntity>().SetMap(_map);
 
-        GameManager.Instance.MapView = mapView;
+        GameManager.Instance.Map = map;
     }
 
     private void PlacePlayer() {
         GameObject player = UnityUtils.LoadResource<GameObject>("Prefabs/Player", true);
-        player.gameObject.name = "Player";
+        player.name = "Player";
 
-        MapEntity mapView = GameManager.Instance.MapView;
-        Vector2 mapCenter = mapView.RoomBounds.center;
+        MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        Rect roomBounds = mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
+
+        Vector2 mapCenter = roomBounds.center;
         player.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
         GameManager.Instance.Player = player;

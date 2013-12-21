@@ -3,17 +3,19 @@ using System.Collections;
 
 public class MapWalkState : BaseGameState {
     private GameObject _player;
-    private MapEntity _mapView;
+    private MapEntity _mapEntity;
     private TweenMover _camMover;
 
     // TODO: this will probably be a minimap at some point
     private MapVisualizer _visualizer;
 
+    private Rect _roomBounds;
+
     public MapWalkState()
         : base(GameStates.MapWalk) {
 
         _player = GameManager.Instance.Player;
-        _mapView = GameManager.Instance.MapView;
+        _mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
         _camMover = GameManager.Instance.GameCamera.GetComponent<TweenMover>();
 
         _visualizer = new MapVisualizer();
@@ -70,14 +72,13 @@ public class MapWalkState : BaseGameState {
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
-        _mapView.UpdateRoomBounds(GameManager.Instance.CurrentCoord);
 
         _player.GetComponent<AxialInputMover>().Enable();
         EnableInput();
     }
 
     private void OnPlayerMove(Vector3 position, Vector3 velocity) {
-        Rect roomBounds = _mapView.RoomBounds;
+        Rect roomBounds = _mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
 
         if(position.x < roomBounds.xMin)
             _camMover.Move(new XY((int)-roomBounds.width, 0));
