@@ -11,13 +11,30 @@ public class GridNode<T, U> {
 
     public Dictionary<GridDirection, GridEdge<T, U>> Edges { get; private set; }
     public Dictionary<GridDirection, GridNode<T, U>> Neighbors { get; private set; }
-    
+
+    public int EdgeCount { get { return Edges.Keys.Count; } }
+    public int NeighborCount { get { return Neighbors.Keys.Count; } }
+
     public GridNode(XY coord, T data) {
         Coord = coord;
         Data = data;
 
         Edges = new Dictionary<GridDirection,GridEdge<T, U>>();
         Neighbors = new Dictionary<GridDirection, GridNode<T, U>>();
+    }
+
+    public List<GridEdge<T, U>> GetEdgeList() {
+        List<GridEdge<T, U>> edges = new List<GridEdge<T, U>>();
+        edges.AddRange(Edges.Values);
+
+        return edges;
+    }
+
+    public List<GridNode<T, U>> GetNeighborList() {
+        List<GridNode<T, U>> neighbors = new List<GridNode<T, U>>();
+        neighbors.AddRange(Neighbors.Values);
+
+        return neighbors;
     }
 
     public override string ToString() {
