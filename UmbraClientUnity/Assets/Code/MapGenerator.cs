@@ -1,77 +1,125 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using MapNode = GridNode<MapRoom, MapPath>;
 
 public class MapGenerator {
     public Map Map { get; private set; }
 
-    private List<MapNode> _openNodes;
-
     public MapGenerator() {
-        _openNodes = new List<MapNode>();
+
     }
 
-    public Map Generate(int numRooms) {
+    public Map Generate(int width, int height) {
         Map = new Map();
-        _openNodes.Clear();
+        
+        // initial setup
+        XY entrance = new XY(0, 0);
 
-        CreateEntrance();
+        // create critical path
+        int dimensionMax = Mathf.Max(width, height);
+        int pathLength = dimensionMax + (dimensionMax / 2);
+        List<XY> critPath = GetPathWithLength(entrance, pathLength);
 
-        CreateRoomTree(numRooms);
+        // build graph structure
+        for(int i = 0; i < critPath.Count; i++) {
+            MapRoomSymbol symbol = MapRoomSymbol.None;
+
+            if(i == 0)
+                symbol = MapRoomSymbol.Entrance;
+            else if(i == critPath.Count - 2)
+                symbol = MapRoomSymbol.Boss;
+            else if(i == critPath.Count - 1)
+                symbol = MapRoomSymbol.Goal;
+
+            XY current = critPath[i];
+            MapNode currentNode = Map.Graph.AddNode(current, new MapRoom(symbol));
+
+            if(i > 0) {
+                XY prev = critPath[i - 1];
+                MapNode prevNode = Map.Graph.GetNodeByCoord(prev);
+
+                Map.Graph.AddEdge(currentNode, prevNode, new MapPath());
+                Map.Graph.AddEdge(prevNode, currentNode, new MapPath());
+            } else {
+                Map.Entrance = currentNode;
+            }
+        }
+
+        // TODO
+        // mark remaining goal and boss room edges as invalid
+        // add key levels, keys
+        // create deviations from critical path
+        // create shortcuts, secret rooms, etc
 
         return Map;
     }
 
-    private void CreateEntrance() {
-        MapNode entrance = Map.Graph.AddNode(new XY(0, 0), new MapRoom(null));
-        Map.Entrance = entrance;
+    private List<XY> GetPathWithLength(XY start, int length) {
+        Stack<XY> path = new Stack<XY>();
+        path.Push(start);
+
+        Dictionary<XY, bool> visited = new Dictionary<XY, bool>();
+
+        while(path.Count < length) {
+            XY current = path.Peek();
+            visited[current] = true;
+
+            List<XY> neighbors = current.Neighbors;
+            neighbors = neighbors.Where(n => !visited.ContainsKey(n)).ToList();
+
+            if(neighbors.Count == 0) {
+                path.Pop();
+            } else {
+                XY next = neighbors[Random.Range(0, neighbors.Count)];
+                path.Push(next);
+            }
+        }
         
-        _openNodes.Add(entrance);
+        return new List<XY>(path.ToArray().Reverse());
     }
 
-    private void CreateRoomTree(int numRooms) {
-        while(Map.Graph.NodeCount < numRooms)
-            AddRoom();
-    }
+    private List<XY> GetTilesWithManhattanDistance(XY start, int distance) {
+        List<XY> tiles = new List<XY>();
 
-    private void AddRoom() {
-        GridGraph<MapRoom, MapPath> Rooms = Map.Graph;
-        
-        // choose random node with open edges
-        MapNode openNode = _openNodes[Random.Range(0, _openNodes.Count)];
+        Queue<XY> tilesToCheck = new Queue<XY>();
+        tilesToCheck.Enqueue(start);
 
-        // choose random open edge direction
-        List<GridDirection> emptyNeighbors = GetEmptyNeighbors(openNode.Neighbors);
-        GridDirection newRoomDirection = emptyNeighbors[Random.Range(0, emptyNeighbors.Count)];
-        
-        // add new room
-        XY nextCoord = Rooms.GetCoordForNeighbor(openNode, newRoomDirection);
-        
-        // add new node and edges to graph
-        MapNode newNode = Rooms.AddNode(nextCoord, new MapRoom());
-        Rooms.AddEdge(openNode, newNode, new MapPath());
-        Rooms.AddEdge(newNode, openNode, new MapPath());
+        List<XY> tilesChecked = new List<XY>();
 
-        // update open nodes
-        foreach(KeyValuePair<GridDirection, MapNode> entry in newNode.Neighbors) {
-            MapNode neighbor = entry.Value;
+        while(tilesToCheck.Count > 0) {
+            XY next = tilesToCheck.Dequeue();
 
-            if(neighbor.Neighbors.Count == 4 && _openNodes.Contains(neighbor))
-                _openNodes.Remove(neighbor);
+            if(tilesChecked.Contains(next)) continue;
+
+            tilesChecked.Add(next);
+
+            int manhattanDistance = Mathf.Abs(next.X - start.X) + Mathf.Abs(next.Y - start.Y);
+            
+            if(manhattanDistance == distance) {
+                tiles.Add(next);
+            } else {
+                List<XY> neighbors = next.Neighbors;
+
+                foreach(XY neighbor in neighbors) {
+                    if(!tilesChecked.Contains(neighbor))
+                        tilesToCheck.Enqueue(neighbor);
+                }
+            }
         }
 
-        if(Map.Graph.GetNeighbors(newNode).Count != 4) _openNodes.Add(newNode);
+        return tiles;
     }
 
-    private List<GridDirection> GetEmptyNeighbors(Dictionary<GridDirection, MapNode> neighbors) {
-        List<GridDirection> empty = new List<GridDirection>();
+    private List<XY> GetCriticalPath(int length, XY start) {
+        List<XY> path = new List<XY>();
 
-        foreach(GridDirection direction in GridDirection.All) {
-            if(!neighbors.ContainsKey(direction)) empty.Add(direction);
-        }
 
-        return empty;
+
+
+
+        return path;
     }
 }
