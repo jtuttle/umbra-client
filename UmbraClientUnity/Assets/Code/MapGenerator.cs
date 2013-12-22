@@ -49,8 +49,8 @@ public class MapGenerator {
         }
 
         // TODO
-        // mark remaining goal room edges as invalid
-        // mark remaining boss room edges as invalid
+        // mark remaining goal and boss room edges as invalid
+        // add key levels, keys
         // create deviations from critical path
         // create shortcuts, secret rooms, etc
 
