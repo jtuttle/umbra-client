@@ -1,9 +1,21 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class XY : IJsonable {
     public int X { get; private set; }
     public int Y { get; private set; }
+
+    public List<XY> Neighbors {
+        get {
+            return new List<XY>() {
+                new XY(X, Y + 1),
+                new XY(X - 1, Y),
+                new XY(X + 1, Y),
+                new XY(X, Y - 1)
+            };
+        }
+    }
 
     public XY(int x, int y) {
         X = x;

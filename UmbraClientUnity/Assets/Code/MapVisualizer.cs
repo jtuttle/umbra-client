@@ -20,7 +20,9 @@ public class MapVisualizer {
         foreach(MapNode node in _map.Graph.BreadthFirstSearch(map.Entrance)) {
             Color color = Color.white;
 
-            if(node == _map.Entrance) color = Color.blue;
+            if(node.Data.Symbol == MapRoomSymbol.Entrance) color = Color.blue;
+            if(node.Data.Symbol == MapRoomSymbol.Boss) color = Color.red;
+            if(node.Data.Symbol == MapRoomSymbol.Goal) color = Color.green;
                 
             RenderRoom(node, color);
 

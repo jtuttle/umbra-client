@@ -27,7 +27,7 @@ public class GameManager : UnitySingleton<GameManager> {
     public void Start() {
         _states.OnStateExit += OnExitState;
 
-        CurrentMap = new MapGenerator().Generate(10);
+        CurrentMap = new MapGenerator().Generate(10, 10);
         CurrentCoord = CurrentMap.Entrance.Coord;
         
         _states.ChangeGameState(new MapEnterState(CurrentMap));
