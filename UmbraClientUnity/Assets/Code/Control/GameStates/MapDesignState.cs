@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapDesignState : BaseGameState {
+public class MapDesignState : BaseState {
     private GameObject _player;
     private MapEntity _mapEntity;
     private TweenMover _cameraMover;

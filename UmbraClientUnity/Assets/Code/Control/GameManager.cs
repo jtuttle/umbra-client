@@ -44,7 +44,7 @@ public class GameManager : UnitySingleton<GameManager> {
         CurrentCoord = CurrentCoord + new XY(dx, dy);
     }
 
-    private void OnExitState(BaseGameState state) {
+    private void OnExitState(BaseState state) {
         switch(state.GameState) {
             case GameStates.MapEnter:
                 _states.ChangeGameState(new MapWalkState());
