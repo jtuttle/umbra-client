@@ -12,18 +12,18 @@ public enum GameStates {
 }
 
 public class GameStateMachine {
-    public delegate void StateChangeDelegate(BaseGameState state);
+    public delegate void StateChangeDelegate(BaseState state);
     public event StateChangeDelegate OnStateExit = delegate { };
 
-    public BaseGameState CurrentState { get; private set; }
+    public BaseState CurrentState { get; private set; }
 
-    private Stack<BaseGameState> _stateStack;
+    private Stack<BaseState> _stateStack;
 
     public GameStateMachine() {
-        _stateStack = new Stack<BaseGameState>();
+        _stateStack = new Stack<BaseState>();
     }
 
-    public void ChangeGameState(BaseGameState newState, bool pushPreviousState = false) {
+    public void ChangeGameState(BaseState newState, bool pushPreviousState = false) {
         // destroy or push old state
         if(CurrentState != null) {
             CurrentState.OnExit -= OnExit;
@@ -48,13 +48,13 @@ public class GameStateMachine {
 
         // set target state to the previous state if none specified
         if(state == GameStates.None)
-            state = (_stateStack.Peek() as BaseGameState).GameState;
+            state = (_stateStack.Peek() as BaseState).GameState;
 
         while(_stateStack.Count > 0 && CurrentState.GameState != state) {
             CurrentState.OnExit -= OnExit;
             CurrentState.Dispose();
 
-            CurrentState = (BaseGameState)_stateStack.Pop();
+            CurrentState = (BaseState)_stateStack.Pop();
         }
 
         if(CurrentState == null) throw new Exception("Previous state not found: " + state.ToString());
@@ -65,7 +65,7 @@ public class GameStateMachine {
         CurrentState.EnterState();
     }
 
-    private void OnExit(BaseGameState exitingState) {
+    private void OnExit(BaseState exitingState) {
         OnStateExit(exitingState);
     }
 }

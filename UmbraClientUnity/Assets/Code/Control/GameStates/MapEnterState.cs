@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class MapEnterState : BaseGameState {
+public class MapEnterState : BaseState {
     private Map _map;
 
     public MapEnterState(Map map) 

@@ -1,4 +1,4 @@
-﻿public interface ITurnState {
+﻿public interface IState {
     void EnterState();
     void ExitState();
     void Update();

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ObjectPlaceState : BaseGameState {
+public class ObjectPlaceState : BaseState {
     private List<GameObject> _options;
 
     private GameObject _currentOption;

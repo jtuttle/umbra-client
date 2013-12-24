@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class BaseGameState : ITurnState {
-    public delegate void StateChangeDelegate(BaseGameState state);
+public abstract class BaseState : IState {
+    public delegate void StateChangeDelegate(BaseState state);
 
     public event StateChangeDelegate OnEnter = delegate { };
     public event StateChangeDelegate OnExit = delegate { };
@@ -10,7 +10,7 @@ public abstract class BaseGameState : ITurnState {
     public GameStates GameState { get; private set; }
     public GameStates NextState { get; protected set; }
 
-    public BaseGameState(GameStates gameState) {
+    public BaseState(GameStates gameState) {
         GameState = gameState;
         NextState = GameStates.None;
     }
