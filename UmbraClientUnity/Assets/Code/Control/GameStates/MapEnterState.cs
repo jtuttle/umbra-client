@@ -18,6 +18,9 @@ public class MapEnterState : BaseState {
         CreateMap();
         PlacePlayer();
 
+        // temp
+        PlaceHero();
+
         ExitState();
     }
 
@@ -63,5 +66,16 @@ public class MapEnterState : BaseState {
         player.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
         GameManager.Instance.Player = player;
+    }
+
+    private void PlaceHero() {
+        GameObject hero = UnityUtils.LoadResource<GameObject>("Prefabs/Hero", true);
+        hero.name = "Hero";
+
+        MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        Rect roomBounds = mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
+
+        Vector2 mapCenter = roomBounds.center;
+        hero.transform.position = new Vector3(mapCenter.x - 50.0f, GameConfig.BLOCK_SIZE, mapCenter.y);
     }
 }
