@@ -17,6 +17,6 @@ public abstract class FSMState {
         OnStateExit(nextStateId);
     }
 
-    public abstract void Update();
-    public abstract void Dispose();
+    public virtual void Update() { }
+    public virtual void Dispose() { }
 }

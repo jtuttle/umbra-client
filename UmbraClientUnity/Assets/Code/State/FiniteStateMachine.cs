@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class FiniteStateMachine {
     public FSMState CurrentState { get; private set; }
@@ -28,11 +29,11 @@ public class FiniteStateMachine {
     }
 
     public bool HasState(Enum stateId) {
-        return _states.Where(s => s.StateId == stateId) != null;
+        return _states.Any(s => s.StateId == stateId);
     }
 
     public FSMState GetState(Enum stateId) {
-        return _states.Find(s => s.StateId == stateId);
+        return _states.Find(s => s.StateId.ToString() == stateId.ToString());
     }
 
     public void ChangeState(Enum stateId) {
