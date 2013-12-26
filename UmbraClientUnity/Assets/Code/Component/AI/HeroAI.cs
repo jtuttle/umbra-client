@@ -2,17 +2,20 @@
 using System.Collections;
 
 public enum HeroState {
-    Walk, Wait
-}
-
-public enum HeroTransition {
-    WalkToWait, WaitToWalk
+    Walk, Wait, Seek
 }
 
 public class HeroAI : MonoBehaviour {
-    private FiniteStateMachine<HeroState, HeroTransition> _fsm;
+    private FiniteStateMachine _fsm;
 
     protected void Awake() {
-        _fsm = new FiniteStateMachine<HeroState, HeroTransition>();
+        _fsm = new FiniteStateMachine();
+
+        _fsm.AddState(new HeroSeekState());
+        _fsm.AddState(new HeroWalkState());
+    }
+
+    protected void Update() {
+        _fsm.CurrentState.Update();
     }
 }
