@@ -11,8 +11,10 @@ public class HeroAI : MonoBehaviour {
     protected void Awake() {
         _fsm = new FiniteStateMachine();
 
-        _fsm.AddState(new HeroSeekState());
+        _fsm.AddState(new HeroSeekState(gameObject));
         _fsm.AddState(new HeroWalkState());
+
+        _fsm.ChangeState(HeroState.Seek);
     }
 
     protected void Update() {
