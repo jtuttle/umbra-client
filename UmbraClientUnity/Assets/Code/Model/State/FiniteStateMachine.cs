@@ -54,7 +54,7 @@ public class FiniteStateMachine {
     public void Update() {
         CurrentState.Update();
 
-        if(CurrentState.NextStateId != null)
+        if(CurrentState.NextStateId != null) 
             ChangeState(CurrentState.NextStateId);
     }
 

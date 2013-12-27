@@ -33,16 +33,16 @@ public class HeroSeekState : GameObjectState {
     }
 
     private Vector3 FindDestination() {
-        // 1) get current room from gameobject coordinates (need to give gameobject access to state)
+        // get current room coord from gameobject position
         MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
         XY currentCoord = mapEntity.GetCoordFromPosition(_gameObject.transform.position);
 
-        // 2) choose next room to explore
+        // choose next room to explore
         MapNode currentNode = mapEntity.MapModel.Graph.GetNodeByCoord(currentCoord);
         List<MapEdge> paths = currentNode.GetEdgeList();
         XY nextCoord = paths[UnityEngine.Random.Range(0, paths.Count)].To.Coord;
 
-        // 3) get center of chosen room
+        // get center of chosen room
         Vector2 nextCenter = mapEntity.GetBoundsForCoord(nextCoord).center;
         
         return new Vector3(nextCenter.x, 0, nextCenter.y);
