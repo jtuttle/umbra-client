@@ -12,12 +12,13 @@ public class HeroAI : MonoBehaviour {
         _fsm = new FiniteStateMachine();
 
         _fsm.AddState(new HeroSeekState(gameObject));
-        _fsm.AddState(new HeroWalkState());
+        _fsm.AddState(new HeroWalkState(gameObject));
+        _fsm.AddState(new HeroWaitState(gameObject));
 
         _fsm.ChangeState(HeroState.Seek);
     }
 
     protected void Update() {
-        _fsm.CurrentState.Update();
+        _fsm.Update();
     }
 }
