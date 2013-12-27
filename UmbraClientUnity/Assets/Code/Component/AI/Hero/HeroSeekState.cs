@@ -14,7 +14,8 @@ public class HeroSeekState : GameObjectState {
     }
 
     public override void EnterState(FSMState prevState) {
-        Vector3 destination = FindDestination();
+        base.EnterState(prevState);
+
     }
 
     public override void ExitState(Enum nextState) {
@@ -23,7 +24,8 @@ public class HeroSeekState : GameObjectState {
     }
 
     public override void Update() {
-        
+        Destination = FindDestination();
+        ExitState(HeroState.Walk);
     }
 
     public override void Dispose() {
@@ -40,13 +42,9 @@ public class HeroSeekState : GameObjectState {
         List<MapEdge> paths = currentNode.GetEdgeList();
         XY nextCoord = paths[UnityEngine.Random.Range(0, paths.Count)].To.Coord;
 
-        // 3) store center of chosen room
+        // 3) get center of chosen room
         Vector2 nextCenter = mapEntity.GetBoundsForCoord(nextCoord).center;
-        Destination = new Vector3(nextCenter.x, 0, nextCenter.y);
-
-        // 4) exit state 
-        ExitState(HeroState.Walk);
-
-        return Vector3.zero;
+        
+        return new Vector3(nextCenter.x, 0, nextCenter.y);
     }
 }

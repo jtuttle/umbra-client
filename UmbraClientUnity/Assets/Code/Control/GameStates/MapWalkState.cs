@@ -30,7 +30,7 @@ public class MapWalkState : BaseState {
         _camMover.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        _player.GetComponent<AxialInputMover>().OnMove += OnPlayerMove;
+        _player.GetComponent<RigidBodyMover>().OnMove += OnPlayerMove;
 
         EnableInput();
     }
@@ -39,7 +39,7 @@ public class MapWalkState : BaseState {
         _camMover.OnMoveBegin -= OnCameraMoveBegin;
         _camMover.OnMoveEnd -= OnCameraMoveEnd;
 
-        _player.GetComponent<AxialInputMover>().OnMove -= OnPlayerMove;
+        _player.GetComponent<RigidBodyMover>().OnMove -= OnPlayerMove;
 
         DisableInput();
 
@@ -67,13 +67,13 @@ public class MapWalkState : BaseState {
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         DisableInput();
-        _player.GetComponent<AxialInputMover>().Disable();
+        _player.GetComponent<PlayerInput>().Disable();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
 
-        _player.GetComponent<AxialInputMover>().Enable();
+        _player.GetComponent<PlayerInput>().Enable();
         EnableInput();
     }
 

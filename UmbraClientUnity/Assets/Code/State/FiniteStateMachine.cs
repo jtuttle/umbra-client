@@ -37,6 +37,8 @@ public class FiniteStateMachine {
     }
 
     public void ChangeState(Enum stateId) {
+        Debug.Log("changing state to: " + stateId);
+
         FSMState nextState = GetState(stateId);
 
         if(nextState == null)
@@ -47,6 +49,13 @@ public class FiniteStateMachine {
 
         CurrentState.OnStateExit += OnStateExit;
         CurrentState.EnterState(prevState);
+    }
+
+    public void Update() {
+        CurrentState.Update();
+
+        if(CurrentState.NextStateId != null)
+            ChangeState(CurrentState.NextStateId);
     }
 
     private void OnStateExit(Enum nextStateId) {
