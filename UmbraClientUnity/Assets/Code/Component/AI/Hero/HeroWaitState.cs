@@ -12,9 +12,9 @@ public class HeroWaitState : GameObjectState {
         
     }
 
-    public override void ExitState(Enum nextState) {
+    public override void ExitState(FSMTransition nextStateTransition) {
 
-        base.ExitState(nextState);
+        base.ExitState(nextStateTransition);
     }
 
     public override void Update() {

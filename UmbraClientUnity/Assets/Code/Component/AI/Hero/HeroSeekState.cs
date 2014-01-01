@@ -18,14 +18,14 @@ public class HeroSeekState : GameObjectState {
 
     }
 
-    public override void ExitState(Enum nextState) {
+    public override void ExitState(FSMTransition nextStateTransition) {
 
-        base.ExitState(nextState);
+        base.ExitState(nextStateTransition);
     }
 
     public override void Update() {
         Destination = FindDestination();
-        ExitState(HeroState.Walk);
+        ExitState(new FSMTransition(HeroState.Walk));
     }
 
     public override void Dispose() {

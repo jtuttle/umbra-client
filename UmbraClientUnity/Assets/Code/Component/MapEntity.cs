@@ -36,8 +36,8 @@ public class MapEntity : MonoBehaviour {
     }
 
     public XY GetCoordFromPosition(Vector3 position) {
-        int coordX = (int)(position.x / (GameConfig.ROOM_WIDTH * GameConfig.BLOCK_SIZE));
-        int coordZ = (int)(position.z / (GameConfig.ROOM_HEIGHT * GameConfig.BLOCK_SIZE));
+        int coordX = (int)Mathf.Floor(position.x / (GameConfig.ROOM_WIDTH * GameConfig.BLOCK_SIZE));
+        int coordZ = (int)Mathf.Floor(position.z / (GameConfig.ROOM_HEIGHT * GameConfig.BLOCK_SIZE));
         return new XY(coordX, coordZ);
     }
 
