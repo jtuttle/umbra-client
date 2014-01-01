@@ -46,6 +46,12 @@ public class MapWalkState : BaseState {
         base.ExitState();
     }
 
+    public override void Update() {
+        Vector3 playerPos = GameManager.Instance.Player.gameObject.transform.position;
+
+        Debug.Log(GameManager.Instance.Map.GetComponent<MapEntity>().GetCoordFromPosition(playerPos));
+    }
+
     public override void Dispose() {
         base.Dispose();
 

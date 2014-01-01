@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 
 public abstract class FSMState {
-    public delegate void StateExitDelegate(Enum nextStateId);
-    public event StateExitDelegate OnStateExit = delegate { };
+    //public delegate void StateExitDelegate(Enum nextStateId);
+    //public event StateExitDelegate OnStateExit = delegate { };
 
     public Enum StateId { get; private set; }
-    public Enum NextStateId { get; private set; }
+    public FSMTransition NextStateTransition { get; private set; }
 
     public FSMState(Enum stateId) {
         StateId = stateId;
     }
 
     public virtual void EnterState(FSMState prevState) {
-        NextStateId = null;
+        NextStateTransition = null;
     }
 
-    public virtual void ExitState(Enum nextStateId) {
+    public virtual void ExitState(FSMTransition nextStateTransition) {
         //OnStateExit(nextStateId);
 
-        NextStateId = nextStateId;
+        NextStateTransition = nextStateTransition;
     }
 
     public virtual void Update() { }

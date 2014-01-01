@@ -7,9 +7,11 @@ public class FiniteStateMachine {
     public FSMState CurrentState { get; private set; }
 
     private List<FSMState> _states;
+    private Stack<FSMState> _stateStack;
 
     public FiniteStateMachine() {
         _states = new List<FSMState>();
+        _stateStack = new Stack<FSMState>();
     }
 
     public void AddState(FSMState state) {
@@ -36,29 +38,33 @@ public class FiniteStateMachine {
         return _states.Find(s => s.StateId.ToString() == stateId.ToString());
     }
 
-    public void ChangeState(Enum stateId) {
-        Debug.Log("changing state to: " + stateId);
+    public void ChangeState(FSMTransition stateTransition) {
+        Enum nextStateId = stateTransition.NextStateId;
 
-        FSMState nextState = GetState(stateId);
+        if(nextStateId == null) {
+            CurrentState = _stateStack.Pop();
+        } else {
+            FSMState nextState = GetState(nextStateId);
 
-        if(nextState == null)
-            throw new Exception("State " + stateId.ToString() + " has not been defined.");
+            if(nextState == null)
+                throw new Exception("State " + nextStateId.ToString() + " has not been defined.");
 
-        FSMState prevState = CurrentState;
-        CurrentState = nextState;
+            if(stateTransition.PushCurrentState)
+                _stateStack.Push(CurrentState);
 
-        CurrentState.OnStateExit += OnStateExit;
-        CurrentState.EnterState(prevState);
+            FSMState prevState = CurrentState;
+            CurrentState = nextState;
+
+            CurrentState.EnterState(prevState);
+        }
+
+        Debug.Log("changed state to: " + CurrentState.StateId.ToString());
     }
 
     public void Update() {
         CurrentState.Update();
 
-        if(CurrentState.NextStateId != null) 
-            ChangeState(CurrentState.NextStateId);
-    }
-
-    private void OnStateExit(Enum nextStateId) {
-        ChangeState(nextStateId);
+        if(CurrentState.NextStateTransition != null)
+            ChangeState(CurrentState.NextStateTransition);
     }
 }
