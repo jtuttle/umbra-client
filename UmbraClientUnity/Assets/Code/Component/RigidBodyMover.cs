@@ -11,7 +11,7 @@ public class RigidBodyMover : MonoBehaviour {
     // TODO: this needs fixing up, it's quite wonky
     public void Move(float h, float v) {
         Vector3 targetVelocity = new Vector3(h, 0, v);
-        //targetVelocity = transform.TransformDirection(targetVelocity);
+        targetVelocity = transform.TransformDirection(targetVelocity);
         targetVelocity *= Speed;
 
         Vector3 velocityChange = targetVelocity - rigidbody.velocity;
