@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapWalkState : BaseGameState {
+public class MapWalkState : FSMState {
     private GameObject _player;
     private MapEntity _mapEntity;
     private TweenMover _camMover;
@@ -12,38 +12,41 @@ public class MapWalkState : BaseGameState {
     private Rect _roomBounds;
 
     public MapWalkState()
-        : base(GameStates.MapWalk) {
+        : base(GameState.MapWalk) {
 
+    }
+
+    public override void EnterState(FSMState prevState) {
+        base.EnterState(prevState);
+
+        ///// init
         _player = GameManager.Instance.Player;
         _mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
         _camMover = GameManager.Instance.GameCamera.GetComponent<TweenMover>();
 
         _visualizer = new MapVisualizer();
         _visualizer.RenderMap(GameManager.Instance.CurrentMap);
-    }
-
-    public override void EnterState() {
-        base.EnterState();
+        /////
 
         // set up camera transition response
         _camMover.OnMoveBegin += OnCameraMoveBegin;
         _camMover.OnMoveEnd += OnCameraMoveEnd;
 
         // set up player move response
-        _player.GetComponent<AxialInputMover>().OnMove += OnPlayerMove;
+        _player.GetComponent<RigidBodyMover>().OnMove += OnPlayerMove;
 
         EnableInput();
     }
 
-    public override void ExitState() {
+    public override void ExitState(FSMTransition nextStateTransition) {
         _camMover.OnMoveBegin -= OnCameraMoveBegin;
         _camMover.OnMoveEnd -= OnCameraMoveEnd;
 
-        _player.GetComponent<AxialInputMover>().OnMove -= OnPlayerMove;
+        _player.GetComponent<RigidBodyMover>().OnMove -= OnPlayerMove;
 
         DisableInput();
 
-        base.ExitState();
+        base.ExitState(nextStateTransition);
     }
 
     public override void Dispose() {
@@ -67,13 +70,13 @@ public class MapWalkState : BaseGameState {
 
     private void OnCameraMoveBegin(Vector3 from, Vector3 to) {
         DisableInput();
-        _player.GetComponent<AxialInputMover>().Disable();
+        _player.GetComponent<PlayerInput>().Disable();
     }
 
     private void OnCameraMoveEnd(Vector3 from, Vector3 to) {
         GameManager.Instance.UpdateCurrentCoord(from, to);
 
-        _player.GetComponent<AxialInputMover>().Enable();
+        _player.GetComponent<PlayerInput>().Enable();
         EnableInput();
     }
 
@@ -91,7 +94,6 @@ public class MapWalkState : BaseGameState {
     }
 
     private void OnSpecialPress() {
-        NextState = GameStates.MapDesign;
-        ExitState();
+        ExitState(new FSMTransition(GameState.MapDesign));
     }
 }

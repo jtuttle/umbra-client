@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AxialInputMover : MonoBehaviour {
-    public delegate void MoveDelegate(Vector3 position, Vector3 velocity);
-    public event MoveDelegate OnMove = delegate { };
+public class PlayerInput : MonoBehaviour {
+    private RigidBodyMover _mover;
 
-    private float _speed = 100.0f;
+    protected void Awake() {
+        _mover = gameObject.GetComponent<RigidBodyMover>();
 
-	protected void Awake() {
         Enable();
 	}
 
@@ -25,14 +24,14 @@ public class AxialInputMover : MonoBehaviour {
     }
 
     private void Move(float h, float v) {
+        /*
         if(h != 0)
             h = (h < 0 ? -1 : 1);
 
         if(v != 0)
             v = (v < 0 ? -1 : 1);
+        */
 
-        rigidbody.velocity = new Vector3(h * _speed, 0, v * _speed);
-
-        OnMove(rigidbody.position, rigidbody.velocity);
+        _mover.Move(h, v);
     }
 }

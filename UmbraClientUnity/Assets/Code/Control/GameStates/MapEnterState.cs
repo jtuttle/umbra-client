@@ -2,23 +2,27 @@
 using System.Collections;
 using System;
 
-public class MapEnterState : BaseGameState {
+public class MapEnterState : FSMState {
     private Map _map;
 
-    public MapEnterState(Map map) 
-        : base(GameStates.MapEnter) {
+    public MapEnterState() 
+        : base(GameState.MapEnter) {
 
-        _map = map;
     }
 
-    public override void EnterState() {
-        base.EnterState();
+    public override void EnterState(FSMState prevState) {
+        base.EnterState(prevState);
+
+        _map = GameManager.Instance.CurrentMap;
 
         SetCamera();
         CreateMap();
         PlacePlayer();
 
-        ExitState();
+        // temp
+        PlaceHero();
+
+        ExitState(new FSMTransition(GameState.MapWalk));
     }
 
     public override void Dispose() {
@@ -63,5 +67,16 @@ public class MapEnterState : BaseGameState {
         player.transform.position = new Vector3(mapCenter.x, GameConfig.BLOCK_SIZE, mapCenter.y);
 
         GameManager.Instance.Player = player;
+    }
+
+    private void PlaceHero() {
+        GameObject hero = UnityUtils.LoadResource<GameObject>("Prefabs/Hero", true);
+        hero.name = "Hero";
+
+        MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        Rect roomBounds = mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
+
+        Vector2 mapCenter = roomBounds.center;
+        hero.transform.position = new Vector3(mapCenter.x - 50.0f, GameConfig.BLOCK_SIZE, mapCenter.y);
     }
 }
