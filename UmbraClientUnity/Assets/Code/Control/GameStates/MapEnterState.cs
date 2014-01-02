@@ -2,17 +2,18 @@
 using System.Collections;
 using System;
 
-public class MapEnterState : BaseState {
+public class MapEnterState : FSMState {
     private Map _map;
 
-    public MapEnterState(Map map) 
-        : base(GameStates.MapEnter) {
+    public MapEnterState() 
+        : base(GameState.MapEnter) {
 
-        _map = map;
     }
 
-    public override void EnterState() {
-        base.EnterState();
+    public override void EnterState(FSMState prevState) {
+        base.EnterState(prevState);
+
+        _map = GameManager.Instance.CurrentMap;
 
         SetCamera();
         CreateMap();
@@ -21,7 +22,7 @@ public class MapEnterState : BaseState {
         // temp
         PlaceHero();
 
-        ExitState();
+        ExitState(new FSMTransition(GameState.MapWalk));
     }
 
     public override void Dispose() {
