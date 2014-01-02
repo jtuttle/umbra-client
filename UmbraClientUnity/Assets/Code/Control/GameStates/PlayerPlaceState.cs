@@ -4,19 +4,21 @@ using System.Collections.Generic;
 
 public class PlayerPlaceState : ObjectPlaceState {
     public PlayerPlaceState()
-        : base(new List<GameObject> { GameManager.Instance.Player.gameObject }, GameStates.PlayerPlace) {
+        : base(GameState.PlayerPlace) {
 
     }
 
-    protected override void OnConfirmPress() {
-        NextState = GameStates.MapWalk;
+    public override void EnterState(FSMState prevState) {
+        _options = new List<GameObject> { GameManager.Instance.Player.gameObject };
 
-        base.OnConfirmPress();
+        base.EnterState(prevState);
     }
 
-    protected override void OnCancelPress() {
-        NextState = GameStates.MapDesign;
+    protected override void PostConfirm() {
+        ExitState(new FSMTransition(GameState.MapWalk));
+    }
 
-        base.OnCancelPress();
+    protected override void PostCancel() {
+        ExitState(new FSMTransition(GameState.MapDesign));
     }
 }

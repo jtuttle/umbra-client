@@ -7,14 +7,14 @@ using MapNode = GridNode<MapRoom, MapPath>;
 public class MapEntity : MonoBehaviour {
     public Dictionary<XY, MapRoomEntity> MapRooms;
 
-    private Map _map;
+    public Map MapModel { get; private set; }
 
     protected void Awake() {
         MapRooms = new Dictionary<XY, MapRoomEntity>();
     }
 
-    public void SetMap(Map map) {
-        _map = map;
+    public void SetMap(Map mapModel) {
+        MapModel = mapModel;
 
         DrawMap();
     }
@@ -35,8 +35,14 @@ public class MapEntity : MonoBehaviour {
         return new Rect(left, top, roomWidth, roomHeight);
     }
 
+    public XY GetCoordFromPosition(Vector3 position) {
+        int coordX = (int)Mathf.Floor(position.x / (GameConfig.ROOM_WIDTH * GameConfig.BLOCK_SIZE));
+        int coordZ = (int)Mathf.Floor(position.z / (GameConfig.ROOM_HEIGHT * GameConfig.BLOCK_SIZE));
+        return new XY(coordX, coordZ);
+    }
+
     private void DrawMap() {
-        foreach(MapNode node in _map.Graph.BreadthFirstSearch(_map.Entrance))
+        foreach(MapNode node in MapModel.Graph.BreadthFirstSearch(MapModel.Entrance))
             DrawRoom(node);
     }
 

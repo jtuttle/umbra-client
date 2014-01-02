@@ -1,18 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MapDesignState : BaseGameState {
+public class MapDesignState : FSMState {
     private GameObject _player;
     private MapEntity _mapEntity;
     private TweenMover _cameraMover;
 
     public MapDesignState()
-        : base(GameStates.MapDesign) {
+        : base(GameState.MapDesign) {
 
     }
 
-    public override void EnterState() {
-        base.EnterState();
+    public override void EnterState(FSMState prevState) {
+        base.EnterState(prevState);
 
         _player = GameManager.Instance.Player;
         _player.gameObject.SetActive(false);
@@ -27,14 +27,14 @@ public class MapDesignState : BaseGameState {
         EnableInput();
     }
 
-    public override void ExitState() {
+    public override void ExitState(FSMTransition nextStateTransition) {
         // set up camera transition response
         _cameraMover.OnMoveBegin -= OnCameraMoveBegin;
         _cameraMover.OnMoveEnd -= OnCameraMoveEnd;
 
         DisableInput();
 
-        base.ExitState();
+        base.ExitState(nextStateTransition);
     }
 
     public override void Dispose() {
@@ -87,8 +87,6 @@ public class MapDesignState : BaseGameState {
     }
 
     private void OnSpecialPress() {
-        NextState = GameStates.PlayerPlace;
-
-        ExitState();
+        ExitState(new FSMTransition(GameState.PlayerPlace));
     }
 }

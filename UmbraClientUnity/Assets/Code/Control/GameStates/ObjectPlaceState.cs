@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ObjectPlaceState : BaseGameState {
-    private List<GameObject> _options;
+public class ObjectPlaceState : FSMState {
+    protected List<GameObject> _options;
 
     private GameObject _currentOption;
     private Color _currentOptionColor;
@@ -12,16 +12,17 @@ public class ObjectPlaceState : BaseGameState {
 
     private Rect _placeBounds;
 
-    public ObjectPlaceState(List<GameObject> options, GameStates gameState)
+    public ObjectPlaceState(GameState gameState)
         : base(gameState) {
             
-        _options = options;
-
-        _mapEntity = GameObject.Find("Map").GetComponent<MapEntity>();
     }
 
-    public override void EnterState() {
-        base.EnterState();
+    public override void EnterState(FSMState prevState) {
+        base.EnterState(prevState);
+
+        /////
+        _mapEntity = GameObject.Find("Map").GetComponent<MapEntity>();
+        /////
 
         SetCurrentOption(0);
         SetPlacementBoundary();
@@ -29,10 +30,10 @@ public class ObjectPlaceState : BaseGameState {
         EnableInput();
     }
 
-    public override void ExitState() {
+    public override void ExitState(FSMTransition nextStateTransition) {
         DisableInput();
 
-        base.ExitState();
+        base.ExitState(nextStateTransition);
     }
 
     public override void Dispose() {
@@ -83,16 +84,18 @@ public class ObjectPlaceState : BaseGameState {
             _currentOption.rigidbody.useGravity = true;
         }
 
-        // TODO: shouldn't exit if we're placing multiple items
-
-        ExitState();
+        PostConfirm();
     }
+
+    protected virtual void PostConfirm() { }
 
     protected virtual void OnCancelPress() {
         // TODO: shouldn't exit if we're placing multiple items
 
-        ExitState();
+        PostCancel();
     }
+
+    protected virtual void PostCancel() { }
 
     private void OnPreviousPress() {
         if(_options.Count < 2) return;
