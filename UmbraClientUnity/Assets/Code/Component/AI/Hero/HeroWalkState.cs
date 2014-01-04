@@ -40,11 +40,8 @@ public class HeroWalkState : GameObjectState {
         float zDiff = _destination.z - _gameObject.transform.position.z;
         float angle = Mathf.Atan2(zDiff, xDiff);
 
-        float x = _mover.Speed * (float)Math.Cos(angle);
-        float z = _mover.Speed * (float)Math.Sin(angle);
-
-        if(Math.Abs(xDiff) < _mover.Speed) x = xDiff;
-        if(Math.Abs(zDiff) < _mover.Speed) z = zDiff;
+        float x = (float)Math.Cos(angle);
+        float z = (float)Math.Sin(angle);
 
         _mover.Move(x, z);
     }
