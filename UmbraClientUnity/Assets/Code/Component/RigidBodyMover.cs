@@ -5,16 +5,15 @@ public class RigidBodyMover : MonoBehaviour {
     public delegate void MoveDelegate(Vector3 position, Vector3 velocity);
     public event MoveDelegate OnMove = delegate { };
 
-    public float Speed;
+    public float VelocityMax;
+    public float Acceleration;
 
     public void Move(float h, float v) {
-        Vector3 moveDirection = new Vector3(h * Speed, 0, v * Speed);
+        if(rigidbody.velocity.magnitude < VelocityMax)
+            rigidbody.velocity += new Vector3(h * Acceleration, 0, v * Acceleration);
 
-        rigidbody.velocity = new Vector3(moveDirection.x, 0, moveDirection.z);
-        rigidbody.AddForce(Vector3.up * -10);
-        
-        if(moveDirection != Vector3.zero)
-            gameObject.transform.forward = moveDirection;
+        if(h != 0 || v != 0)
+            gameObject.transform.forward = new Vector3(h, 0, v);
 
         OnMove(transform.position, rigidbody.velocity);
     }
