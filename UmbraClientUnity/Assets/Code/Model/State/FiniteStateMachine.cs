@@ -62,9 +62,11 @@ public class FiniteStateMachine {
     }
 
     public void Update() {
-        CurrentState.Update();
+        if(CurrentState != null) {
+            CurrentState.Update();
 
-        if(CurrentState.NextStateTransition != null)
-            ChangeState(CurrentState.NextStateTransition);
+            if(CurrentState.NextStateTransition != null)
+                ChangeState(CurrentState.NextStateTransition);
+        }
     }
 }

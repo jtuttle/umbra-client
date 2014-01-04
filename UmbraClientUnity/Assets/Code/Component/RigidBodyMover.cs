@@ -5,21 +5,15 @@ public class RigidBodyMover : MonoBehaviour {
     public delegate void MoveDelegate(Vector3 position, Vector3 velocity);
     public event MoveDelegate OnMove = delegate { };
 
-    public float Speed;
-    public float MaxSpeed;
+    public float VelocityMax;
+    public float Acceleration;
 
-    // TODO: this needs fixing up, it's quite wonky
     public void Move(float h, float v) {
-        Vector3 targetVelocity = new Vector3(h, 0, v);
-        targetVelocity = transform.TransformDirection(targetVelocity);
-        targetVelocity *= Speed;
+        if(rigidbody.velocity.magnitude < VelocityMax)
+            rigidbody.velocity += new Vector3(h * Acceleration, 0, v * Acceleration);
 
-        Vector3 velocityChange = targetVelocity - rigidbody.velocity;
-        velocityChange.x = Mathf.Clamp(velocityChange.x, -MaxSpeed, MaxSpeed);
-        velocityChange.y = 0;
-        velocityChange.z = Mathf.Clamp(velocityChange.z, -MaxSpeed, MaxSpeed);
-
-        rigidbody.AddForce(velocityChange, ForceMode.VelocityChange);
+        if(h != 0 || v != 0)
+            gameObject.transform.forward = new Vector3(h, 0, v);
 
         OnMove(transform.position, rigidbody.velocity);
     }

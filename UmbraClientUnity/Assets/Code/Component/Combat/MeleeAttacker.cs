@@ -3,36 +3,32 @@ using System.Collections;
 
 public class MeleeAttacker : MonoBehaviour {
     public Collider AttackCollider;
-    public float AttackDuration;
 
     private TimeKeeper _attackTimer;
 
-	void Awake() {
-        _attackTimer = TimeKeeper.GetTimer(AttackDuration, 1.0f, "AttackTimer");
-        _attackTimer.OnTimerComplete += OnAttackTimerComplete;
-	}
-
-    void Destroy() {
-        _attackTimer.OnTimerComplete -= OnAttackTimerComplete;
+    protected void Awake() {
+        _attackTimer = TimeKeeper.GetTimer(0.3f, 1, "AttackTimer");
+        _attackTimer.OnTimerComplete += OnAttackTimer;
     }
 
     public void Attack() {
-        AttackCollider.enabled = true;
+        /*
+        Vector3 position = gameObject.transform.position;
+        Vector3 direction = gameObject.transform.forward;
+        float angle = Mathf.Atan2(direction.z, direction.x);
 
-        _attackTimer.ResetTimer();
+        float x = position.x + Mathf.Cos(angle) * AttackRange;
+        float z = position.z + Mathf.Sin(angle) * AttackRange;
+
+        AttackCollider.transform.position = new Vector3(x, 0, z);
+        */
+
+        AttackCollider.enabled = true;
+        
         _attackTimer.StartTimer();
     }
 
-    public void UpdateAttackColliderPosition(Vector3 position, Vector3 velocity) {
-        float angle = Mathf.Atan2(velocity.y, velocity.x);
-
-        float x = position.x + 30 * Mathf.Cos(angle);
-        float y = position.y + 30 * Mathf.Sin(angle);
-
-        AttackCollider.transform.position = new Vector3(x, y, 0);
-    }
-
-    private void OnAttackTimerComplete(TimeKeeper timer) {
+    private void OnAttackTimer(TimeKeeper timer) {
         AttackCollider.enabled = false;
     }
 }
