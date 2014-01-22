@@ -36,8 +36,6 @@ public class GameManager : UnitySingleton<GameManager> {
         CurrentMap = new MapGenerator().Generate(10, 10);
         CurrentCoord = CurrentMap.Entrance.Coord;
 
-        Debug.Log("Setting map");
-
         _fsm.ChangeState(new FSMTransition(GameState.MapEnter));
     }
 

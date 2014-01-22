@@ -10,4 +10,9 @@ public class UnityUtils {
             throw new ArgumentException("Unable to load resource: " + path);
         }
     }
+
+    public static void SetTransparency(GameObject gameObject, float transparency) {
+        Color current = gameObject.renderer.material.color;
+        gameObject.renderer.material.color = new Color(current.r, current.g, current.b, transparency);
+    }
 }

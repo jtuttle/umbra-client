@@ -2,29 +2,35 @@
 using System.Collections;
 
 public class MeleeAttacker : MonoBehaviour {
+    public int Damage;
     public Collider AttackCollider;
 
     private TimeKeeper _attackTimer;
 
     protected void Awake() {
+        Damage = 1;
+
         _attackTimer = TimeKeeper.GetTimer(0.3f, 1, "AttackTimer");
+        _attackTimer.transform.parent = gameObject.transform;
         _attackTimer.OnTimerComplete += OnAttackTimer;
     }
 
+    protected void OnTriggerEnter(Collider other) {
+        if(other.gameObject.tag == "Enemy") {
+            Killable killable = other.gameObject.GetComponent<Killable>();
+
+            if(killable == null || killable.Hittable) {
+                Vector3 direction = other.transform.position - transform.position;
+                other.gameObject.rigidbody.velocity = direction * 20;
+            }
+
+            if(killable != null)
+                killable.TakeDamage(Damage);
+        }
+    }
+
     public void Attack() {
-        /*
-        Vector3 position = gameObject.transform.position;
-        Vector3 direction = gameObject.transform.forward;
-        float angle = Mathf.Atan2(direction.z, direction.x);
-
-        float x = position.x + Mathf.Cos(angle) * AttackRange;
-        float z = position.z + Mathf.Sin(angle) * AttackRange;
-
-        AttackCollider.transform.position = new Vector3(x, 0, z);
-        */
-
         AttackCollider.enabled = true;
-        
         _attackTimer.StartTimer();
     }
 
