@@ -26,6 +26,7 @@ public class GameManager : UnitySingleton<GameManager> {
         _inputManager = GetComponent<InputManager>();
 
         _fsm = new FiniteStateMachine();
+
         _fsm.AddState(new MapEnterState());
         _fsm.AddState(new MapWalkState());
         _fsm.AddState(new MapDesignState());

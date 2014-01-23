@@ -19,18 +19,18 @@ public class MapEntity : MonoBehaviour {
         DrawMap();
     }
 
-    public Rect GetBoundsForCoord(XY coord) {
+    public Rect GetBoundsForCoord(XY coord, float margin = 0) {
         // return cached value if possible
-        if(MapRooms.ContainsKey(coord))
-            return MapRooms[coord].RoomBounds;
+        //if(MapRooms.ContainsKey(coord))
+        //    return MapRooms[coord].RoomBounds;
 
         int blockSize = GameConfig.BLOCK_SIZE;
+        
+        float roomWidth = (GameConfig.ROOM_WIDTH * blockSize) - (margin * 2); // WTF??
+        float roomHeight = (GameConfig.ROOM_HEIGHT * blockSize) - (margin * 2);
 
-        float roomWidth = (GameConfig.ROOM_WIDTH * blockSize);
-        float roomHeight = (GameConfig.ROOM_HEIGHT * blockSize);
-
-        float left = coord.X * roomWidth - (blockSize / 2);
-        float top = coord.Y * roomHeight - (blockSize / 2);
+        float left = coord.X * roomWidth - (blockSize / 2) + margin;
+        float top = coord.Y * roomHeight - (blockSize / 2) + margin;
 
         return new Rect(left, top, roomWidth, roomHeight);
     }
