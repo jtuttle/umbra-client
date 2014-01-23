@@ -1,22 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MeleeAttacker : MonoBehaviour {
-    public int Damage;
+public class MeleeAttacker : Attacker {
     public Collider AttackCollider;
 
     private TimeKeeper _attackTimer;
 
     protected void Awake() {
-        Damage = 1;
+        AttackCollider.enabled = false;
 
         _attackTimer = TimeKeeper.GetTimer(0.3f, 1, "AttackTimer");
-        _attackTimer.transform.parent = gameObject.transform;
         _attackTimer.OnTimerComplete += OnAttackTimer;
+        _attackTimer.transform.parent = gameObject.transform;
     }
 
     protected void OnTriggerEnter(Collider other) {
-        if(other.gameObject.tag == "Enemy") {
+        if(other.gameObject.tag == "Hero") {
             Killable killable = other.gameObject.GetComponent<Killable>();
 
             if(killable == null || killable.Hittable) {

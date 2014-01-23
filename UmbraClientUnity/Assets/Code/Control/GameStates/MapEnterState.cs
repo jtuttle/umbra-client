@@ -21,6 +21,7 @@ public class MapEnterState : FSMState {
 
         // temp
         PlaceHero();
+        PlaceMonster();
 
         ExitState(new FSMTransition(GameState.MapWalk));
     }
@@ -78,5 +79,16 @@ public class MapEnterState : FSMState {
 
         Vector2 mapCenter = roomBounds.center;
         hero.transform.position = new Vector3(mapCenter.x - 50.0f, GameConfig.BLOCK_SIZE, mapCenter.y);
+    }
+
+    private void PlaceMonster() {
+        GameObject monster = UnityUtils.LoadResource<GameObject>("Prefabs/Monster", true);
+        monster.name = "Monster";
+
+        MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
+        Rect roomBounds = mapEntity.GetBoundsForCoord(GameManager.Instance.CurrentCoord);
+
+        Vector2 mapCenter = roomBounds.center;
+        monster.transform.position = new Vector3(mapCenter.x + 50.0f, GameConfig.BLOCK_SIZE, mapCenter.y);
     }
 }
