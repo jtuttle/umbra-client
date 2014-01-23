@@ -15,6 +15,7 @@ public class Killable : MonoBehaviour {
 
         _hitRecoverTimer = TimeKeeper.GetTimer(HitRecoverSeconds, 1, "HitRecoverTimer");
         _hitRecoverTimer.OnTimerComplete += OnHitRecoverTimer;
+        _hitRecoverTimer.transform.parent = gameObject.transform;
     }
 
     public void TakeDamage(int damage) {
