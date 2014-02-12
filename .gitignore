@@ -5,9 +5,12 @@
 #   git config --global core.excludesfile ~/.gitignore_global
 
 # Unity Client
-/UmbraClientUnity/Library
-/UmbraClientUnity/Obj
-/UmbraClientUnity/Temp
+*/Library/
+*/Obj/
+*/Temp/
+
+# uEcho Clones
+*Clone*/
 
 # Visual Studio
 *.sln

@@ -38,9 +38,7 @@ public class MonsterWanderState : GameObjectState {
         MapEntity mapEntity = GameManager.Instance.Map.GetComponent<MapEntity>();
 
         XY coord = mapEntity.GetCoordFromPosition(_gameObject.transform.position);
-
-        float margin = GameConfig.BLOCK_SIZE * 2;
-        Rect bounds = mapEntity.GetBoundsForCoord(coord, margin);
+        Rect bounds = mapEntity.GetBoundsForCoord(coord, 1);
 
         float xRand = UnityEngine.Random.Range(bounds.xMin, bounds.xMax);
         float zRand = UnityEngine.Random.Range(bounds.yMin, bounds.yMax);
