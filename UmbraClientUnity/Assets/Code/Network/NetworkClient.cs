@@ -18,11 +18,28 @@ public class NetworkClient : UnityEngine.MonoBehaviour {
 
         Random.seed = levelSeed;
 
+        SetCamera();
         LoadMap();
     }
 
     protected void uLink_OnFailedToConnect(uLink.NetworkConnectionError error) {
         Debug.Log("Failed to connect: " + error);
+    }
+
+    private void SetCamera() {
+        int blockSize = GameConfig.BLOCK_SIZE;
+
+        Camera cam = Camera.main;
+
+        float camX = -(blockSize / 2) + (GameConfig.ROOM_WIDTH * blockSize) / 2;
+        float camY = 180.0f;
+        float camZ = 10.0f;
+
+        float lookX = camX;
+        float lookZ = -(blockSize / 2) + (GameConfig.ROOM_HEIGHT * blockSize) / 2;
+
+        cam.transform.position = new Vector3(camX, camY, camZ);
+        cam.transform.LookAt(new Vector3(lookX, 0, lookZ));
     }
 
     private void LoadMap() {

@@ -112,14 +112,4 @@ public class MapGenerator {
 
         return tiles;
     }
-
-    private List<XY> GetCriticalPath(int length, XY start) {
-        List<XY> path = new List<XY>();
-
-
-
-
-
-        return path;
-    }
 }

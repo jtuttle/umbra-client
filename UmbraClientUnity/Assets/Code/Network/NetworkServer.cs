@@ -36,6 +36,11 @@ public class NetworkServer : UnityEngine.MonoBehaviour {
         InstantiatePlayer(player);
     }
 
+    protected void uLink_OnPlayerDisconnected(uLink.NetworkPlayer player) {
+        uLink.Network.DestroyPlayerObjects(player);
+        uLink.Network.RemoveRPCs(player);
+    }
+
     private void LoadMap() {
         Map map = new MapGenerator().Generate(10, 10);
 
