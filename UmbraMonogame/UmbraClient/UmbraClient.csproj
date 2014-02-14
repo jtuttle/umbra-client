@@ -35,6 +35,14 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Entity\Entity.cs" />
+    <Compile Include="Entity\EntityFactory.cs" />
+    <Compile Include="Entity\EntityList.cs" />
+    <Compile Include="Entity\Interface\IDraw.cs" />
+    <Compile Include="Entity\Interface\IEntityGame.cs" />
+    <Compile Include="Entity\Interface\IUpdate.cs" />
+    <Compile Include="Entity\World.cs" />
+    <Compile Include="Input\PlayerInput.cs" />
     <Compile Include="UmbraClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,8 +71,11 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Content\" />
+    <None Include="Content\Images\Hero.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
