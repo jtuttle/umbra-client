@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UmbraClient.Entity.Interface;
+using CrawLib.Entity.Interface;
 
-namespace UmbraClient.Entity {
+namespace CrawLib.Entity {
     public class EntityList : IUpdate, IDraw {
         public List<Entity> Entities;
 

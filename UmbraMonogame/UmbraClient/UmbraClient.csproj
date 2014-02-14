@@ -35,15 +35,9 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Entity\Entity.cs" />
-    <Compile Include="Entity\EntityFactory.cs" />
-    <Compile Include="Entity\EntityList.cs" />
-    <Compile Include="Entity\Interface\IDraw.cs" />
-    <Compile Include="Entity\Interface\IEntityGame.cs" />
-    <Compile Include="Entity\Interface\IUpdate.cs" />
-    <Compile Include="Entity\World.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Input\PlayerInput.cs" />
-    <Compile Include="UmbraClient.cs" />
+    <Compile Include="UmbraGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -75,7 +69,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\CrawLib\CrawLib.csproj">
+      <Project>{DF7E009E-C7F5-41A2-AF7A-8718BD355940}</Project>
+      <Name>CrawLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

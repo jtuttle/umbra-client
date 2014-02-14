@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using UmbraClient.Entity.Interface;
+using CrawLib.Entity.Interface;
 
-namespace UmbraClient.Entity {
+namespace CrawLib.Entity {
     public abstract class Entity {
-        public string Name { get; private set; }
-        public Vector3 Position { get; private set; }
-        public Quaternion Orientation { get; private set; }
-        public Entity Parent { get; private set; }
+        public string Name { get; protected set; }
+        public Vector3 Position { get; protected set; }
+        public Quaternion Orientation { get; protected set; }
+        public Entity Parent { get; protected set; }
 
         protected Game _game;
 

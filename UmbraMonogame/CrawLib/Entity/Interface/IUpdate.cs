@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace UmbraClient.Entity.Interface {
-    interface IUpdate {
+namespace CrawLib.Entity.Interface {
+    public interface IUpdate {
         void Update();
     }
 }

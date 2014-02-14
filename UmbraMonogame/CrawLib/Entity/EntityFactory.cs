@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using UmbraClient.Entity.Interface;
+using CrawLib.Entity.Interface;
 
-namespace UmbraClient.Entity {
+namespace CrawLib.Entity {
     public class EntityFactory {
         public static IEntityGame Game;
 
         public static Entity CreateEntity(Type entityType, string name, Entity parent, Vector3 position, Quaternion orientation) {
             Entity entity = (Entity)Activator.CreateInstance(entityType, name, parent, position, orientation, Game);
 
-            Game.Entities.Add(entity);
+            if(Game != null)
+                Game.Entities.Add(entity);
 
             return entity;
         }

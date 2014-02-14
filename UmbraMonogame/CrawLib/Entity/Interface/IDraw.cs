@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace UmbraClient.Entity.Interface {
+namespace CrawLib.Entity.Interface {
     public interface IDraw {
         void Draw();
     }
