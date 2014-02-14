@@ -8,25 +8,26 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.GamerServices;
 using System;
 using System.Collections.Generic;
-using UmbraClient.Entity;
-using UmbraClient.Entity.Interface;
+using CrawLib.Entity;
+using CrawLib.Entity.Interface;
+using UmbraClient.Entities;
 #endregion
 
 namespace UmbraMonogame {
-    public class UmbraClient : Game, IEntityGame {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+    public class UmbraGame : Game, IEntityGame {
+        public GraphicsDeviceManager graphics;
+        public SpriteBatch spriteBatch;
 
         // TODO: move all this client stuff into a helper class, especially the Update logic
-        NetClient client;
-
-        // TODO: move this too
-        private Texture2D _hero;
+        public NetClient client;
 
         public EntityList Entities { get; private set; }
         public World World { get; private set; }
 
-        public UmbraClient()
+        // TEMP
+        private Player _player;
+
+        public UmbraGame()
             : base() {
 
             graphics = new GraphicsDeviceManager(this);
@@ -36,7 +37,7 @@ namespace UmbraMonogame {
 
             Entities = new EntityList();
             World = (World)EntityFactory.CreateEntity(typeof(World), "World", null);
-
+            
             NetPeerConfiguration config = new NetPeerConfiguration("MyExampleName");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             config.LocalAddress = NetUtility.Resolve("localhost");
@@ -54,8 +55,7 @@ namespace UmbraMonogame {
 
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            _hero = Content.Load<Texture2D>("Images/Hero");
+
         }
 
         protected override void UnloadContent() {
@@ -63,9 +63,38 @@ namespace UmbraMonogame {
         }
 
         protected override void Update(GameTime gameTime) {
+            // exit if back or esc pressed
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            ///////////////////////// TEMP /////////////////////////
+            if(_player != null) {
+                int xinput = 0;
+                int yinput = 0;
+
+                GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+                KeyboardState keyState = Keyboard.GetState();
+
+                // use arrows or dpad to move avatar
+                if(gamePadState.DPad.Left == ButtonState.Pressed || keyState.IsKeyDown(Keys.Left))
+                    xinput = -1;
+                if(gamePadState.DPad.Right == ButtonState.Pressed || keyState.IsKeyDown(Keys.Right))
+                    xinput = 1;
+                if(gamePadState.DPad.Up == ButtonState.Pressed || keyState.IsKeyDown(Keys.Up))
+                    yinput = -1;
+                if(gamePadState.DPad.Down == ButtonState.Pressed || keyState.IsKeyDown(Keys.Down))
+                    yinput = 1;
+
+                if(xinput != 0 || yinput != 0) {
+                    NetOutgoingMessage om = client.CreateMessage();
+                    om.Write(xinput); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
+                    om.Write(yinput);
+                    client.SendMessage(om, NetDeliveryMethod.Unreliable);
+                }
+            }
+            ///////////////////////// TEMP /////////////////////////
+
+            // read messages from server
             NetIncomingMessage msg;
 
             while((msg = client.ReadMessage()) != null) {
@@ -77,17 +106,25 @@ namespace UmbraMonogame {
 
                         client.Connect(msg.SenderEndpoint);
 
+                        _player = (Player)EntityFactory.CreateEntity(typeof(Player), "Player", World);
+
                         break;
                     case NetIncomingMessageType.Data:
                         Console.WriteLine("Received server data");
 
-                        // process data from server
+                        long playerId = msg.ReadInt64();
+
+                        float xPos = msg.ReadFloat();
+                        float yPos = msg.ReadFloat();
+
+                        _player.UpdatePosition(xPos, yPos);
 
                         break;
                     default: break;
                 }
             }
 
+            Entities.Update();
 
             base.Update(gameTime);
         }
@@ -95,9 +132,7 @@ namespace UmbraMonogame {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-            spriteBatch.Draw(_hero, Vector2.Zero, Color.White);
-            spriteBatch.End();
+            Entities.Draw();
 
             base.Draw(gameTime);
         }

@@ -11,7 +11,7 @@ namespace UmbraMonogame {
         [STAThread]
         static void Main()
         {
-            using (var game = new UmbraClient())
+            using (var game = new UmbraGame())
                 game.Run();
         }
     }
