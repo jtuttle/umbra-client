@@ -37,8 +37,8 @@ namespace UmbraMonogame {
 
             Entities = new EntityList();
             World = (World)EntityFactory.CreateEntity(typeof(World), "World", null);
-            
-            NetPeerConfiguration config = new NetPeerConfiguration("MyExampleName");
+
+            NetPeerConfiguration config = new NetPeerConfiguration("Umbra");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
             config.LocalAddress = NetUtility.Resolve("localhost");
 
