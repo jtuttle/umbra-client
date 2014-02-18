@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="artemis">
+      <HintPath>lib\artemis.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.dll</HintPath>
     </Reference>
@@ -43,6 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Artemis\Components\SpatialFormComponent.cs" />
+    <Compile Include="Artemis\Components\TransformComponent.cs" />
+    <Compile Include="Artemis\Components\VelocityComponent.cs" />
+    <Compile Include="Artemis\Systems\MovementSystem.cs" />
     <Compile Include="Entity\Entity.cs" />
     <Compile Include="Entity\EntityFactory.cs" />
     <Compile Include="Entity\EntityList.cs" />
@@ -52,6 +59,7 @@
     <Compile Include="Entity\World.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
