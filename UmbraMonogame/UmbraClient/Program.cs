@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 #endregion
 
-namespace UmbraMonogame {
+namespace UmbraClient {
 #if WINDOWS || LINUX
     public static class Program
     {

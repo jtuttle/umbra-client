@@ -2,32 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CrawLib.Entity;
-using UmbraServer.Entities;
+using Artemis;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
+using CrawLib.Artemis.Components;
 
 namespace UmbraServer {
     public class UmbraGameServer {
         private NetPeerConfiguration _netConfig;
         private NetServer _netServer;
 
-        private Dictionary<long, Player> _players;
-        private World _world;
+        private EntityWorld _entityWorld;
 
         private float _updatesPerSecond = 30.0f;
         private double _nextSendUpdates = NetTime.Now;
 
         public UmbraGameServer() {
-            _world = (World)EntityFactory.CreateEntity(typeof(World), "World", null);
-
-            _players = new Dictionary<long, Player>();
-
             // TODO: probably want to move this to an XML file or something at some point
             _netConfig = new NetPeerConfiguration("Umbra");
             _netConfig.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
             _netConfig.LocalAddress = NetUtility.Resolve("localhost");
             _netConfig.Port = 14242;
+        }
+
+        public void Initialize() {
+            _entityWorld = new EntityWorld();
+            _entityWorld.InitializeAll(new[] { GetType().Assembly });
         }
 
         public void Start() {
@@ -46,9 +46,9 @@ namespace UmbraServer {
         public void Update() {
             ReadMessages();
 
-            // do physics step
+            _entityWorld.Update();
 
-            SendUpdates();
+            //SendUpdates();
         }
 
         private void ReadMessages() {
@@ -70,8 +70,9 @@ namespace UmbraServer {
 
                         switch(status) {
                             case NetConnectionStatus.Connected:
-                                Player player = (Player)EntityFactory.CreateEntity(typeof(Player), "Player", _world);
-                                _players[playerId] = player;
+                                Entity player = _entityWorld.CreateEntity();
+                                player.AddComponent(new TransformComponent());
+                                player.AddComponent(new VelocityComponent());
 
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -87,7 +88,7 @@ namespace UmbraServer {
                         int xInput = msg.ReadInt32();
                         int yInput = msg.ReadInt32();
 
-                        _players[msg.SenderConnection.RemoteUniqueIdentifier].UpdatePosition(xInput, yInput);
+                        //_players[msg.SenderConnection.RemoteUniqueIdentifier].UpdatePosition(xInput, yInput);
 
                         break;
                     case NetIncomingMessageType.DebugMessage:
@@ -113,9 +114,9 @@ namespace UmbraServer {
                         // write who this position is for
                         om.Write(playerId);
 
-                        Vector3 position = _players[playerId].Position;
-                        om.Write(position.X);
-                        om.Write(position.Y);
+                        //Vector3 position = _players[playerId].Position;
+                        //om.Write(position.X);
+                        //om.Write(position.Y);
                             
                             // send message
                         _netServer.SendMessage(om, player, NetDeliveryMethod.Unreliable);
