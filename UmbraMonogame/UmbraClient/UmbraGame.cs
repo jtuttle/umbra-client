@@ -8,35 +8,27 @@ using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.GamerServices;
 using System;
 using System.Collections.Generic;
-using CrawLib.Entity;
-using CrawLib.Entity.Interface;
-using UmbraClient.Entities;
+using Artemis;
+using CrawLib.Artemis.Components;
+using Artemis.System;
 #endregion
 
-namespace UmbraMonogame {
-    public class UmbraGame : Game, IEntityGame {
+namespace UmbraClient {
+    public class UmbraGame : Game {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
         // TODO: move all this client stuff into a helper class, especially the Update logic
         public NetClient client;
 
-        public EntityList Entities { get; private set; }
-        public World World { get; private set; }
-
-        // TEMP
-        private Player _player;
+        private EntityWorld _entityWorld;
+        private Entity _player;
 
         public UmbraGame()
             : base() {
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            EntityFactory.Game = (IEntityGame)this;
-
-            Entities = new EntityList();
-            World = (World)EntityFactory.CreateEntity(typeof(World), "World", null);
 
             NetPeerConfiguration config = new NetPeerConfiguration("Umbra");
             config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
@@ -46,6 +38,15 @@ namespace UmbraMonogame {
         }
 
         protected override void Initialize() {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _entityWorld = new EntityWorld();
+            
+            EntitySystem.BlackBoard.SetEntry("ContentManager", this.Content);
+            EntitySystem.BlackBoard.SetEntry("SpriteBatch", this.spriteBatch);
+
+            _entityWorld.InitializeAll(new[] { GetType().Assembly });
+
             client.Start();
 
             client.DiscoverLocalPeers(14242);
@@ -53,13 +54,8 @@ namespace UmbraMonogame {
             base.Initialize();
         }
 
-        protected override void LoadContent() {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        }
-
         protected override void UnloadContent() {
-        
+            
         }
 
         protected override void Update(GameTime gameTime) {
@@ -68,31 +64,22 @@ namespace UmbraMonogame {
                 Exit();
 
             ///////////////////////// TEMP /////////////////////////
+            // semi-authoritative setup where client dictates position
             if(_player != null) {
-                int xinput = 0;
-                int yinput = 0;
+                TransformComponent transform = _player.GetComponent<TransformComponent>();
 
-                GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-                KeyboardState keyState = Keyboard.GetState();
+                if(transform.Dirty) {
+                    transform.Dirty = false;
 
-                // use arrows or dpad to move avatar
-                if(gamePadState.DPad.Left == ButtonState.Pressed || keyState.IsKeyDown(Keys.Left))
-                    xinput = -1;
-                if(gamePadState.DPad.Right == ButtonState.Pressed || keyState.IsKeyDown(Keys.Right))
-                    xinput = 1;
-                if(gamePadState.DPad.Up == ButtonState.Pressed || keyState.IsKeyDown(Keys.Up))
-                    yinput = -1;
-                if(gamePadState.DPad.Down == ButtonState.Pressed || keyState.IsKeyDown(Keys.Down))
-                    yinput = 1;
-
-                if(xinput != 0 || yinput != 0) {
                     NetOutgoingMessage om = client.CreateMessage();
-                    om.Write(xinput); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
-                    om.Write(yinput);
+                    om.Write(transform.X); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
+                    om.Write(transform.Y);
                     client.SendMessage(om, NetDeliveryMethod.Unreliable);
                 }
             }
             ///////////////////////// TEMP /////////////////////////
+
+            _entityWorld.Update();
 
             // read messages from server
             NetIncomingMessage msg;
@@ -106,25 +93,29 @@ namespace UmbraMonogame {
 
                         client.Connect(msg.SenderEndpoint);
 
-                        _player = (Player)EntityFactory.CreateEntity(typeof(Player), "Player", World);
+                        //Vector2 center = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+
+                        _player = _entityWorld.CreateEntity();
+                        _player.AddComponent(new TransformComponent());
+                        _player.AddComponent(new VelocityComponent());
+                        _player.AddComponent(new SpatialFormComponent("Hero"));
+                        _player.Tag = "PLAYER";
 
                         break;
                     case NetIncomingMessageType.Data:
                         Console.WriteLine("Received server data");
 
-                        long playerId = msg.ReadInt64();
+                        //long playerId = msg.ReadInt64();
 
-                        float xPos = msg.ReadFloat();
-                        float yPos = msg.ReadFloat();
+                        //float xPos = msg.ReadFloat();
+                        //float yPos = msg.ReadFloat();
 
-                        _player.UpdatePosition(xPos, yPos);
+                        //_player.UpdatePosition(xPos, yPos);
 
                         break;
                     default: break;
                 }
             }
-
-            Entities.Update();
 
             base.Update(gameTime);
         }
@@ -132,7 +123,11 @@ namespace UmbraMonogame {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            Entities.Draw();
+            spriteBatch.Begin();
+
+            _entityWorld.Draw();
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
