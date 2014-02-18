@@ -7,8 +7,24 @@ using Microsoft.Xna.Framework;
 
 namespace CrawLib.Artemis.Components {
     public class TransformComponent : IComponent {
-        public float X { get; set; }
-        public float Y { get; set; }
+        private float _x;
+        public float X {
+            get { return _x; }
+            set {
+                if(_x != value)
+                    Dirty = true;
+                _x = value;
+            }
+        }
+
+        private float _y;
+        public float Y {
+            get { return _y; }
+            set {
+                if(_y != value) Dirty = true;
+                _y = value;
+            }
+        }
 
         public Vector2 Position {
             get { return new Vector2(this.X, this.Y); }
@@ -18,6 +34,8 @@ namespace CrawLib.Artemis.Components {
             }
         }
 
+        public bool Dirty { get; set; }
+
         public TransformComponent()
             : this(Vector2.Zero) {
 
@@ -25,11 +43,13 @@ namespace CrawLib.Artemis.Components {
 
         public TransformComponent(float x, float y)
             : this(new Vector2(x, y)) {
-        
+
         }
 
         public TransformComponent(Vector2 position) {
             Position = position;
+
+            Dirty = false;
         }
     }
 }

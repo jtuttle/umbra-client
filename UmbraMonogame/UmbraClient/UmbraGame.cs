@@ -22,6 +22,7 @@ namespace UmbraClient {
         public NetClient client;
 
         private EntityWorld _entityWorld;
+        private Entity _player;
 
         public UmbraGame()
             : base() {
@@ -54,7 +55,7 @@ namespace UmbraClient {
         }
 
         protected override void UnloadContent() {
-        
+            
         }
 
         protected override void Update(GameTime gameTime) {
@@ -63,30 +64,19 @@ namespace UmbraClient {
                 Exit();
 
             ///////////////////////// TEMP /////////////////////////
-            //if(_player != null) {
-            //    int xinput = 0;
-            //    int yinput = 0;
+            // semi-authoritative setup where client dictates position
+            if(_player != null) {
+                TransformComponent transform = _player.GetComponent<TransformComponent>();
 
-            //    GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
-            //    KeyboardState keyState = Keyboard.GetState();
+                if(transform.Dirty) {
+                    transform.Dirty = false;
 
-            //    // use arrows or dpad to move avatar
-            //    if(gamePadState.DPad.Left == ButtonState.Pressed || keyState.IsKeyDown(Keys.Left))
-            //        xinput = -1;
-            //    if(gamePadState.DPad.Right == ButtonState.Pressed || keyState.IsKeyDown(Keys.Right))
-            //        xinput = 1;
-            //    if(gamePadState.DPad.Up == ButtonState.Pressed || keyState.IsKeyDown(Keys.Up))
-            //        yinput = -1;
-            //    if(gamePadState.DPad.Down == ButtonState.Pressed || keyState.IsKeyDown(Keys.Down))
-            //        yinput = 1;
-
-            //    if(xinput != 0 || yinput != 0) {
-            //        NetOutgoingMessage om = client.CreateMessage();
-            //        om.Write(xinput); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
-            //        om.Write(yinput);
-            //        client.SendMessage(om, NetDeliveryMethod.Unreliable);
-            //    }
-            //}
+                    NetOutgoingMessage om = client.CreateMessage();
+                    om.Write(transform.X); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
+                    om.Write(transform.Y);
+                    client.SendMessage(om, NetDeliveryMethod.Unreliable);
+                }
+            }
             ///////////////////////// TEMP /////////////////////////
 
             _entityWorld.Update();
@@ -103,24 +93,22 @@ namespace UmbraClient {
 
                         client.Connect(msg.SenderEndpoint);
 
-                        Vector2 center = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                        //Vector2 center = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
 
-                        Entity player = _entityWorld.CreateEntity();
-                        player.AddComponent(new TransformComponent(center));
-                        player.AddComponent(new VelocityComponent());
-                        player.AddComponent(new SpatialFormComponent("Hero"));
-                        player.Tag = "PLAYER";
-
-                        //_player = (Player)EntityFactory.CreateEntity(typeof(Player), "Player", World);
+                        _player = _entityWorld.CreateEntity();
+                        _player.AddComponent(new TransformComponent());
+                        _player.AddComponent(new VelocityComponent());
+                        _player.AddComponent(new SpatialFormComponent("Hero"));
+                        _player.Tag = "PLAYER";
 
                         break;
                     case NetIncomingMessageType.Data:
                         Console.WriteLine("Received server data");
 
-                        long playerId = msg.ReadInt64();
+                        //long playerId = msg.ReadInt64();
 
-                        float xPos = msg.ReadFloat();
-                        float yPos = msg.ReadFloat();
+                        //float xPos = msg.ReadFloat();
+                        //float yPos = msg.ReadFloat();
 
                         //_player.UpdatePosition(xPos, yPos);
 

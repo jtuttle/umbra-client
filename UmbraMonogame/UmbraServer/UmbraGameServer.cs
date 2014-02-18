@@ -13,6 +13,7 @@ namespace UmbraServer {
         private NetServer _netServer;
 
         private EntityWorld _entityWorld;
+        private Dictionary<long, Entity> _players;
 
         private float _updatesPerSecond = 30.0f;
         private double _nextSendUpdates = NetTime.Now;
@@ -28,6 +29,8 @@ namespace UmbraServer {
         public void Initialize() {
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
+
+            _players = new Dictionary<long, Entity>();
         }
 
         public void Start() {
@@ -53,6 +56,7 @@ namespace UmbraServer {
 
         private void ReadMessages() {
             NetIncomingMessage msg;
+            Entity player;
 
             // read messages from server
             while((msg = _netServer.ReadMessage()) != null) {
@@ -70,9 +74,14 @@ namespace UmbraServer {
 
                         switch(status) {
                             case NetConnectionStatus.Connected:
-                                Entity player = _entityWorld.CreateEntity();
-                                player.AddComponent(new TransformComponent());
+                                player = _entityWorld.CreateEntity();
+                                player.AddComponent(new TransformComponent(0, 0));
                                 player.AddComponent(new VelocityComponent());
+                                
+                                // send message to client with unique id for player creation
+                                // every time an entity is created, this is how it'll have to be
+
+                                _players[playerId] = player;
 
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -83,12 +92,13 @@ namespace UmbraServer {
 
                         break;
                     case NetIncomingMessageType.Data:
-                        // process client data
+                        int xPos = msg.ReadInt32();
+                        int yPos = msg.ReadInt32();
 
-                        int xInput = msg.ReadInt32();
-                        int yInput = msg.ReadInt32();
+                        player = _players[msg.SenderConnection.RemoteUniqueIdentifier];
+                        TransformComponent transform = player.GetComponent<TransformComponent>();
 
-                        //_players[msg.SenderConnection.RemoteUniqueIdentifier].UpdatePosition(xInput, yInput);
+                        transform.Position = new Vector2(xPos, yPos);
 
                         break;
                     case NetIncomingMessageType.DebugMessage:
@@ -107,19 +117,19 @@ namespace UmbraServer {
 			    foreach (NetConnection player in _netServer.Connections) {
 					foreach (NetConnection otherPlayer in _netServer.Connections) {
                         // send position update about 'otherPlayer' to 'player'
-                        NetOutgoingMessage om = _netServer.CreateMessage();
+                        //NetOutgoingMessage om = _netServer.CreateMessage();
 
-                        long playerId = otherPlayer.RemoteUniqueIdentifier;
+                        //long playerId = otherPlayer.RemoteUniqueIdentifier;
 
                         // write who this position is for
-                        om.Write(playerId);
+                        //om.Write(playerId);
 
                         //Vector3 position = _players[playerId].Position;
                         //om.Write(position.X);
                         //om.Write(position.Y);
                             
-                            // send message
-                        _netServer.SendMessage(om, player, NetDeliveryMethod.Unreliable);
+                        // send message
+                        //_netServer.SendMessage(om, player, NetDeliveryMethod.Unreliable);
 					}
 				}
 
