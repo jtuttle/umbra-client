@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using CrawLib.Entity;
 using Microsoft.Xna.Framework;
-using CrawLib.Entity.Interface;
 
 namespace UmbraServer {
     class Program {
