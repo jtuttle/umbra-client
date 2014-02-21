@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Artemis;
 using CrawLib.Artemis.Components;
 using Artemis.System;
+using CrawLib;
 #endregion
 
 namespace UmbraClient {
