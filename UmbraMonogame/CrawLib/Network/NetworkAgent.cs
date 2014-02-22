@@ -24,6 +24,9 @@ namespace CrawLib.Network {
 
         private List<NetIncomingMessage> _incomingMessages;
 
+        private float _updatesPerSecond = 30.0f;
+        private double _nextSendUpdates = NetTime.Now;
+
         public List<NetConnection> Connections {
             get { return _peer.Connections; }
         }
@@ -103,9 +106,15 @@ namespace CrawLib.Network {
         }
 
         public void SendMessages() {
-            while(NetworkAgent.MessageQueue.Count > 0) {
-                INetworkMessage outgoingMessage = NetworkAgent.MessageQueue.Dequeue();
-                BroadcastMessage(outgoingMessage);
+            double now = NetTime.Now;
+
+            if(now > _nextSendUpdates) {
+                while(NetworkAgent.MessageQueue.Count > 0) {
+                    INetworkMessage outgoingMessage = NetworkAgent.MessageQueue.Dequeue();
+                    BroadcastMessage(outgoingMessage);
+                }
+
+                _nextSendUpdates += (1.0 / _updatesPerSecond);
             }
         }
 

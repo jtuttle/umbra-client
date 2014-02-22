@@ -22,12 +22,6 @@ namespace UmbraServer {
         private EntityWorld _entityWorld;
         private Dictionary<long, Entity> _entities;
 
-        private float _updatesPerSecond = 30.0f;
-        private double _nextSendUpdates = NetTime.Now;
-
-        // temp
-        private Entity _player;
-
         public UmbraGameServer() {
             
         }
@@ -85,9 +79,6 @@ namespace UmbraServer {
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, transformComponent.Position);
             _netAgent.BroadcastMessage(msg, true);
-
-            // temp
-            _player = player;
         }
 
         private void OnEntityAdded(Entity entity) {
