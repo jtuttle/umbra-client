@@ -39,7 +39,7 @@
     <Compile Include="Spatials\Hero.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
-    <Compile Include="UmbraGame.cs" />
+    <Compile Include="UmbraGameClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -78,6 +78,10 @@
     <ProjectReference Include="..\CrawLib\CrawLib.csproj">
       <Project>{DF7E009E-C7F5-41A2-AF7A-8718BD355940}</Project>
       <Name>CrawLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UmbraLib\UmbraLib.csproj">
+      <Project>{D37EE1D9-0798-4821-B8A7-D8C03C8D312B}</Project>
+      <Name>UmbraLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
