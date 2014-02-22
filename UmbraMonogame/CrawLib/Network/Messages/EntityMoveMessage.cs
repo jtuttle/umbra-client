@@ -11,6 +11,8 @@ namespace CrawLib.Network.Messages {
     public class EntityMoveMessage : EntityMessage {
         public Vector2 Position { get; set; }
 
+        public EntityMoveMessage() : base() { }
+
         // TODO: instead of passing an entity in, maybe stick to primitive types?
         // breaks coupling with Artemis
         public EntityMoveMessage(long entityId, Vector2 position)

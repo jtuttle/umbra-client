@@ -53,7 +53,7 @@ namespace UmbraServer {
         private void OnPlayerConnect() {
             Entity player = _entityWorld.CreateEntity();
 
-            TransformComponent transform = new TransformComponent(0, 0);
+            TransformComponent transform = new TransformComponent(100, 100);
             player.AddComponent(transform);
             player.AddComponent(new VelocityComponent());
 
