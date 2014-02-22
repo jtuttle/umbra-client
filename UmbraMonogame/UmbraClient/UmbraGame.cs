@@ -12,6 +12,7 @@ using Artemis;
 using CrawLib.Artemis.Components;
 using Artemis.System;
 using CrawLib;
+using CrawLib.Network;
 #endregion
 
 namespace UmbraClient {
@@ -19,8 +20,7 @@ namespace UmbraClient {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
-        // TODO: move all this client stuff into a helper class, especially the Update logic
-        public NetClient client;
+        public NetworkAgent netAgent;
 
         private EntityWorld _entityWorld;
         private Entity _player;
@@ -30,12 +30,6 @@ namespace UmbraClient {
 
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            NetPeerConfiguration config = new NetPeerConfiguration("Umbra");
-            config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
-            config.LocalAddress = NetUtility.Resolve("localhost");
-
-            client = new NetClient(config);
         }
 
         protected override void Initialize() {
@@ -48,9 +42,8 @@ namespace UmbraClient {
 
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            client.Start();
-
-            client.DiscoverLocalPeers(14242);
+            netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
+            netAgent.Connect("127.0.0.1");
 
             base.Initialize();
         }
@@ -64,6 +57,7 @@ namespace UmbraClient {
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            /*
             ///////////////////////// TEMP /////////////////////////
             // semi-authoritative setup where client dictates position
             if(_player != null) {
@@ -79,9 +73,13 @@ namespace UmbraClient {
                 }
             }
             ///////////////////////// TEMP /////////////////////////
+            */
+
+            List<NetIncomingMessage> message = netAgent.ReadMessages();
 
             _entityWorld.Update();
 
+            /*
             // read messages from server
             NetIncomingMessage msg;
 
@@ -117,6 +115,7 @@ namespace UmbraClient {
                     default: break;
                 }
             }
+            */
 
             base.Update(gameTime);
         }
@@ -134,7 +133,7 @@ namespace UmbraClient {
         }
 
         protected override void OnExiting(object sender, EventArgs args) {
-            client.Shutdown("bye");
+            netAgent.Shutdown();
 
             base.OnExiting(sender, args);
         }

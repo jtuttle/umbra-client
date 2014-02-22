@@ -6,11 +6,11 @@ using Artemis;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using CrawLib.Artemis.Components;
+using CrawLib.Network;
 
 namespace UmbraServer {
     public class UmbraGameServer {
-        private NetPeerConfiguration _netConfig;
-        private NetServer _netServer;
+        private NetworkAgent _netAgent;
 
         private EntityWorld _entityWorld;
         private Dictionary<long, Entity> _players;
@@ -19,11 +19,7 @@ namespace UmbraServer {
         private double _nextSendUpdates = NetTime.Now;
 
         public UmbraGameServer() {
-            // TODO: probably want to move this to an XML file or something at some point
-            _netConfig = new NetPeerConfiguration("Umbra");
-            _netConfig.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
-            _netConfig.LocalAddress = NetUtility.Resolve("localhost");
-            _netConfig.Port = 14242;
+            
         }
 
         public void Initialize() {
@@ -31,29 +27,27 @@ namespace UmbraServer {
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             _players = new Dictionary<long, Entity>();
+
+            _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
         }
 
         public void Start() {
-            _netServer = new NetServer(_netConfig);
-            _netServer.Start();
-
-            Console.WriteLine("Server running on " + _netConfig.LocalAddress + ":" + _netServer.Port);
+            
         }
         
         public void Shutdown() {
-            Console.WriteLine("Server shutting down");
-
-            _netServer.Shutdown("app exiting");
+            _netAgent.Shutdown();
         }
 
         public void Update() {
-            ReadMessages();
+            List<NetIncomingMessage> messages = _netAgent.ReadMessages();
 
             _entityWorld.Update();
 
             //SendUpdates();
         }
 
+        /*
         private void ReadMessages() {
             NetIncomingMessage msg;
             Entity player;
@@ -137,5 +131,6 @@ namespace UmbraServer {
                 _nextSendUpdates += (1.0 / _updatesPerSecond);
 			}
         }
+        */
     }
 }
