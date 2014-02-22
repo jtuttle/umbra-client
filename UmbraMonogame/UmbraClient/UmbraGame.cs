@@ -14,6 +14,7 @@ using Artemis.System;
 using CrawLib;
 using CrawLib.Network;
 using CrawLib.Network.Messages;
+using UmbraLib;
 #endregion
 
 namespace UmbraClient {
@@ -80,12 +81,13 @@ namespace UmbraClient {
 
             foreach(NetIncomingMessage netMessage in messages) {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
-
+                
                 if(messageType == NetworkMessageType.EntityAdd) {
+                    EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>();
+                    msg.Decode(netMessage);
 
-
-                    _player = _entityWorld.CreateEntity();
-                    _player.AddComponent(new TransformComponent());
+                    _player = _entityWorld.CreateEntity(msg.EntityId);
+                    _player.AddComponent(new TransformComponent(msg.Position));
                     _player.AddComponent(new VelocityComponent());
                     _player.AddComponent(new SpatialFormComponent("Hero"));
                     _player.Tag = "PLAYER";

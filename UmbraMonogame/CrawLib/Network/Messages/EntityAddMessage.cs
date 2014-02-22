@@ -8,9 +8,11 @@ using CrawLib.Artemis.Components;
 using Microsoft.Xna.Framework;
 
 namespace CrawLib.Network.Messages {
-    public class EntityAddMessage<TEnum> : EntityMessage where TEnum : byte {
+    public class EntityAddMessage<TEnum> : EntityMessage {
         public TEnum EntityType { get; private set; }
         public Vector2 Position { get; private set; }
+
+        public EntityAddMessage() : base() { }
 
         public EntityAddMessage(long entityId, TEnum entityType, Vector2 position)
             : base(entityId, NetworkMessageType.EntityAdd) {
@@ -20,19 +22,19 @@ namespace CrawLib.Network.Messages {
         }
 
         public override void Decode(NetIncomingMessage msg) {
-            EntityId = msg.ReadInt64();
+            base.Decode(msg);
 
-            // read entity type
+            EntityType = (TEnum)Enum.ToObject(typeof(TEnum), msg.ReadByte());
 
-            int x = msg.ReadInt32();
-            int y = msg.ReadInt32();
+            float x = msg.ReadFloat();
+            float y = msg.ReadFloat();
             Position = new Vector2(x, y);
         }
 
         public override void Encode(NetOutgoingMessage msg) {
-            msg.Write(EntityId);
+            base.Encode(msg);
 
-            msg.Write((byte)EntityType);
+            msg.Write(Convert.ToByte(EntityType));
 
             msg.Write(Position.X);
             msg.Write(Position.Y);

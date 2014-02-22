@@ -61,7 +61,6 @@
     <Compile Include="Network\Messages\INetworkMessage.cs" />
     <Compile Include="Network\NetworkAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UmbraConstants.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

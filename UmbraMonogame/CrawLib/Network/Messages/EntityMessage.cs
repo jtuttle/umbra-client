@@ -11,12 +11,19 @@ namespace CrawLib.Network.Messages {
 
         public long EntityId { get; protected set; }
 
+        public EntityMessage() { }
+
         public EntityMessage(long entityId, NetworkMessageType messageType) {
             EntityId = entityId;
             _messageType = messageType;
         }
 
-        public virtual void Decode(NetIncomingMessage message) { }
-        public virtual void Encode(NetOutgoingMessage message) { }
+        public virtual void Decode(NetIncomingMessage msg) {
+            EntityId = msg.ReadInt64();
+        }
+
+        public virtual void Encode(NetOutgoingMessage msg) {
+            msg.Write(EntityId);
+        }
     }
 }
