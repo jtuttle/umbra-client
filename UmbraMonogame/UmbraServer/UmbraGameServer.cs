@@ -7,6 +7,8 @@ using Lidgren.Network;
 using Microsoft.Xna.Framework;
 using CrawLib.Artemis.Components;
 using CrawLib.Network;
+using CrawLib.Network.Messages;
+using UmbraLib;
 
 namespace UmbraServer {
     public class UmbraGameServer {
@@ -29,6 +31,7 @@ namespace UmbraServer {
             _players = new Dictionary<long, Entity>();
 
             _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
+            _netAgent.OnPlayerConnect += OnPlayerConnect;
         }
 
         public void Start() {
@@ -45,6 +48,17 @@ namespace UmbraServer {
             _entityWorld.Update();
 
             //SendUpdates();
+        }
+
+        private void OnPlayerConnect() {
+            Entity player = _entityWorld.CreateEntity();
+
+            TransformComponent transform = new TransformComponent(0, 0);
+            player.AddComponent(transform);
+            player.AddComponent(new VelocityComponent());
+
+            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, transform.Position);
+            _netAgent.BroadcastMessage(msg);
         }
 
         /*

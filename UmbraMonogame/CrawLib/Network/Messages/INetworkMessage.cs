@@ -5,12 +5,13 @@ using System.Text;
 using Lidgren.Network;
 
 namespace CrawLib.Network.Messages {
-    public enum MessageType : byte {
-        EntityAdd
+    public enum NetworkMessageType : byte {
+        EntityAdd,
+        EntityMove
     }
 
-    public interface INetMessage {
-        MessageType MessageType { get; }
+    public interface INetworkMessage {
+        NetworkMessageType MessageType { get; }
         void Decode(NetIncomingMessage message);
         void Encode(NetOutgoingMessage message);
     }

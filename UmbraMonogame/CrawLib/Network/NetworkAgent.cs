@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lidgren.Network;
+using CrawLib.Network.Messages;
 
 namespace CrawLib.Network {
     public enum AgentRole { 
@@ -11,13 +12,17 @@ namespace CrawLib.Network {
     }
 
     public class NetworkAgent {
+        public delegate void PlayerConnectDelegate();
+        public event PlayerConnectDelegate OnPlayerConnect = delegate { };
+
+        public static Queue<INetworkMessage> MessageQueue = new Queue<INetworkMessage>();
+
         private AgentRole _role;
         private NetPeer _peer;
         private NetPeerConfiguration _config;
         private int _port = 14242;
 
         private List<NetIncomingMessage> _incomingMessages;
-        private NetOutgoingMessage _outgoingMessage;
 
         public List<NetConnection> Connections {
             get { return _peer.Connections; }
@@ -59,24 +64,10 @@ namespace CrawLib.Network {
             _peer.Shutdown("Closing conection.");
         }
 
-        public void SendMessage(NetConnection recipient) {
-            SendMessage(recipient, false);   
-        }
-
-        public void SendMessage(NetConnection recipient, bool guaranteed) {
-            NetDeliveryMethod method = (guaranteed ? NetDeliveryMethod.ReliableOrdered : NetDeliveryMethod.UnreliableSequenced);
-
-            // one optimization trick for Lidgren is to call CreateMessage with a size argument to prevent dynamic resizing 
-            // of the message, so this is probably not very smart since you have no idea about the size this early on
-            _peer.SendMessage(_outgoingMessage, recipient, method);
-            _outgoingMessage = _peer.CreateMessage();
-        }
-
         public List<NetIncomingMessage> ReadMessages() {
             _incomingMessages.Clear();
 
             NetIncomingMessage msg;
-            string output = "";
 
             while((msg = _peer.ReadMessage()) != null) {
                 Log("Received " + msg.MessageType + " message");
@@ -90,35 +81,57 @@ namespace CrawLib.Network {
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.ErrorMessage:
                         if(_role == AgentRole.Server)
-                            output += msg.ReadString() + "\n";
+                            Log(msg.ReadString());
                         break;
                     case NetIncomingMessageType.StatusChanged:
                         NetConnectionStatus status = (NetConnectionStatus)msg.ReadByte();
+                        Log("Status message: " + msg.ReadString());
 
-                        if(_role == AgentRole.Server)
-                            output += "Status message: " + msg.ReadString() + "\n";
-
-                        if(status == NetConnectionStatus.Connected) {
-                            // PLAYER CONNECTED
-                        }
+                        if(status == NetConnectionStatus.Connected)
+                            OnPlayerConnect();
                         break;
                     case NetIncomingMessageType.Data:
                         _incomingMessages.Add(msg);
                         break;
                     default:
-                        output += "ERROR: Unknown message type";
+                        Log("ERROR: Unknown message type");
                         break;
                 }
             }
 
-            if(_role == AgentRole.Server)
-                Log(output);
-
             return _incomingMessages;
         }
 
+        public void SendMessage(INetworkMessage msg, NetConnection recipient) {
+            SendMessage(msg, recipient, false);
+        }
+
+        public void SendMessage(INetworkMessage msg, NetConnection recipient, bool guaranteed) {
+            NetDeliveryMethod method = (guaranteed ? NetDeliveryMethod.ReliableOrdered : NetDeliveryMethod.UnreliableSequenced);
+
+            // opt - tell the peer the message size
+            NetOutgoingMessage outgoing = _peer.CreateMessage();
+            outgoing.Write((byte)msg.MessageType);
+            msg.Encode(outgoing);
+
+            _peer.SendMessage(outgoing, recipient, method);
+        }
+
+        public void BroadcastMessage(INetworkMessage msg) {
+            BroadcastMessage(msg, false);
+        }
+
+        public void BroadcastMessage(INetworkMessage msg, bool guaranteed) {
+            if(_role == AgentRole.Server) {
+                foreach(NetConnection connection in _peer.Connections)
+                    SendMessage(msg, connection, guaranteed);
+            } else {
+                throw new SystemException("Attempted to broadcast as client. Only server should broadcast.");
+            }
+        }
+
         private void Log(string output) {
-            Console.Write(output);
+            Console.WriteLine(output);
         }
     }
 }

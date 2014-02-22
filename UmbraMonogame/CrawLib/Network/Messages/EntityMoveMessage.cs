@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Artemis;
 using Lidgren.Network;
+using Artemis;
 using CrawLib.Artemis.Components;
 using Microsoft.Xna.Framework;
 
 namespace CrawLib.Network.Messages {
-    public class EntityAddMessage<TEnum> : EntityMessage where TEnum : byte {
-        public TEnum EntityType { get; private set; }
-        public Vector2 Position { get; private set; }
+    public class EntityMoveMessage : EntityMessage {
+        public Vector2 Position { get; set; }
 
-        public EntityAddMessage(long entityId, TEnum entityType, Vector2 position)
-            : base(entityId, NetworkMessageType.EntityAdd) {
+        // TODO: instead of passing an entity in, maybe stick to primitive types?
+        // breaks coupling with Artemis
+        public EntityMoveMessage(long entityId, Vector2 position)
+            : base(entityId, NetworkMessageType.EntityMove) {
 
-            EntityType = entityType;
             Position = position;
         }
 
         public override void Decode(NetIncomingMessage msg) {
-            EntityId = msg.ReadInt64();
+            long entityId = msg.ReadInt64();
 
             // read entity type
 
@@ -32,7 +32,7 @@ namespace CrawLib.Network.Messages {
         public override void Encode(NetOutgoingMessage msg) {
             msg.Write(EntityId);
 
-            msg.Write((byte)EntityType);
+            // type of entity
 
             msg.Write(Position.X);
             msg.Write(Position.Y);

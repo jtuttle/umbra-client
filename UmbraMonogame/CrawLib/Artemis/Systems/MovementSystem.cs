@@ -6,6 +6,8 @@ using Artemis.System;
 using Artemis;
 using Microsoft.Xna.Framework;
 using CrawLib.Artemis.Components;
+using CrawLib.Network;
+using CrawLib.Network.Messages;
 
 namespace UmbraServer.Systems {
     public class MovementSystem : EntityComponentProcessingSystem<TransformComponent, VelocityComponent> {
@@ -15,6 +17,8 @@ namespace UmbraServer.Systems {
 
                 transform.X += (float)(Math.Cos(MathHelper.ToRadians(velocity.Angle)) * velocity.Speed * ms);
                 transform.Y += (float)(Math.Sin(MathHelper.ToRadians(velocity.Angle)) * velocity.Speed * ms);
+
+                NetworkAgent.MessageQueue.Enqueue(new EntityMoveMessage(entity.UniqueId, transform.Position));
             }
         }
     }
