@@ -18,6 +18,10 @@ namespace UmbraServer.Systems {
                 transform.X += (float)(Math.Cos(MathHelper.ToRadians(velocity.Angle)) * velocity.Speed * ms);
                 transform.Y += (float)(Math.Sin(MathHelper.ToRadians(velocity.Angle)) * velocity.Speed * ms);
 
+                // this produces FAR too many move events, we only want to update just before sending game state
+                // instead of having a queue that gets emptied every x milliseconds, it would be better to store
+                // the current delta in the component and then have the server collect the world state just before 
+                // it's time to send messages
                 NetworkAgent.MessageQueue.Enqueue(new EntityMoveMessage(entity.UniqueId, transform.Position));
             }
         }

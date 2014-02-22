@@ -24,7 +24,7 @@ namespace CrawLib.Network {
 
         private List<NetIncomingMessage> _incomingMessages;
 
-        private float _updatesPerSecond = 30.0f;
+        private float _updatesPerSecond = 1.0f;
         private double _nextSendUpdates = NetTime.Now;
 
         public List<NetConnection> Connections {
@@ -109,6 +109,8 @@ namespace CrawLib.Network {
             double now = NetTime.Now;
 
             if(now > _nextSendUpdates) {
+                Console.WriteLine("sending update");
+
                 while(NetworkAgent.MessageQueue.Count > 0) {
                     INetworkMessage outgoingMessage = NetworkAgent.MessageQueue.Dequeue();
                     BroadcastMessage(outgoingMessage);
