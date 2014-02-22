@@ -59,24 +59,6 @@ namespace UmbraClient {
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            /*
-            ///////////////////////// TEMP /////////////////////////
-            // semi-authoritative setup where client dictates position
-            if(_player != null) {
-                TransformComponent transform = _player.GetComponent<TransformComponent>();
-
-                if(transform.Dirty) {
-                    transform.Dirty = false;
-
-                    NetOutgoingMessage om = client.CreateMessage();
-                    om.Write(transform.X); // very inefficient to send a full Int32 (4 bytes) but we'll use this for simplicity
-                    om.Write(transform.Y);
-                    client.SendMessage(om, NetDeliveryMethod.Unreliable);
-                }
-            }
-            ///////////////////////// TEMP /////////////////////////
-            */
-
             List<NetIncomingMessage> messages = netAgent.ReadMessages();
 
             foreach(NetIncomingMessage netMessage in messages) {
@@ -95,44 +77,6 @@ namespace UmbraClient {
             }
 
             _entityWorld.Update();
-
-            /*
-            // read messages from server
-            NetIncomingMessage msg;
-
-            while((msg = client.ReadMessage()) != null) {
-                Console.WriteLine("Received " + msg.MessageType + " message from " + msg.SenderEndpoint);
-
-                switch(msg.MessageType) {
-                    case NetIncomingMessageType.DiscoveryResponse:
-                        Console.WriteLine("Found server at " + msg.SenderEndpoint);
-
-                        client.Connect(msg.SenderEndpoint);
-
-                        //Vector2 center = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-
-                        _player = _entityWorld.CreateEntity();
-                        _player.AddComponent(new TransformComponent());
-                        _player.AddComponent(new VelocityComponent());
-                        _player.AddComponent(new SpatialFormComponent("Hero"));
-                        _player.Tag = "PLAYER";
-
-                        break;
-                    case NetIncomingMessageType.Data:
-                        Console.WriteLine("Received server data");
-
-                        //long playerId = msg.ReadInt64();
-
-                        //float xPos = msg.ReadFloat();
-                        //float yPos = msg.ReadFloat();
-
-                        //_player.UpdatePosition(xPos, yPos);
-
-                        break;
-                    default: break;
-                }
-            }
-            */
 
             base.Update(gameTime);
         }
