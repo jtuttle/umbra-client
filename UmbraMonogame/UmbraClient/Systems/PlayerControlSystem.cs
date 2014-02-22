@@ -8,6 +8,8 @@ using Artemis.Manager;
 using Artemis;
 using CrawLib.Artemis.Components;
 using Microsoft.Xna.Framework.Input;
+using CrawLib.Network;
+using CrawLib.Network.Messages;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
@@ -28,6 +30,10 @@ namespace UmbraClient.Systems {
             } else if(keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right)) {
                 transform.X += keyMoveSpeed;
             }
+
+            // this should perhaps be a different type of message to distinguish it from entities that 
+            // the server/other players are moving
+            NetworkAgent.MessageQueue.Enqueue(new EntityMoveMessage(entity.UniqueId, transform.Position));
         }
     }
 }

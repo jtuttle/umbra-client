@@ -102,6 +102,13 @@ namespace CrawLib.Network {
             return _incomingMessages;
         }
 
+        public void SendMessages() {
+            while(NetworkAgent.MessageQueue.Count > 0) {
+                INetworkMessage outgoingMessage = NetworkAgent.MessageQueue.Dequeue();
+                BroadcastMessage(outgoingMessage);
+            }
+        }
+
         public void SendMessage(INetworkMessage msg, NetConnection recipient) {
             SendMessage(msg, recipient, false);
         }
@@ -122,12 +129,8 @@ namespace CrawLib.Network {
         }
 
         public void BroadcastMessage(INetworkMessage msg, bool guaranteed) {
-            if(_role == AgentRole.Server) {
-                foreach(NetConnection connection in _peer.Connections)
-                    SendMessage(msg, connection, guaranteed);
-            } else {
-                throw new SystemException("Attempted to broadcast as client. Only server should broadcast.");
-            }
+            foreach(NetConnection connection in _peer.Connections)
+                SendMessage(msg, connection, guaranteed);
         }
 
         private void Log(string output) {
