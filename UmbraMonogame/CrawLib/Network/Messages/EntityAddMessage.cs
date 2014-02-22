@@ -5,36 +5,37 @@ using System.Text;
 using Artemis;
 using Lidgren.Network;
 using CrawLib.Artemis.Components;
+using Microsoft.Xna.Framework;
 
 namespace CrawLib.Network.Messages {
-    public class EntityAddEvent : INetMessage {
-        public MessageType MessageType { get { return MessageType.EntityAdd; } }
+    public class EntityAddMessage<TEnum> : EntityMessage where TEnum : byte {
+        public TEnum EntityType { get; private set; }
+        public Vector2 Position { get; private set; }
 
-        protected Entity _entity;
+        public EntityAddMessage(long entityId, TEnum entityType, Vector2 position)
+            : base(entityId, NetworkMessageType.EntityAdd) {
 
-        public EntityAddEvent(Entity entity) {
-            _entity = entity;
+            EntityType = entityType;
+            Position = position;
         }
 
-        public void Decode(NetIncomingMessage msg) {
-            long entityId = msg.ReadInt64();
+        public override void Decode(NetIncomingMessage msg) {
+            EntityId = msg.ReadInt64();
 
-            // read type
+            // read entity type
 
             int x = msg.ReadInt32();
             int y = msg.ReadInt32();
-
-            
+            Position = new Vector2(x, y);
         }
 
-        public void Encode(NetOutgoingMessage msg) {
-            msg.Write(_entity.UniqueId);
-            
-            // type of entity
+        public override void Encode(NetOutgoingMessage msg) {
+            msg.Write(EntityId);
 
-            TransformComponent transform = _entity.GetComponent<TransformComponent>();
-            msg.Write(transform.X);
-            msg.Write(transform.Y);
+            msg.Write((byte)EntityType);
+
+            msg.Write(Position.X);
+            msg.Write(Position.Y);
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Text;
 
 namespace UmbraLib {
     public enum UmbraEntityType : byte {
-        Player
+        Player,
+        Dog,
+        Cactus
     }
 }
