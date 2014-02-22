@@ -18,16 +18,18 @@ using UmbraLib;
 #endregion
 
 namespace UmbraClient {
-    public class UmbraGame : Game {
+    public class UmbraGameClient : Game {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
         public NetworkAgent netAgent;
 
         private EntityWorld _entityWorld;
+        private Dictionary<long, Entity> _entities;
+
         private Entity _player;
 
-        public UmbraGame()
+        public UmbraGameClient()
             : base() {
 
             graphics = new GraphicsDeviceManager(this);
@@ -38,11 +40,15 @@ namespace UmbraClient {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _entityWorld = new EntityWorld();
-            
+
             EntitySystem.BlackBoard.SetEntry("ContentManager", this.Content);
             EntitySystem.BlackBoard.SetEntry("SpriteBatch", this.spriteBatch);
 
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
+
+            _entities = new Dictionary<long, Entity>();
+            _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
+            _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
 
             netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
             netAgent.Connect("127.0.0.1");
@@ -67,7 +73,7 @@ namespace UmbraClient {
                 if(messageType == NetworkMessageType.EntityAdd) {
                     EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>();
                     msg.Decode(netMessage);
-
+                    
                     _player = _entityWorld.CreateEntity(msg.EntityId);
                     _player.AddComponent(new TransformComponent(msg.Position));
                     _player.AddComponent(new VelocityComponent());
@@ -77,6 +83,8 @@ namespace UmbraClient {
             }
 
             _entityWorld.Update();
+
+            netAgent.SendMessages();
 
             base.Update(gameTime);
         }
@@ -97,6 +105,15 @@ namespace UmbraClient {
             netAgent.Shutdown();
 
             base.OnExiting(sender, args);
+        }
+        
+        // todo - DRY this up between server and client
+        private void OnEntityAdded(Entity entity) {
+            _entities[entity.UniqueId] = entity;
+        }
+
+        private void OnEntityRemoved(Entity entity) {
+            _entities.Remove(entity.UniqueId);
         }
     }
 }

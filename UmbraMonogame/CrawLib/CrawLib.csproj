@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Artemis\Components\NetworkComponent.cs" />
     <Compile Include="Artemis\Components\SpatialFormComponent.cs" />
     <Compile Include="Artemis\Components\TransformComponent.cs" />
     <Compile Include="Artemis\Components\VelocityComponent.cs" />

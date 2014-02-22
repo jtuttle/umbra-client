@@ -13,8 +13,6 @@ namespace CrawLib.Network.Messages {
 
         public EntityMoveMessage() : base() { }
 
-        // TODO: instead of passing an entity in, maybe stick to primitive types?
-        // breaks coupling with Artemis
         public EntityMoveMessage(long entityId, Vector2 position)
             : base(entityId, NetworkMessageType.EntityMove) {
 
@@ -22,20 +20,18 @@ namespace CrawLib.Network.Messages {
         }
 
         public override void Decode(NetIncomingMessage msg) {
-            long entityId = msg.ReadInt64();
+            base.Decode(msg);
 
-            // read entity type
-
-            int x = msg.ReadInt32();
-            int y = msg.ReadInt32();
+            // opt - should probably use ints here
+            float x = msg.ReadFloat();
+            float y = msg.ReadFloat(); 
             Position = new Vector2(x, y);
         }
 
         public override void Encode(NetOutgoingMessage msg) {
-            msg.Write(EntityId);
+            base.Encode(msg);
 
-            // type of entity
-
+            // opt - should probably use ints here
             msg.Write(Position.X);
             msg.Write(Position.Y);
         }
