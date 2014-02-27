@@ -36,6 +36,10 @@ namespace UmbraClient.Systems {
                     if(string.Compare("Hero", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
                         Hero.Render(_spriteBatch, _content, transformComponent);
                     }
+
+                    if(string.Compare("NPC", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                        NPC.Render(_spriteBatch, _content, transformComponent);
+                    }
                 }
             }
         }

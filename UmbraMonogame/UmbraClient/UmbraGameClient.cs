@@ -15,6 +15,7 @@ using CrawLib;
 using CrawLib.Network;
 using CrawLib.Network.Messages;
 using UmbraLib;
+using UmbraLib.Components;
 #endregion
 
 namespace UmbraClient {
@@ -80,12 +81,14 @@ namespace UmbraClient {
 
                     if(msg.EntityType == UmbraEntityType.Player) {
                         _player = _entityWorld.CreateEntity(msg.EntityId);
+                        _player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
                         _player.AddComponent(new TransformComponent(msg.Position));
                         _player.AddComponent(new VelocityComponent());
                         _player.AddComponent(new SpatialFormComponent("Hero"));
                         _player.Tag = "PLAYER";
                     } else if(msg.EntityType == UmbraEntityType.NPC) {
                         Entity npc = _entityWorld.CreateEntity(msg.EntityId);
+                        npc.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.NPC));
                         npc.AddComponent(new TransformComponent(msg.Position));
                         npc.AddComponent(new VelocityComponent());
                         npc.AddComponent(new SpatialFormComponent("NPC"));
