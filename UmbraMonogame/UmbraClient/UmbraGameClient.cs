@@ -29,6 +29,10 @@ namespace UmbraClient {
 
         private Entity _player;
 
+        // todo - DRY this stuff up
+        private float _updatesPerSecond = 1.0f;
+        private double _nextSendUpdates = NetTime.Now;
+
         public UmbraGameClient()
             : base() {
 
@@ -73,18 +77,38 @@ namespace UmbraClient {
                 if(messageType == NetworkMessageType.EntityAdd) {
                     EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>();
                     msg.Decode(netMessage);
-                    
-                    _player = _entityWorld.CreateEntity(msg.EntityId);
-                    _player.AddComponent(new TransformComponent(msg.Position));
-                    _player.AddComponent(new VelocityComponent());
-                    _player.AddComponent(new SpatialFormComponent("Hero"));
-                    _player.Tag = "PLAYER";
+
+                    if(msg.EntityType == UmbraEntityType.Player) {
+                        _player = _entityWorld.CreateEntity(msg.EntityId);
+                        _player.AddComponent(new TransformComponent(msg.Position));
+                        _player.AddComponent(new VelocityComponent());
+                        _player.AddComponent(new SpatialFormComponent("Hero"));
+                        _player.Tag = "PLAYER";
+                    } else if(msg.EntityType == UmbraEntityType.NPC) {
+                        Entity npc = _entityWorld.CreateEntity(msg.EntityId);
+                        npc.AddComponent(new TransformComponent(msg.Position));
+                        npc.AddComponent(new VelocityComponent());
+                        npc.AddComponent(new SpatialFormComponent("NPC"));
+                    }
                 }
             }
 
             _entityWorld.Update();
 
-            netAgent.SendMessages();
+            double now = NetTime.Now;
+
+            if(now > _nextSendUpdates) {
+                Console.WriteLine("sending update");
+
+                List<INetworkMessage> outgoingMessages = new List<INetworkMessage>();
+
+                TransformComponent transform = _player.GetComponent<TransformComponent>();
+                outgoingMessages.Add(new EntityMoveMessage(_player.UniqueId, transform.Position));
+
+                netAgent.SendMessages(outgoingMessages);
+
+                _nextSendUpdates += (1.0 / _updatesPerSecond);
+            }
 
             base.Update(gameTime);
         }
