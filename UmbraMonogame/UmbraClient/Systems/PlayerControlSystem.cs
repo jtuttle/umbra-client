@@ -27,13 +27,23 @@ namespace UmbraClient.Systems {
 
             if(keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left)) {
                 transform.X -= keyMoveSpeed;
-            } else if(keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right)) {
+            } 
+
+            if(keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right)) {
                 transform.X += keyMoveSpeed;
+            }
+
+            if(keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up)) {
+                transform.Y += keyMoveSpeed;
+            }
+
+            if(keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down)) {
+                transform.Y -= keyMoveSpeed;
             }
 
             // this should perhaps be a different type of message to distinguish it from entities that 
             // the server/other players are moving
-            NetworkAgent.MessageQueue.Enqueue(new EntityMoveMessage(entity.UniqueId, transform.Position));
+            //NetworkAgent.MessageQueue.Enqueue(new EntityMoveMessage(entity.UniqueId, transform.Position));
         }
     }
 }

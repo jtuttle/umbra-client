@@ -15,7 +15,7 @@ namespace CrawLib.Network {
         public delegate void PlayerConnectDelegate();
         public event PlayerConnectDelegate OnPlayerConnect = delegate { };
 
-        public static Queue<INetworkMessage> MessageQueue = new Queue<INetworkMessage>();
+        //public static Queue<INetworkMessage> MessageQueue = new Queue<INetworkMessage>();
 
         private AgentRole _role;
         private NetPeer _peer;
@@ -23,9 +23,6 @@ namespace CrawLib.Network {
         private int _port = 14242;
 
         private List<NetIncomingMessage> _incomingMessages;
-
-        private float _updatesPerSecond = 1.0f;
-        private double _nextSendUpdates = NetTime.Now;
 
         public List<NetConnection> Connections {
             get { return _peer.Connections; }
@@ -64,7 +61,7 @@ namespace CrawLib.Network {
         }
 
         public void Shutdown() {
-            _peer.Shutdown("Closing conection.");
+            _peer.Shutdown("Closing connection.");
         }
 
         public List<NetIncomingMessage> ReadMessages() {
@@ -105,18 +102,9 @@ namespace CrawLib.Network {
             return _incomingMessages;
         }
 
-        public void SendMessages() {
-            double now = NetTime.Now;
-
-            if(now > _nextSendUpdates) {
-                Console.WriteLine("sending update");
-
-                while(NetworkAgent.MessageQueue.Count > 0) {
-                    INetworkMessage outgoingMessage = NetworkAgent.MessageQueue.Dequeue();
-                    BroadcastMessage(outgoingMessage);
-                }
-
-                _nextSendUpdates += (1.0 / _updatesPerSecond);
+        public void SendMessages(List<INetworkMessage> outgoingMessages) {
+            foreach(INetworkMessage outgoingMessage in outgoingMessages) {
+                BroadcastMessage(outgoingMessage);
             }
         }
 
