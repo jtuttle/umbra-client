@@ -12,7 +12,7 @@ namespace CrawLib.Network {
     }
 
     public class NetworkAgent {
-        public delegate void PlayerConnectDelegate();
+        public delegate void PlayerConnectDelegate(NetConnection connection);
         public event PlayerConnectDelegate OnPlayerConnect = delegate { };
 
         //public static Queue<INetworkMessage> MessageQueue = new Queue<INetworkMessage>();
@@ -88,7 +88,7 @@ namespace CrawLib.Network {
                         Log("Status message: " + msg.ReadString());
 
                         if(status == NetConnectionStatus.Connected)
-                            OnPlayerConnect();
+                            OnPlayerConnect(msg.SenderConnection);
                         break;
                     case NetIncomingMessageType.Data:
                         _incomingMessages.Add(msg);

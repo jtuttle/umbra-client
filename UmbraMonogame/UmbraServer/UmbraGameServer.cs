@@ -10,6 +10,8 @@ using CrawLib.Network;
 using CrawLib.Network.Messages;
 using UmbraLib;
 using UmbraServer.Components;
+using UmbraLib.Components;
+using Artemis.Utils;
 
 namespace UmbraServer {
     public class UmbraGameServer {
@@ -47,12 +49,14 @@ namespace UmbraServer {
             //// TEMP ////
             Entity npc = _entityWorld.CreateEntity();
 
+            UmbraEntityTypeComponent entityTypeComponent = new UmbraEntityTypeComponent(UmbraEntityType.NPC);
+            npc.AddComponent(entityTypeComponent);
             TransformComponent transformComponent = new TransformComponent(200, 200);
             npc.AddComponent(transformComponent);
             npc.AddComponent(new VelocityComponent());
             npc.AddComponent(new AiComponent());
 
-            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, transformComponent.Position);
+            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, entityTypeComponent.EntityType, transformComponent.Position);
             _netAgent.BroadcastMessage(msg, true);
             //// TEMP ////
         }
@@ -100,14 +104,29 @@ namespace UmbraServer {
             }
         }
 
-        private void OnPlayerConnect() {
+        private void OnPlayerConnect(NetConnection connection) {
+            EntityAddMessage<UmbraEntityType> msg;
+
+            Bag<Entity> entities = _entityWorld.EntityManager.GetEntities(Aspect.All(typeof(UmbraEntityTypeComponent)));
+
+            // signal addition of all other entities
+            foreach(Entity entity in entities) {
+                UmbraEntityTypeComponent entityType = entity.GetComponent<UmbraEntityTypeComponent>();
+                TransformComponent transform = entity.GetComponent<TransformComponent>();
+
+                msg = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
+                _netAgent.SendMessage(msg, connection);
+            }
+
+            // create and signal addition of player entity
             Entity player = _entityWorld.CreateEntity();
 
-            TransformComponent transformComponent = new TransformComponent(100, 100);
-            player.AddComponent(transformComponent);
+            TransformComponent playerTransform = new TransformComponent(100, 100);
+            player.AddComponent(playerTransform);
             player.AddComponent(new VelocityComponent());
+            player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
 
-            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, transformComponent.Position);
+            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, playerTransform.Position);
             _netAgent.BroadcastMessage(msg, true);
         }
 
