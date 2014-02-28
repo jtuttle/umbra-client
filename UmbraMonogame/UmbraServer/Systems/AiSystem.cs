@@ -6,14 +6,26 @@ using Artemis.System;
 using UmbraServer.Components;
 using Artemis;
 using CrawLib.Artemis.Components;
+using Artemis.Attributes;
+using Artemis.Manager;
 
 namespace UmbraServer.Systems {
+    // TODO: probably need to make sure this takes priority over movementsystem
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
     class AiSystem : EntityComponentProcessingSystem<AiComponent, TransformComponent> {
-        public override void Process(Entity entity, AiComponent ai, TransformComponent transform) {
-            Random rnd = new Random();
+        private Random _rnd = new Random();
 
-            transform.X += rnd.Next() * 5;
-            transform.Y += rnd.Next() * 5;
+        // temp
+        private bool _right = true;
+
+        public override void Process(Entity entity, AiComponent ai, TransformComponent transform) {
+            if(_right)
+                transform.X += 0.1f;
+            else
+                transform.X -= 0.1f;
+
+            if(transform.X > 200 || transform.X < 0)
+                _right = !_right;
         }
     }
 }

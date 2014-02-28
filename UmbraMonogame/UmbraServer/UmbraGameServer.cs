@@ -26,7 +26,7 @@ namespace UmbraServer {
         private Dictionary<long, Entity> _entities;
 
         // todo - DRY this stuff up
-        private float _updatesPerSecond = 1.0f;
+        private float _updatesPerSecond = 10.0f;
         private double _nextSendUpdates = NetTime.Now;
 
         public UmbraGameServer() {
