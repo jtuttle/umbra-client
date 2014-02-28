@@ -34,11 +34,11 @@ namespace UmbraClient.Systems {
             }
 
             if(keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up)) {
-                transform.Y += keyMoveSpeed;
+                transform.Y -= keyMoveSpeed;
             }
 
             if(keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down)) {
-                transform.Y -= keyMoveSpeed;
+                transform.Y += keyMoveSpeed;
             }
 
             // this should perhaps be a different type of message to distinguish it from entities that 
