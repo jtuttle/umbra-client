@@ -76,22 +76,32 @@ namespace UmbraClient {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
                 
                 if(messageType == NetworkMessageType.EntityAdd) {
-                    EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>();
-                    msg.Decode(netMessage);
+                    EntityAddMessage<UmbraEntityType> addMessage = new EntityAddMessage<UmbraEntityType>();
+                    addMessage.Decode(netMessage);
 
-                    if(msg.EntityType == UmbraEntityType.Player) {
-                        _player = _entityWorld.CreateEntity(msg.EntityId);
+                    if(addMessage.EntityType == UmbraEntityType.Player) {
+                        _player = _entityWorld.CreateEntity(addMessage.EntityId);
                         _player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
-                        _player.AddComponent(new TransformComponent(msg.Position));
+                        _player.AddComponent(new TransformComponent(addMessage.Position));
                         _player.AddComponent(new VelocityComponent());
                         _player.AddComponent(new SpatialFormComponent("Hero"));
                         _player.Tag = "PLAYER";
-                    } else if(msg.EntityType == UmbraEntityType.NPC) {
-                        Entity npc = _entityWorld.CreateEntity(msg.EntityId);
+                    } else if(addMessage.EntityType == UmbraEntityType.NPC) {
+                        Entity npc = _entityWorld.CreateEntity(addMessage.EntityId);
                         npc.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.NPC));
-                        npc.AddComponent(new TransformComponent(msg.Position));
+                        npc.AddComponent(new TransformComponent(addMessage.Position));
                         npc.AddComponent(new VelocityComponent());
                         npc.AddComponent(new SpatialFormComponent("NPC"));
+                    }
+                } else if(messageType == NetworkMessageType.EntityMove) {
+                    EntityMoveMessage moveMessage = new EntityMoveMessage();
+                    moveMessage.Decode(netMessage);
+
+                    Entity entity = _entities[moveMessage.EntityId];
+
+                    if(entity != _player) {
+                        TransformComponent transform = entity.GetComponent<TransformComponent>();
+                        transform.Position = moveMessage.Position;
                     }
                 }
             }
