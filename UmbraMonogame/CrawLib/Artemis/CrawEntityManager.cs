@@ -35,7 +35,7 @@ namespace CrawLib.Artemis {
         }
 
         public Entity GetEntity(long entityId) {
-            return _entities[entityId];
+            return (_entities.ContainsKey(entityId) ? _entities[entityId] : null);
         }
 
         private void OnEntityAdded(Entity entity) {

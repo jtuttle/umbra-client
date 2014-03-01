@@ -13,7 +13,7 @@ using CrawLib.Network.Messages;
 using Lidgren.Network;
 
 namespace UmbraClient.Systems {
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
     public class PlayerControlSystem : TagSystem {
         private NetworkAgent _netAgent;
 

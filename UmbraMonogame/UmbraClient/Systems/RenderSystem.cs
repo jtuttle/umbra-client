@@ -12,7 +12,7 @@ using Artemis;
 using UmbraClient.Spatials;
 
 namespace UmbraClient.Systems {
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 0)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 1)]
     public class RenderSystem : EntityComponentProcessingSystem<SpatialFormComponent, TransformComponent> {
         private ContentManager _content;
         private SpriteBatch _spriteBatch;
