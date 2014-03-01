@@ -32,7 +32,7 @@ namespace UmbraServer {
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            EntityManager.Instance.Initialize(_entityWorld);
+            EntityManager.Instance.Initialize(_entityWorld, new ServerEntityFactory(_entityWorld));
 
             _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
             _netAgent.OnPlayerConnect += OnPlayerConnect;
@@ -40,16 +40,10 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            Entity npc = _entityWorld.CreateEntity();
+            Vector2 position = new Vector2(200, 200);
+            Entity npc = EntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
-            UmbraEntityTypeComponent entityTypeComponent = new UmbraEntityTypeComponent(UmbraEntityType.NPC);
-            npc.AddComponent(entityTypeComponent);
-            TransformComponent transformComponent = new TransformComponent(200, 200);
-            npc.AddComponent(transformComponent);
-            npc.AddComponent(new VelocityComponent());
-            npc.AddComponent(new AiComponent());
-
-            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, entityTypeComponent.EntityType, transformComponent.Position);
+            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
             _netAgent.BroadcastMessage(msg, true);
             //// TEMP ////
         }
@@ -112,14 +106,10 @@ namespace UmbraServer {
             }
 
             // create and signal addition of player entity
-            Entity player = _entityWorld.CreateEntity();
+            Vector2 position = new Vector2(100, 100);
+            Entity player = EntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
-            TransformComponent playerTransform = new TransformComponent(100, 100);
-            player.AddComponent(playerTransform);
-            player.AddComponent(new VelocityComponent());
-            player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
-
-            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, playerTransform.Position);
+            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
             _netAgent.BroadcastMessage(msg, true);
         }
     }

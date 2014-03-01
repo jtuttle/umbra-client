@@ -49,7 +49,7 @@ namespace UmbraClient {
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            EntityManager.Instance.Initialize(_entityWorld);
+            EntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
             
             netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
             netAgent.Connect("127.0.0.1");
@@ -75,19 +75,13 @@ namespace UmbraClient {
                     EntityAddMessage<UmbraEntityType> addMessage = new EntityAddMessage<UmbraEntityType>();
                     addMessage.Decode(netMessage);
 
+                    long entityId = addMessage.EntityId;
+                    Vector2 position = addMessage.Position;
+
                     if(addMessage.EntityType == UmbraEntityType.Player) {
-                        _player = _entityWorld.CreateEntity(addMessage.EntityId);
-                        _player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
-                        _player.AddComponent(new TransformComponent(addMessage.Position));
-                        _player.AddComponent(new VelocityComponent());
-                        _player.AddComponent(new SpatialFormComponent("Hero"));
-                        _player.Tag = "PLAYER";
+                        _player = EntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
                     } else if(addMessage.EntityType == UmbraEntityType.NPC) {
-                        Entity npc = _entityWorld.CreateEntity(addMessage.EntityId);
-                        npc.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.NPC));
-                        npc.AddComponent(new TransformComponent(addMessage.Position));
-                        npc.AddComponent(new VelocityComponent());
-                        npc.AddComponent(new SpatialFormComponent("NPC"));
+                        EntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
                     }
                 } else if(messageType == NetworkMessageType.EntityMove) {
                     EntityMoveMessage moveMessage = new EntityMoveMessage();

@@ -8,6 +8,8 @@ namespace CrawLib.Artemis {
     public class EntityManager {
         private static EntityManager _instance;
 
+        public IEntityFactory EntityFactory { get; private set; }
+
         private EntityWorld _entityWorld;
         private Dictionary<long, Entity> _entities;
 
@@ -24,11 +26,16 @@ namespace CrawLib.Artemis {
             }
         }
 
-        public void Initialize(EntityWorld entityWorld) {
+        public void Initialize(EntityWorld entityWorld, IEntityFactory entityFactory) {
             _entityWorld = entityWorld;
+            EntityFactory = entityFactory;
 
             _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
             _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
+        }
+
+        public Entity GetEntity(long entityId) {
+            return _entities[entityId];
         }
 
         private void OnEntityAdded(Entity entity) {
