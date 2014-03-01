@@ -12,18 +12,13 @@ using UmbraLib;
 using UmbraServer.Components;
 using UmbraLib.Components;
 using Artemis.Utils;
+using CrawLib.Artemis;
 
 namespace UmbraServer {
     public class UmbraGameServer {
-        private int _nextEntityId;
-        public int NextEntityId {
-            get { return _nextEntityId++; }
-        }
-        
-        private NetworkAgent _netAgent;
-
         private EntityWorld _entityWorld;
-        private Dictionary<long, Entity> _entities;
+
+        private NetworkAgent _netAgent;
 
         // todo - DRY this stuff up
         private float _updatesPerSecond = 10.0f;
@@ -36,10 +31,8 @@ namespace UmbraServer {
         public void Initialize() {
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
-            _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
-            _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
 
-            _entities = new Dictionary<long, Entity>();
+            EntityManager.Instance.Initialize(_entityWorld);
 
             _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
             _netAgent.OnPlayerConnect += OnPlayerConnect;
@@ -75,12 +68,12 @@ namespace UmbraServer {
                     EntityMoveMessage msg = new EntityMoveMessage();
                     msg.Decode(netMessage);
 
-                    if(_entities.ContainsKey(msg.EntityId)) {
-                        Entity entity = _entities[msg.EntityId];
+                    //if(_entities.ContainsKey(msg.EntityId)) {
+                    //    Entity entity = _entities[msg.EntityId];
 
-                        TransformComponent transform = entity.GetComponent<TransformComponent>();
-                        transform.Position = msg.Position;
-                    }
+                    //    TransformComponent transform = entity.GetComponent<TransformComponent>();
+                    //    transform.Position = msg.Position;
+                    //}
                 }
             }
 
@@ -108,7 +101,7 @@ namespace UmbraServer {
             EntityAddMessage<UmbraEntityType> msg;
 
             Bag<Entity> entities = _entityWorld.EntityManager.GetEntities(Aspect.All(typeof(UmbraEntityTypeComponent)));
-
+            
             // signal addition of all other entities
             foreach(Entity entity in entities) {
                 UmbraEntityTypeComponent entityType = entity.GetComponent<UmbraEntityTypeComponent>();
@@ -128,14 +121,6 @@ namespace UmbraServer {
 
             msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, playerTransform.Position);
             _netAgent.BroadcastMessage(msg, true);
-        }
-
-        private void OnEntityAdded(Entity entity) {
-            _entities[entity.UniqueId] = entity;
-        }
-
-        private void OnEntityRemoved(Entity entity) {
-            _entities.Remove(entity.UniqueId);
         }
     }
 }
