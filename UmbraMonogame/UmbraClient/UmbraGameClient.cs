@@ -16,6 +16,7 @@ using CrawLib.Network;
 using CrawLib.Network.Messages;
 using UmbraLib;
 using UmbraLib.Components;
+using CrawLib.Artemis;
 #endregion
 
 namespace UmbraClient {
@@ -26,8 +27,6 @@ namespace UmbraClient {
         public NetworkAgent netAgent;
 
         private EntityWorld _entityWorld;
-        private Dictionary<long, Entity> _entities;
-
         private Entity _player;
 
         // todo - DRY this stuff up
@@ -44,17 +43,14 @@ namespace UmbraClient {
         protected override void Initialize() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
+            EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
+
             _entityWorld = new EntityWorld();
-
-            EntitySystem.BlackBoard.SetEntry("ContentManager", this.Content);
-            EntitySystem.BlackBoard.SetEntry("SpriteBatch", this.spriteBatch);
-
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            _entities = new Dictionary<long, Entity>();
-            _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
-            _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
-
+            EntityManager.Instance.Initialize(_entityWorld);
+            
             netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
             netAgent.Connect("127.0.0.1");
 
@@ -97,12 +93,12 @@ namespace UmbraClient {
                     EntityMoveMessage moveMessage = new EntityMoveMessage();
                     moveMessage.Decode(netMessage);
 
-                    Entity entity = _entities[moveMessage.EntityId];
+                    //Entity entity = _entities[moveMessage.EntityId];
 
-                    if(entity != _player) {
-                        TransformComponent transform = entity.GetComponent<TransformComponent>();
-                        transform.Position = moveMessage.Position;
-                    }
+                    //if(entity != _player) {
+                    //    TransformComponent transform = entity.GetComponent<TransformComponent>();
+                    //    transform.Position = moveMessage.Position;
+                    //}
                 }
             }
 
@@ -142,15 +138,6 @@ namespace UmbraClient {
             netAgent.Shutdown();
 
             base.OnExiting(sender, args);
-        }
-        
-        // todo - DRY this up between server and client
-        private void OnEntityAdded(Entity entity) {
-            _entities[entity.UniqueId] = entity;
-        }
-
-        private void OnEntityRemoved(Entity entity) {
-            _entities.Remove(entity.UniqueId);
         }
     }
 }
