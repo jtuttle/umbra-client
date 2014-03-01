@@ -12,7 +12,8 @@
     <AssemblyName>CrawLib</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,6 +54,8 @@
     <Compile Include="Artemis\Components\SpatialFormComponent.cs" />
     <Compile Include="Artemis\Components\TransformComponent.cs" />
     <Compile Include="Artemis\Components\VelocityComponent.cs" />
+    <Compile Include="Artemis\CrawEntityManager.cs" />
+    <Compile Include="Artemis\IEntityFactory.cs" />
     <Compile Include="Artemis\Systems\MovementSystem.cs" />
     <Compile Include="Network\Messages\EntityAddMessage.cs" />
     <Compile Include="Network\Messages\EntityMessage.cs" />

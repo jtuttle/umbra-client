@@ -11,7 +11,8 @@
     <RootNamespace>ContentBuilder</RootNamespace>
     <AssemblyName>IgnoreMe</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <XnaPlatform>Windows</XnaPlatform>

@@ -8,15 +8,15 @@ using Microsoft.Xna.Framework;
 using CrawLib.Artemis.Components;
 
 namespace UmbraClient.Spatials {
-    internal static class Hero {
+    internal static class NPC {
         private static Texture2D _sprite;
         private static Rectangle _bounds;
         private static float _scale;
-
+        
         public static void Render(SpriteBatch spriteBatch, ContentManager content, TransformComponent transform) {
             if(_sprite == null) {
                 _sprite = content.Load<Texture2D>("Images/Oryx");
-                _bounds = new Rectangle(169, 25, 22, 22);
+                _bounds = new Rectangle(193, 25, 22, 22);
                 _scale = 2.0f;
             }
 

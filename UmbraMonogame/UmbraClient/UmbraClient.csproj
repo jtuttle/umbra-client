@@ -11,6 +11,9 @@
     <RootNamespace>UmbraClient</RootNamespace>
     <AssemblyName>UmbraClient</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -35,8 +38,10 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Input\PlayerInput.cs" />
+    <Compile Include="ClientEntityFactory.cs" />
+    <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
+    <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
     <Compile Include="UmbraGameClient.cs" />
@@ -70,6 +75,15 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Content\Images\Oryx.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Images\NPC.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Content\Images\Hero.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

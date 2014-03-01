@@ -9,84 +9,72 @@ using CrawLib.Artemis.Components;
 using CrawLib.Network;
 using CrawLib.Network.Messages;
 using UmbraLib;
+using UmbraServer.Components;
+using UmbraLib.Components;
+using Artemis.Utils;
+using CrawLib.Artemis;
+using Artemis.System;
 
 namespace UmbraServer {
     public class UmbraGameServer {
-        private int _nextEntityId;
-        public int NextEntityId {
-            get { return _nextEntityId++; }
-        }
-        
-        private NetworkAgent _netAgent;
-
         private EntityWorld _entityWorld;
-        private Dictionary<long, Entity> _entities;
 
+        private NetworkAgent _networkAgent;
+        
         public UmbraGameServer() {
             
         }
 
         public void Initialize() {
+            _networkAgent = new NetworkAgent(AgentRole.Server, "Umbra");
+            _networkAgent.OnPlayerConnect += OnPlayerConnect;
+
+            EntitySystem.BlackBoard.SetEntry("NetworkAgent", _networkAgent);
+
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
-            _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
-            _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
 
-            _entities = new Dictionary<long, Entity>();
-
-            _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
-            _netAgent.OnPlayerConnect += OnPlayerConnect;
+            CrawEntityManager.Instance.Initialize(_entityWorld, new ServerEntityFactory(_entityWorld));
         }
 
         public void Start() {
-            
+            //// TEMP ////
+            Vector2 position = new Vector2(200, 200);
+            Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
+
+            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
+            _networkAgent.BroadcastMessage(msg, true);
+            //// TEMP ////
         }
         
         public void Shutdown() {
-            _netAgent.Shutdown();
+            _networkAgent.Shutdown();
         }
 
         public void Update() {
-            List<NetIncomingMessage> messages = _netAgent.ReadMessages();
+            _entityWorld.Update();
+        }
 
-            foreach(NetIncomingMessage netMessage in messages) {
-                NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
+        private void OnPlayerConnect(NetConnection connection) {
+            EntityAddMessage<UmbraEntityType> msg;
 
-                if(messageType == NetworkMessageType.EntityMove) {
-                    EntityMoveMessage msg = new EntityMoveMessage();
-                    msg.Decode(netMessage);
+            Bag<Entity> entities = _entityWorld.EntityManager.GetEntities(Aspect.All(typeof(UmbraEntityTypeComponent)));
+            
+            // signal addition of all other entities
+            foreach(Entity entity in entities) {
+                UmbraEntityTypeComponent entityType = entity.GetComponent<UmbraEntityTypeComponent>();
+                TransformComponent transform = entity.GetComponent<TransformComponent>();
 
-                    if(_entities.ContainsKey(msg.EntityId)) {
-                        Entity entity = _entities[msg.EntityId];
-
-                        TransformComponent transform = entity.GetComponent<TransformComponent>();
-                        transform.Position = msg.Position;
-                    }
-                }
+                msg = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
+                _networkAgent.SendMessage(msg, connection);
             }
 
-            _entityWorld.Update();
+            // create and signal addition of player entity
+            Vector2 position = new Vector2(100, 100);
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
-            _netAgent.SendMessages();
-        }
-
-        private void OnPlayerConnect() {
-            Entity player = _entityWorld.CreateEntity();
-
-            TransformComponent transformComponent = new TransformComponent(100, 100);
-            player.AddComponent(transformComponent);
-            player.AddComponent(new VelocityComponent());
-
-            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, transformComponent.Position);
-            _netAgent.BroadcastMessage(msg, true);
-        }
-
-        private void OnEntityAdded(Entity entity) {
-            _entities[entity.UniqueId] = entity;
-        }
-
-        private void OnEntityRemoved(Entity entity) {
-            _entities.Remove(entity.UniqueId);
+            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
+            _networkAgent.BroadcastMessage(msg, true);
         }
     }
 }

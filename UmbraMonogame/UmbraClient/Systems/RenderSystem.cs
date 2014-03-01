@@ -12,7 +12,7 @@ using Artemis;
 using UmbraClient.Spatials;
 
 namespace UmbraClient.Systems {
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 0)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 1)]
     public class RenderSystem : EntityComponentProcessingSystem<SpatialFormComponent, TransformComponent> {
         private ContentManager _content;
         private SpriteBatch _spriteBatch;
@@ -35,6 +35,10 @@ namespace UmbraClient.Systems {
                 {
                     if(string.Compare("Hero", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
                         Hero.Render(_spriteBatch, _content, transformComponent);
+                    }
+
+                    if(string.Compare("NPC", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                        NPC.Render(_spriteBatch, _content, transformComponent);
                     }
                 }
             }

@@ -12,7 +12,8 @@
     <AssemblyName>UmbraServer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -53,8 +54,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ServerEntityFactory.cs" />
+    <Compile Include="Components\AiComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Systems\AiSystem.cs" />
+    <Compile Include="Systems\NetworkMessageSystem.cs" />
+    <Compile Include="Systems\WorldUpdateSystem.cs" />
     <Compile Include="UmbraGameServer.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -70,10 +76,7 @@
       <Name>UmbraLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Components\" />
-    <Folder Include="Systems\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
