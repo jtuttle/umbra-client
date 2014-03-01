@@ -29,9 +29,6 @@ namespace UmbraClient {
 
         private EntityWorld _entityWorld;
 
-        // todo - DRY this stuff up
-        
-
         public UmbraGameClient()
             : base() {
 
@@ -52,6 +49,7 @@ namespace UmbraClient {
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             EntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
+
             _messageProcessor = new ClientMessageProcessor(_entityWorld);
             
             _netAgent.Connect("127.0.0.1");
