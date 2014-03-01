@@ -15,6 +15,8 @@ using CrawLib;
 using CrawLib.Network;
 using CrawLib.Network.Messages;
 using UmbraLib;
+using UmbraLib.Components;
+using CrawLib.Artemis;
 #endregion
 
 namespace UmbraClient {
@@ -22,12 +24,9 @@ namespace UmbraClient {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
-        public NetworkAgent netAgent;
-
+        private NetworkAgent _netAgent;
+        
         private EntityWorld _entityWorld;
-        private Dictionary<long, Entity> _entities;
-
-        private Entity _player;
 
         public UmbraGameClient()
             : base() {
@@ -39,19 +38,18 @@ namespace UmbraClient {
         protected override void Initialize() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            _netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
+
+            EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
+            EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
+            EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
+
             _entityWorld = new EntityWorld();
-
-            EntitySystem.BlackBoard.SetEntry("ContentManager", this.Content);
-            EntitySystem.BlackBoard.SetEntry("SpriteBatch", this.spriteBatch);
-
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            _entities = new Dictionary<long, Entity>();
-            _entityWorld.EntityManager.AddedEntityEvent += OnEntityAdded;
-            _entityWorld.EntityManager.RemovedEntityEvent += OnEntityRemoved;
-
-            netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
-            netAgent.Connect("127.0.0.1");
+            CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
+    
+            _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
         }
@@ -65,26 +63,7 @@ namespace UmbraClient {
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            List<NetIncomingMessage> messages = netAgent.ReadMessages();
-
-            foreach(NetIncomingMessage netMessage in messages) {
-                NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
-                
-                if(messageType == NetworkMessageType.EntityAdd) {
-                    EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>();
-                    msg.Decode(netMessage);
-                    
-                    _player = _entityWorld.CreateEntity(msg.EntityId);
-                    _player.AddComponent(new TransformComponent(msg.Position));
-                    _player.AddComponent(new VelocityComponent());
-                    _player.AddComponent(new SpatialFormComponent("Hero"));
-                    _player.Tag = "PLAYER";
-                }
-            }
-
             _entityWorld.Update();
-
-            netAgent.SendMessages();
 
             base.Update(gameTime);
         }
@@ -102,18 +81,9 @@ namespace UmbraClient {
         }
 
         protected override void OnExiting(object sender, EventArgs args) {
-            netAgent.Shutdown();
+            _netAgent.Shutdown();
 
             base.OnExiting(sender, args);
-        }
-        
-        // todo - DRY this up between server and client
-        private void OnEntityAdded(Entity entity) {
-            _entities[entity.UniqueId] = entity;
-        }
-
-        private void OnEntityRemoved(Entity entity) {
-            _entities.Remove(entity.UniqueId);
         }
     }
 }
