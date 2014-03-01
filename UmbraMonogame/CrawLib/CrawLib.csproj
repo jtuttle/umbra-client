@@ -55,6 +55,7 @@
     <Compile Include="Artemis\Components\TransformComponent.cs" />
     <Compile Include="Artemis\Components\VelocityComponent.cs" />
     <Compile Include="Artemis\EntityManager.cs" />
+    <Compile Include="Artemis\IEntityFactory.cs" />
     <Compile Include="Artemis\Systems\MovementSystem.cs" />
     <Compile Include="Network\Messages\EntityAddMessage.cs" />
     <Compile Include="Network\Messages\EntityMessage.cs" />
