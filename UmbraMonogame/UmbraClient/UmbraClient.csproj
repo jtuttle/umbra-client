@@ -42,6 +42,7 @@
     <Compile Include="ClientMessageProcessor.cs" />
     <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
+    <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
     <Compile Include="UmbraGameClient.cs" />

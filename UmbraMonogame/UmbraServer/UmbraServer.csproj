@@ -54,12 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ServerMessageProcessor.cs" />
     <Compile Include="ServerEntityFactory.cs" />
     <Compile Include="Components\AiComponent.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Systems\AiSystem.cs" />
+    <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\WorldUpdateSystem.cs" />
     <Compile Include="UmbraGameServer.cs" />
   </ItemGroup>

@@ -19,44 +19,39 @@ namespace UmbraServer {
     public class UmbraGameServer {
         private EntityWorld _entityWorld;
 
-        private NetworkAgent _netAgent;
-        private ServerMessageProcessor _messageProcessor;
-
+        private NetworkAgent _networkAgent;
+        
         public UmbraGameServer() {
             
         }
 
         public void Initialize() {
-            _netAgent = new NetworkAgent(AgentRole.Server, "Umbra");
-            _netAgent.OnPlayerConnect += OnPlayerConnect;
+            _networkAgent = new NetworkAgent(AgentRole.Server, "Umbra");
+            _networkAgent.OnPlayerConnect += OnPlayerConnect;
 
-            EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
+            EntitySystem.BlackBoard.SetEntry("NetworkAgent", _networkAgent);
 
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            EntityManager.Instance.Initialize(_entityWorld, new ServerEntityFactory(_entityWorld));
-
-            _messageProcessor = new ServerMessageProcessor(_entityWorld);
+            CrawEntityManager.Instance.Initialize(_entityWorld, new ServerEntityFactory(_entityWorld));
         }
 
         public void Start() {
             //// TEMP ////
             Vector2 position = new Vector2(200, 200);
-            Entity npc = EntityManager.Instance.EntityFactory.CreateNPC(null, position);
+            Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
-            _netAgent.BroadcastMessage(msg, true);
+            _networkAgent.BroadcastMessage(msg, true);
             //// TEMP ////
         }
         
         public void Shutdown() {
-            _netAgent.Shutdown();
+            _networkAgent.Shutdown();
         }
 
         public void Update() {
-            _messageProcessor.ProcessIncomingMessages(_netAgent.ReadMessages());
-
             _entityWorld.Update();
         }
 
@@ -71,15 +66,15 @@ namespace UmbraServer {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
 
                 msg = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
-                _netAgent.SendMessage(msg, connection);
+                _networkAgent.SendMessage(msg, connection);
             }
 
             // create and signal addition of player entity
             Vector2 position = new Vector2(100, 100);
-            Entity player = EntityManager.Instance.EntityFactory.CreatePlayer(null, position);
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
             msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
-            _netAgent.BroadcastMessage(msg, true);
+            _networkAgent.BroadcastMessage(msg, true);
         }
     }
 }

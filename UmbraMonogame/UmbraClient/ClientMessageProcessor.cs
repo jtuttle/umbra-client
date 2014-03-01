@@ -37,14 +37,14 @@ namespace UmbraClient {
             Vector2 position = msg.Position;
 
             if(msg.EntityType == UmbraEntityType.Player) {
-                EntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
             } else if(msg.EntityType == UmbraEntityType.NPC) {
-                EntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
             }
         }
 
         private void MoveEntity(EntityMoveMessage msg) {
-            Entity entity = EntityManager.Instance.GetEntity(msg.EntityId);
+            Entity entity = CrawEntityManager.Instance.GetEntity(msg.EntityId);
 
             if(entity.Tag != "PLAYER") {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
