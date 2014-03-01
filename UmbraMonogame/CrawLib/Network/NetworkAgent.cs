@@ -15,8 +15,6 @@ namespace CrawLib.Network {
         public delegate void PlayerConnectDelegate(NetConnection connection);
         public event PlayerConnectDelegate OnPlayerConnect = delegate { };
 
-        //public static Queue<INetworkMessage> MessageQueue = new Queue<INetworkMessage>();
-
         private AgentRole _role;
         private NetPeer _peer;
         private NetPeerConfiguration _config;
