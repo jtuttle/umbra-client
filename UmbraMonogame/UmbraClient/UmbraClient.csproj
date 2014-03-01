@@ -39,6 +39,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ClientEntityFactory.cs" />
+    <Compile Include="ClientMessageProcessor.cs" />
     <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />

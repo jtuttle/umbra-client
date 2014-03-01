@@ -24,14 +24,13 @@ namespace UmbraClient {
         public GraphicsDeviceManager graphics;
         public SpriteBatch spriteBatch;
 
-        public NetworkAgent netAgent;
+        private NetworkAgent _netAgent;
+        private ClientMessageProcessor _messageProcessor;
 
         private EntityWorld _entityWorld;
-        private Entity _player;
 
         // todo - DRY this stuff up
-        private float _updatesPerSecond = 1.0f;
-        private double _nextSendUpdates = NetTime.Now;
+        
 
         public UmbraGameClient()
             : base() {
@@ -43,16 +42,19 @@ namespace UmbraClient {
         protected override void Initialize() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            _netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
+
             EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
+            EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
 
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             EntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
+            _messageProcessor = new ClientMessageProcessor(_entityWorld);
             
-            netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
-            netAgent.Connect("127.0.0.1");
+            _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
         }
@@ -66,52 +68,9 @@ namespace UmbraClient {
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            List<NetIncomingMessage> messages = netAgent.ReadMessages();
-
-            foreach(NetIncomingMessage netMessage in messages) {
-                NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
-                
-                if(messageType == NetworkMessageType.EntityAdd) {
-                    EntityAddMessage<UmbraEntityType> addMessage = new EntityAddMessage<UmbraEntityType>();
-                    addMessage.Decode(netMessage);
-
-                    long entityId = addMessage.EntityId;
-                    Vector2 position = addMessage.Position;
-
-                    if(addMessage.EntityType == UmbraEntityType.Player) {
-                        _player = EntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
-                    } else if(addMessage.EntityType == UmbraEntityType.NPC) {
-                        EntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
-                    }
-                } else if(messageType == NetworkMessageType.EntityMove) {
-                    EntityMoveMessage moveMessage = new EntityMoveMessage();
-                    moveMessage.Decode(netMessage);
-
-                    //Entity entity = _entities[moveMessage.EntityId];
-
-                    //if(entity != _player) {
-                    //    TransformComponent transform = entity.GetComponent<TransformComponent>();
-                    //    transform.Position = moveMessage.Position;
-                    //}
-                }
-            }
+            _messageProcessor.ProcessIncomingMessages(_netAgent.ReadMessages());
 
             _entityWorld.Update();
-
-            double now = NetTime.Now;
-
-            if(now > _nextSendUpdates) {
-                Console.WriteLine("sending update");
-
-                List<INetworkMessage> outgoingMessages = new List<INetworkMessage>();
-
-                TransformComponent transform = _player.GetComponent<TransformComponent>();
-                outgoingMessages.Add(new EntityMoveMessage(_player.UniqueId, transform.Position));
-
-                netAgent.SendMessages(outgoingMessages);
-
-                _nextSendUpdates += (1.0 / _updatesPerSecond);
-            }
 
             base.Update(gameTime);
         }
@@ -129,7 +88,7 @@ namespace UmbraClient {
         }
 
         protected override void OnExiting(object sender, EventArgs args) {
-            netAgent.Shutdown();
+            _netAgent.Shutdown();
 
             base.OnExiting(sender, args);
         }
