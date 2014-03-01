@@ -2,21 +2,35 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Artemis.Attributes;
+using Artemis.Manager;
+using Artemis.System;
 using Artemis;
+using CrawLib.Artemis.Components;
+using CrawLib.Network;
 using Lidgren.Network;
 using CrawLib.Network.Messages;
+using CrawLib.Artemis;
 using UmbraLib;
 using Microsoft.Xna.Framework;
-using CrawLib.Artemis;
-using CrawLib.Artemis.Components;
 
-namespace UmbraClient {
-    public class ClientMessageProcessor {
-        public ClientMessageProcessor(EntityWorld entityWorld) {
+namespace UmbraClient.Systems {
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
+    class NetworkMessageSystem : EntitySystem {
+        private NetworkAgent _networkAgent;
 
+        public override void LoadContent() {
+            _networkAgent = BlackBoard.GetEntry<NetworkAgent>("NetworkAgent");
         }
 
-        public void ProcessIncomingMessages(List<NetIncomingMessage> messages) {
+        // this is a little hacky as there aren't actually any entities to process
+        // probably a sign that I'm abusing the entity component system. i think the proper
+        // way to do this is to create a simple entity that just has a component to hold
+        // a reference to the network agent. that's roughly how it would work in unity.
+        // might be best to use a TagSystem like for player input?
+        protected override void ProcessEntities(IDictionary<int, Entity> entities) {
+            List<NetIncomingMessage> messages = _networkAgent.ReadMessages();
+
             foreach(NetIncomingMessage netMessage in messages) {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
 

@@ -5,22 +5,22 @@ using System.Text;
 using Artemis;
 
 namespace CrawLib.Artemis {
-    public class EntityManager {
-        private static EntityManager _instance;
+    public class CrawEntityManager {
+        private static CrawEntityManager _instance;
 
         public IEntityFactory EntityFactory { get; private set; }
 
         private EntityWorld _entityWorld;
         private Dictionary<long, Entity> _entities;
 
-        private EntityManager() {
+        private CrawEntityManager() {
             _entities = new Dictionary<long, Entity>();
         }
 
-        public static EntityManager Instance {
+        public static CrawEntityManager Instance {
             get {
                 if(_instance == null)
-                    _instance = new EntityManager();
+                    _instance = new CrawEntityManager();
 
                 return _instance;
             }

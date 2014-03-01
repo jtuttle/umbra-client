@@ -25,8 +25,7 @@ namespace UmbraClient {
         public SpriteBatch spriteBatch;
 
         private NetworkAgent _netAgent;
-        private ClientMessageProcessor _messageProcessor;
-
+        
         private EntityWorld _entityWorld;
 
         public UmbraGameClient()
@@ -48,10 +47,8 @@ namespace UmbraClient {
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
-            EntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
-
-            _messageProcessor = new ClientMessageProcessor(_entityWorld);
-            
+            CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
+    
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
@@ -65,8 +62,6 @@ namespace UmbraClient {
             // exit if back or esc pressed
             if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            _messageProcessor.ProcessIncomingMessages(_netAgent.ReadMessages());
 
             _entityWorld.Update();
 
