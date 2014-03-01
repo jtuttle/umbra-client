@@ -11,7 +11,7 @@ using Artemis.Manager;
 
 namespace UmbraServer.Systems {
     // TODO: probably need to make sure this takes priority over movementsystem
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
     class AiSystem : EntityComponentProcessingSystem<AiComponent, TransformComponent> {
         private Random _rnd = new Random();
 

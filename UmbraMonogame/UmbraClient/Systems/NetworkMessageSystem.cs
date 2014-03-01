@@ -15,7 +15,7 @@ using UmbraLib;
 using Microsoft.Xna.Framework;
 
 namespace UmbraClient.Systems {
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
     class NetworkMessageSystem : EntitySystem {
         private NetworkAgent _networkAgent;
 
@@ -60,7 +60,7 @@ namespace UmbraClient.Systems {
         private void MoveEntity(EntityMoveMessage msg) {
             Entity entity = CrawEntityManager.Instance.GetEntity(msg.EntityId);
 
-            if(entity.Tag != "PLAYER") {
+            if(entity != null && entity.Tag != "PLAYER") {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
                 transform.Position = msg.Position;
             }
