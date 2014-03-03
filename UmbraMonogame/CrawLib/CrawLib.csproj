@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Artemis\Components\SpatialFormComponent.cs" />
+    <Compile Include="Artemis\Components\TileMapComponent.cs" />
     <Compile Include="Artemis\Components\TransformComponent.cs" />
     <Compile Include="Artemis\Components\VelocityComponent.cs" />
     <Compile Include="Artemis\CrawEntityManager.cs" />
@@ -63,6 +64,8 @@
     <Compile Include="Network\Messages\INetworkMessage.cs" />
     <Compile Include="Network\NetworkAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TileMap\MapTile.cs" />
+    <Compile Include="TileMap\Map.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

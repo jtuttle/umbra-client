@@ -17,6 +17,7 @@ using CrawLib.Network.Messages;
 using UmbraLib;
 using UmbraLib.Components;
 using CrawLib.Artemis;
+using CrawLib.TileMap;
 #endregion
 
 namespace UmbraClient {
@@ -48,7 +49,13 @@ namespace UmbraClient {
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
-    
+
+            //// TEMP ////
+            Map map = new Map(10, 10);
+            Entity mapEntity = _entityWorld.CreateEntity();
+            mapEntity.AddComponent(new TileMapComponent(map));
+            //// TEMP ////
+
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
