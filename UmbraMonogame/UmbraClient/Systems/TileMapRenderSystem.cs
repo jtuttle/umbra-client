@@ -42,7 +42,6 @@ namespace UmbraClient.Systems {
             MapTile[] tiles = tileMapComponent.TileMap.Tiles;
 
             for(int i = 0; i < tiles.Length; i++) {
-
                 float x = i % tileMapComponent.TileMap.Width * TILE_WIDTH * _scale;
                 float y = (float)(int)(i / tileMapComponent.TileMap.Width) * TILE_HEIGHT * _scale;
 
