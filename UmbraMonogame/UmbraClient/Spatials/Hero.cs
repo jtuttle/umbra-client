@@ -15,7 +15,7 @@ namespace UmbraClient.Spatials {
 
         public static void Render(SpriteBatch spriteBatch, ContentManager content, TransformComponent transform) {
             if(_sprite == null) {
-                _sprite = content.Load<Texture2D>("Images/Oryx");
+                _sprite = content.Load<Texture2D>("Images/OryxChar");
                 _bounds = new Rectangle(169, 25, 22, 22);
                 _scale = 2.0f;
             }
