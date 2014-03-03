@@ -13,6 +13,7 @@ using CrawLib.Network.Messages;
 using CrawLib.Artemis;
 using UmbraLib;
 using Microsoft.Xna.Framework;
+using CrawLib;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -51,7 +52,8 @@ namespace UmbraClient.Systems {
             Vector2 position = msg.Position;
 
             if(msg.EntityType == UmbraEntityType.Player) {
-                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                BlackBoard.GetEntry<Camera2D>("Camera").Focus = player.GetComponent<TransformComponent>();
             } else if(msg.EntityType == UmbraEntityType.NPC) {
                 CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
             }

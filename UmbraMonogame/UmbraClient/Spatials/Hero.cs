@@ -22,7 +22,7 @@ namespace UmbraClient.Spatials {
 
             Vector2 position = new Vector2(transform.X - (_bounds.Width * 0.5f), transform.Y - (_bounds.Height * 0.5f));
 
-            spriteBatch.Draw(_sprite, position, _bounds, Color.White, 0, Vector2.Zero, _scale, SpriteEffects.None, 0);
+            spriteBatch.Draw(_sprite, position, _bounds, Color.White, 0, Vector2.Zero, _scale, SpriteEffects.None, 1);
         }
     }
 }

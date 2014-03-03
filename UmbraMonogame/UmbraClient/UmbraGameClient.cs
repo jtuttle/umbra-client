@@ -29,6 +29,8 @@ namespace UmbraClient {
         
         private EntityWorld _entityWorld;
 
+        private Camera2D _camera;
+
         public UmbraGameClient()
             : base() {
 
@@ -41,9 +43,13 @@ namespace UmbraClient {
 
             _netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
 
+            _camera = new Camera2D(this);
+            Components.Add(_camera);
+
             EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
             EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
+            EntitySystem.BlackBoard.SetEntry("Camera", _camera);
 
             _entityWorld = new EntityWorld();
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
@@ -78,7 +84,13 @@ namespace UmbraClient {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, 
+                              BlendState.AlphaBlend, 
+                              SamplerState.LinearClamp, 
+                              DepthStencilState.None,
+                              RasterizerState.CullCounterClockwise, 
+                              null, 
+                              _camera.Transform);
 
             _entityWorld.Draw();
 
