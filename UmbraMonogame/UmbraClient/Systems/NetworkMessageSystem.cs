@@ -53,7 +53,11 @@ namespace UmbraClient.Systems {
 
             if(msg.EntityType == UmbraEntityType.Player) {
                 Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
-                BlackBoard.GetEntry<Camera2D>("Camera").Focus = player.GetComponent<TransformComponent>();
+                TransformComponent transform = player.GetComponent<TransformComponent>();
+
+                Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+                camera.Position = transform.Position;
+                camera.Focus = transform;
             } else if(msg.EntityType == UmbraEntityType.NPC) {
                 CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
             }
