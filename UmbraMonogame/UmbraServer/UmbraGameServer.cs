@@ -39,7 +39,7 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            Vector2 position = new Vector2(200, 200);
+            Vector2 position = new Vector2(600, 600);
             Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
@@ -70,7 +70,7 @@ namespace UmbraServer {
             }
 
             // create and signal addition of player entity
-            Vector2 position = new Vector2(100, 100);
+            Vector2 position = new Vector2(0, 0);
             Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
             msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);

@@ -57,11 +57,11 @@ namespace UmbraClient {
             CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
 
             //// TEMP ////
-            Map map = new Map(10, 10);
+            Map map = new Map(30, 30);
             Entity mapEntity = _entityWorld.CreateEntity();
             mapEntity.AddComponent(new TileMapComponent(map));
             //// TEMP ////
-
+            
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
