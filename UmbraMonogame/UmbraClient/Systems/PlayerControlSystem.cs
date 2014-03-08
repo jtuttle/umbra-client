@@ -17,7 +17,7 @@ namespace UmbraClient.Systems {
     public class PlayerControlSystem : TagSystem {
         private NetworkAgent _netAgent;
 
-        private float _updatesPerSecond = 1.0f;
+        private int _updatesPerSecond = 10;
         private double _nextSendUpdates = NetTime.Now;
 
         public PlayerControlSystem()
@@ -64,7 +64,7 @@ namespace UmbraClient.Systems {
 
                 _netAgent.SendMessages(outgoingMessages);
                 
-                _nextSendUpdates += (1.0 / _updatesPerSecond);
+                _nextSendUpdates += (1.0f / _updatesPerSecond);
             }
         }
     }
