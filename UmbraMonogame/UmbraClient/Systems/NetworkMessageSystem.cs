@@ -60,13 +60,16 @@ namespace UmbraClient.Systems {
             Vector2 position = msg.Position;
 
             Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
-            if(msg.IsSelf) player.Tag = "PLAYER";
 
-            TransformComponent transform = player.GetComponent<TransformComponent>();
+            if(msg.IsSelf) {
+                player.Tag = "PLAYER";
 
-            Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
-            camera.Position = transform.Position;
-            camera.Focus = transform;
+                TransformComponent transform = player.GetComponent<TransformComponent>();
+
+                Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+                camera.Position = transform.Position;
+                camera.Focus = transform;
+            }
         }
 
         private void AddEntity(EntityAddMessage<UmbraEntityType> msg) {
