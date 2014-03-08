@@ -73,8 +73,9 @@ namespace UmbraServer {
             Vector2 position = new Vector2(0, 0);
             Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
-            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
-            _networkAgent.BroadcastMessage(msg, true);
+            //msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
+            EntityAddPlayer<UmbraEntityType> meMsg = new EntityAddPlayer<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
+            _networkAgent.SendMessage(meMsg, connection);
         }
     }
 }

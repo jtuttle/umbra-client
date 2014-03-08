@@ -6,6 +6,7 @@ using Lidgren.Network;
 
 namespace CrawLib.Network.Messages {
     public enum NetworkMessageType : byte {
+        EntityAddPlayer,
         EntityAdd,
         EntityMove
     }

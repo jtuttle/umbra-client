@@ -35,7 +35,11 @@ namespace UmbraClient.Systems {
             foreach(NetIncomingMessage netMessage in messages) {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
 
-                if(messageType == NetworkMessageType.EntityAdd) {
+                if(messageType == NetworkMessageType.EntityAddPlayer) {
+                    EntityAddPlayer<UmbraEntityType> addPlayerMessage = new EntityAddPlayer<UmbraEntityType>();
+                    addPlayerMessage.Decode(netMessage);
+                    AddPlayerEntity(addPlayerMessage);
+                }  else if(messageType == NetworkMessageType.EntityAdd) {
                     EntityAddMessage<UmbraEntityType> addMessage = new EntityAddMessage<UmbraEntityType>();
                     addMessage.Decode(netMessage);
                     AddEntity(addMessage);
@@ -47,17 +51,32 @@ namespace UmbraClient.Systems {
             }
         }
 
+        private void AddPlayerEntity(EntityAddPlayer<UmbraEntityType> msg) {
+            long entityId = msg.EntityId;
+            Vector2 position = msg.Position;
+
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+            TransformComponent transform = player.GetComponent<TransformComponent>();
+
+            Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+            camera.Position = transform.Position;
+            camera.Focus = transform;
+        }
+
         private void AddEntity(EntityAddMessage<UmbraEntityType> msg) {
             long entityId = msg.EntityId;
             Vector2 position = msg.Position;
 
             if(msg.EntityType == UmbraEntityType.Player) {
-                Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
-                TransformComponent transform = player.GetComponent<TransformComponent>();
+                CrawEntityManager.Instance.EntityFactory.CreateOtherPlayer((long?)entityId, position);
 
-                Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
-                camera.Position = transform.Position;
-                camera.Focus = transform;
+
+                //Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                //TransformComponent transform = player.GetComponent<TransformComponent>();
+
+                //Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+                //camera.Position = transform.Position;
+                //camera.Focus = transform;
             } else if(msg.EntityType == UmbraEntityType.NPC) {
                 CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
             }
