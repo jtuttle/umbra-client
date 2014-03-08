@@ -11,6 +11,8 @@ using CrawLib.Network;
 using Lidgren.Network;
 using CrawLib.Network.Messages;
 using CrawLib.Artemis;
+using UmbraLib.Components;
+using UmbraLib;
 
 namespace UmbraServer.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -32,6 +34,8 @@ namespace UmbraServer.Systems {
             foreach(NetIncomingMessage netMessage in messages) {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
 
+                Console.WriteLine(messageType);
+
                 if(messageType == NetworkMessageType.EntityMove) {
                     EntityMoveMessage moveMessage = new EntityMoveMessage();
                     moveMessage.Decode(netMessage);
@@ -42,8 +46,9 @@ namespace UmbraServer.Systems {
 
         private void MoveEntity(EntityMoveMessage msg) {
             Entity entity = CrawEntityManager.Instance.GetEntity(msg.EntityId);
+            UmbraEntityType entityType = entity.GetComponent<UmbraEntityTypeComponent>().EntityType;
 
-            if(entity.Tag == "PLAYER") {
+            if(entityType == UmbraEntityType.Player) {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
                 transform.Position = msg.Position;
             }
