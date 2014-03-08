@@ -47,7 +47,7 @@ namespace UmbraClient.Systems {
                     EntityMoveMessage moveMessage = new EntityMoveMessage();
                     moveMessage.Decode(netMessage);
                     MoveEntity(moveMessage);
-                } else if(messageType == NetworkMessageType.EntityMove) {
+                } else if(messageType == NetworkMessageType.EntityRemove) {
                     EntityRemoveMessage removeMessage = new EntityRemoveMessage();
                     removeMessage.Decode(netMessage);
                     RemoveEntity(removeMessage);
