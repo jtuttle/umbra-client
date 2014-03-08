@@ -44,6 +44,8 @@ namespace UmbraClient.Systems {
 
             Rectangle bounds = new Rectangle(32, 224, TILE_WIDTH, TILE_HEIGHT);
 
+            // opt - tons of repeated calculations here
+
             Viewport viewport = _spriteBatch.GraphicsDevice.Viewport;
             float left = _camera.Position.X - (viewport.Width / 2.0f) - TILE_WIDTH * _scale;
             float right = _camera.Position.X + (viewport.Width / 2.0f) + TILE_WIDTH * _scale;
