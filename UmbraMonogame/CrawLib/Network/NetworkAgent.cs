@@ -15,10 +15,14 @@ namespace CrawLib.Network {
         public delegate void PlayerConnectDelegate(NetConnection connection);
         public event PlayerConnectDelegate OnPlayerConnect = delegate { };
 
+        public delegate void PlayerDisconnectDelegate(NetConnection connection);
+        public event PlayerDisconnectDelegate OnPlayerDisconnect = delegate { };
+
         private AgentRole _role;
         private NetPeer _peer;
         private NetPeerConfiguration _config;
         private int _port = 14242;
+        private float _pingInterval = 2.0f;
 
         private List<NetIncomingMessage> _incomingMessages;
 
@@ -39,10 +43,15 @@ namespace CrawLib.Network {
             if(_role == AgentRole.Server) {
                 _config.EnableMessageType(NetIncomingMessageType.DiscoveryRequest);
                 _config.Port = _port;
+                _config.PingInterval = _pingInterval;
+                _config.ConnectionTimeout = _pingInterval + 1;
                 _peer = new NetServer(_config);
+                
                 Log("Server starting on " + _config.LocalAddress + ":" + _config.Port);
             } else if(_role == AgentRole.Client) {
                 _config.EnableMessageType(NetIncomingMessageType.DiscoveryResponse);
+                _config.PingInterval = _pingInterval;
+                _config.ConnectionTimeout = _pingInterval + 1;
                 _peer = new NetClient(_config);
             }
 
@@ -64,7 +73,7 @@ namespace CrawLib.Network {
 
         public List<NetIncomingMessage> ReadMessages() {
             _incomingMessages.Clear();
-
+            
             NetIncomingMessage msg;
 
             while((msg = _peer.ReadMessage()) != null) {
@@ -87,6 +96,8 @@ namespace CrawLib.Network {
 
                         if(status == NetConnectionStatus.Connected)
                             OnPlayerConnect(msg.SenderConnection);
+                        else if(status == NetConnectionStatus.Disconnected)
+                            OnPlayerDisconnect(msg.SenderConnection);
                         break;
                     case NetIncomingMessageType.Data:
                         _incomingMessages.Add(msg);

@@ -8,6 +8,7 @@ namespace CrawLib.Network.Messages {
     public enum NetworkMessageType : byte {
         EntityAdd,
         EntityMove,
+        EntityRemove,
         PlayerConnect
     }
 

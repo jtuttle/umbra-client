@@ -59,6 +59,7 @@
     <Compile Include="Artemis\IEntityFactory.cs" />
     <Compile Include="Artemis\Systems\MovementSystem.cs" />
     <Compile Include="Camera2D.cs" />
+    <Compile Include="Network\Messages\EntityRemoveMessage.cs" />
     <Compile Include="Network\Messages\PlayerConnectMessage.cs" />
     <Compile Include="Network\Messages\EntityAddMessage.cs" />
     <Compile Include="Network\Messages\EntityMessage.cs" />
