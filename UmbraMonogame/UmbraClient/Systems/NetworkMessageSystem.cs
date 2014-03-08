@@ -47,6 +47,10 @@ namespace UmbraClient.Systems {
                     EntityMoveMessage moveMessage = new EntityMoveMessage();
                     moveMessage.Decode(netMessage);
                     MoveEntity(moveMessage);
+                } else if(messageType == NetworkMessageType.EntityMove) {
+                    EntityRemoveMessage removeMessage = new EntityRemoveMessage();
+                    removeMessage.Decode(netMessage);
+                    RemoveEntity(removeMessage);
                 }
             }
         }
@@ -83,6 +87,11 @@ namespace UmbraClient.Systems {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
                 transform.Position = msg.Position;
             }
+        }
+
+        private void RemoveEntity(EntityRemoveMessage msg) {
+            Entity entity = CrawEntityManager.Instance.GetEntity(msg.EntityId);
+            if(entity != null) entity.Delete();
         }
     }
 }

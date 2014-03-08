@@ -23,7 +23,7 @@ namespace CrawLib.Network.Messages {
         }
 
         public virtual void Encode(NetOutgoingMessage msg) {
-            msg.Write(EntityId);
+            msg.Write((long)EntityId);
         }
     }
 }
