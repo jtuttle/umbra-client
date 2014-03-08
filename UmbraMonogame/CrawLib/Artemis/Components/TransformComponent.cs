@@ -6,7 +6,7 @@ using Artemis.Interface;
 using Microsoft.Xna.Framework;
 
 namespace CrawLib.Artemis.Components {
-    public class TransformComponent : IComponent {
+    public class TransformComponent : IComponent, IFocusable {
         private float _x;
         public float X {
             get { return _x; }

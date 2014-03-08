@@ -13,6 +13,7 @@ using CrawLib.Network.Messages;
 using CrawLib.Artemis;
 using UmbraLib;
 using Microsoft.Xna.Framework;
+using CrawLib;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -34,7 +35,11 @@ namespace UmbraClient.Systems {
             foreach(NetIncomingMessage netMessage in messages) {
                 NetworkMessageType messageType = (NetworkMessageType)Enum.ToObject(typeof(NetworkMessageType), netMessage.ReadByte());
 
-                if(messageType == NetworkMessageType.EntityAdd) {
+                if(messageType == NetworkMessageType.PlayerConnect) {
+                    PlayerConnectMessage<UmbraEntityType> playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>();
+                    playerConnectMessage.Decode(netMessage);
+                    PlayerConnect(playerConnectMessage);
+                }  else if(messageType == NetworkMessageType.EntityAdd) {
                     EntityAddMessage<UmbraEntityType> addMessage = new EntityAddMessage<UmbraEntityType>();
                     addMessage.Decode(netMessage);
                     AddEntity(addMessage);
@@ -44,6 +49,20 @@ namespace UmbraClient.Systems {
                     MoveEntity(moveMessage);
                 }
             }
+        }
+
+        private void PlayerConnect(PlayerConnectMessage<UmbraEntityType> msg) {
+            long entityId = msg.EntityId;
+            Vector2 position = msg.Position;
+
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+            if(msg.IsSelf) player.Tag = "PLAYER";
+
+            TransformComponent transform = player.GetComponent<TransformComponent>();
+
+            Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+            camera.Position = transform.Position;
+            camera.Focus = transform;
         }
 
         private void AddEntity(EntityAddMessage<UmbraEntityType> msg) {
