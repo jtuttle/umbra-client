@@ -25,19 +25,7 @@ namespace UmbraClient {
             player.AddComponent(new TransformComponent(position));
             player.AddComponent(new VelocityComponent());
             player.AddComponent(new SpatialFormComponent("Hero"));
-            player.Tag = "PLAYER";
-            
-            return player;
-        }
 
-        public Entity CreateOtherPlayer(long? entityId, Vector2 position) {
-            Entity player = _entityWorld.CreateEntity(entityId);
-
-            player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
-            player.AddComponent(new TransformComponent(position));
-            player.AddComponent(new VelocityComponent());
-            player.AddComponent(new SpatialFormComponent("Hero"));
-            
             return player;
         }
 

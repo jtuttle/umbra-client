@@ -8,17 +8,19 @@ using CrawLib.Artemis.Components;
 using Microsoft.Xna.Framework;
 
 namespace CrawLib.Network.Messages {
-    public class EntityAddPlayer<TEnum> : EntityMessage {
+    public class PlayerConnectMessage<TEnum> : EntityMessage {
         public TEnum EntityType { get; private set; }
         public Vector2 Position { get; private set; }
+        public bool IsSelf { get; private set; }
 
-        public EntityAddPlayer() : base() { }
+        public PlayerConnectMessage() : base() { }
 
-        public EntityAddPlayer(long entityId, TEnum entityType, Vector2 position)
-            : base(entityId, NetworkMessageType.EntityAddPlayer) {
+        public PlayerConnectMessage(long entityId, TEnum entityType, Vector2 position, bool isSelf)
+            : base(entityId, NetworkMessageType.PlayerConnect) {
 
             EntityType = entityType;
             Position = position;
+            IsSelf = isSelf;
         }
 
         public override void Decode(NetIncomingMessage msg) {
@@ -29,6 +31,8 @@ namespace CrawLib.Network.Messages {
             float x = msg.ReadFloat();
             float y = msg.ReadFloat();
             Position = new Vector2(x, y);
+
+            IsSelf = msg.ReadBoolean();
         }
 
         public override void Encode(NetOutgoingMessage msg) {
@@ -38,6 +42,8 @@ namespace CrawLib.Network.Messages {
 
             msg.Write(Position.X);
             msg.Write(Position.Y);
+
+            msg.Write(IsSelf);
         }
     }
 }

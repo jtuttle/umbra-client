@@ -28,10 +28,6 @@ namespace UmbraServer {
             return player;
         }
 
-        public Entity CreateOtherPlayer(long? entityId, Vector2 position) {
-            return null;
-        }
-
         public Entity CreateNPC(long? entityId, Vector2 position) {
             Entity npc = _entityWorld.CreateEntity();
 
