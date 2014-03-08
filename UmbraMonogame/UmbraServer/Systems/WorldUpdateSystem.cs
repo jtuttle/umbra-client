@@ -30,7 +30,7 @@ namespace UmbraServer.Systems {
 
         protected override void ProcessEntities(IDictionary<int, Entity> entities) {
             if(NetTime.Now > _nextSendUpdates) {
-                Console.WriteLine("sending world update");
+                //Console.WriteLine("sending world update");
                 _sendUpdates = true;
                 _nextSendUpdates += (1.0 / _updatesPerSecond);
             }

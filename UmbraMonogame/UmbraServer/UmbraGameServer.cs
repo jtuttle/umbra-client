@@ -39,7 +39,7 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            Vector2 position = new Vector2(200, 200);
+            Vector2 position = new Vector2(600, 600);
             Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
@@ -55,26 +55,37 @@ namespace UmbraServer {
             _entityWorld.Update();
         }
 
-        private void OnPlayerConnect(NetConnection connection) {
-            EntityAddMessage<UmbraEntityType> msg;
+        private void OnPlayerConnect(NetConnection playerConnection) {
+            EntityAddMessage<UmbraEntityType> entityAddMessage;
 
             Bag<Entity> entities = _entityWorld.EntityManager.GetEntities(Aspect.All(typeof(UmbraEntityTypeComponent)));
             
-            // signal addition of all other entities
+            // send message to connecting player about existing entities
             foreach(Entity entity in entities) {
                 UmbraEntityTypeComponent entityType = entity.GetComponent<UmbraEntityTypeComponent>();
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
 
-                msg = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
-                _networkAgent.SendMessage(msg, connection);
+                entityAddMessage = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
+                _networkAgent.SendMessage(entityAddMessage, playerConnection);
             }
 
-            // create and signal addition of player entity
-            Vector2 position = new Vector2(100, 100);
+            // send message confirming player's connection
+            PlayerConnectMessage<UmbraEntityType> playerConnectMessage;
+
+            Vector2 position = new Vector2(0, 0);
             Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
-            msg = new EntityAddMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position);
-            _networkAgent.BroadcastMessage(msg, true);
+            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position, true);
+            _networkAgent.SendMessage(playerConnectMessage, playerConnection);
+
+            // message other clients about player's connection
+            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position, false);
+            
+            foreach(NetConnection connection in _networkAgent.Connections) {
+                if(connection != playerConnection) {
+                    _networkAgent.SendMessage(playerConnectMessage, connection);
+                }
+            }
         }
     }
 }

@@ -7,7 +7,8 @@ using Lidgren.Network;
 namespace CrawLib.Network.Messages {
     public enum NetworkMessageType : byte {
         EntityAdd,
-        EntityMove
+        EntityMove,
+        PlayerConnect
     }
 
     public interface INetworkMessage {

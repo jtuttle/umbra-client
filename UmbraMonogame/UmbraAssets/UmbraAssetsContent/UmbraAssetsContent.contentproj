@@ -48,15 +48,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Images\Hero.png">
-      <Name>Hero</Name>
+    <Compile Include="Images\OryxChar.png">
+      <Name>OryxChar</Name>
       <Importer>TextureImporter</Importer>
-      <Processor>MGTextureProcessor</Processor>
+      <Processor>TextureProcessor</Processor>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Images\Oryx.png">
-      <Name>Oryx</Name>
+    <Compile Include="Images\OryxEnv.png">
+      <Name>OryxEnv</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

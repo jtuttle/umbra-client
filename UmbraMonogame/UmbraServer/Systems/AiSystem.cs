@@ -24,7 +24,7 @@ namespace UmbraServer.Systems {
             else
                 transform.X -= 0.1f;
 
-            if(transform.X > 200 || transform.X < 0)
+            if(transform.X > 800 || transform.X < 600)
                 _right = !_right;
         }
     }

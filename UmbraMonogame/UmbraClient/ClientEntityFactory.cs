@@ -25,8 +25,7 @@ namespace UmbraClient {
             player.AddComponent(new TransformComponent(position));
             player.AddComponent(new VelocityComponent());
             player.AddComponent(new SpatialFormComponent("Hero"));
-            player.Tag = "PLAYER";
-            
+
             return player;
         }
 
