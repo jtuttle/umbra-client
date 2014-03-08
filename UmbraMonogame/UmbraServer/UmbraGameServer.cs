@@ -20,14 +20,17 @@ namespace UmbraServer {
         private EntityWorld _entityWorld;
 
         private NetworkAgent _networkAgent;
+
+        private Dictionary<NetConnection, long> _playerEntityIds;
         
         public UmbraGameServer() {
-            
+            _playerEntityIds = new Dictionary<NetConnection, long>();
         }
 
         public void Initialize() {
             _networkAgent = new NetworkAgent(AgentRole.Server, "Umbra");
             _networkAgent.OnPlayerConnect += OnPlayerConnect;
+            _networkAgent.OnPlayerDisconnect += OnPlayerDisconnect;
 
             EntitySystem.BlackBoard.SetEntry("NetworkAgent", _networkAgent);
 
@@ -86,6 +89,19 @@ namespace UmbraServer {
                     _networkAgent.SendMessage(playerConnectMessage, connection);
                 }
             }
+
+            _playerEntityIds[playerConnection] = player.UniqueId;
+        }
+
+        private void OnPlayerDisconnect(NetConnection playerConnection) {
+            long playerEntityId = _playerEntityIds[playerConnection];
+            Entity playerEntity = CrawEntityManager.Instance.GetEntity(playerEntityId);
+
+            playerEntity.Delete();
+            _playerEntityIds.Remove(playerConnection);
+
+            EntityRemoveMessage msg = new EntityRemoveMessage(playerEntityId);
+            _networkAgent.BroadcastMessage(msg);
         }
     }
 }
