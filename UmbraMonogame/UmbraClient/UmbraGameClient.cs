@@ -60,11 +60,14 @@ namespace UmbraClient {
             Map map = new Map(30, 30);
             Entity mapEntity = _entityWorld.CreateEntity();
             mapEntity.AddComponent(new TileMapComponent(map));
+
+            _camera.MoveBounds = new Rectangle(0, 0, map.Width * TileConfig.TILE_WIDTH, map.Height * TileConfig.TILE_HEIGHT);
             //// TEMP ////
             
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
+            //_camera.Scale = 2.0f;
         }
 
         protected override void UnloadContent() {
