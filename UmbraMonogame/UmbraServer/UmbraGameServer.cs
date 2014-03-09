@@ -75,7 +75,7 @@ namespace UmbraServer {
             // send message confirming player's connection
             PlayerConnectMessage<UmbraEntityType> playerConnectMessage;
 
-            Vector2 position = new Vector2(0, 0);
+            Vector2 position = new Vector2(500, 500);
             Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
 
             playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position, true);

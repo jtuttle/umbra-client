@@ -17,7 +17,7 @@ namespace UmbraClient.Spatials {
             if(_sprite == null) {
                 _sprite = content.Load<Texture2D>("Images/OryxChar");
                 _bounds = new Rectangle(169, 25, 22, 22);
-                _scale = 2.0f;
+                _scale = 1.0f;
             }
 
             Vector2 position = new Vector2(transform.X - (_bounds.Width * 0.5f), transform.Y - (_bounds.Height * 0.5f));

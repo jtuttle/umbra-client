@@ -63,6 +63,9 @@ namespace CrawLib {
         /// <value>The focus.</value>
         IFocusable Focus { get; set; }
 
+        Rectangle MoveBounds { get; set; }
+        RectangleF ViewBounds { get; }
+
         /// <summary>
         /// Determines whether the target is in view given the specified position.
         /// This can be used to increase performance by not drawing objects
@@ -90,13 +93,24 @@ namespace CrawLib {
             get { return _position; }
             set { _position = value; }
         }
+        public float MoveSpeed { get; set; }
         public float Rotation { get; set; }
         public Vector2 Origin { get; set; }
         public float Scale { get; set; }
         public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
         public IFocusable Focus { get; set; }
-        public float MoveSpeed { get; set; }
+        public Rectangle MoveBounds { get; set; }
+        
+        public RectangleF ViewBounds { 
+            get {
+                float x = Position.X - Origin.X;
+                float y = Position.Y - Origin.Y;
+                float width = (Position.X + Origin.X) - x;
+                float height = (Position.Y + Origin.Y) - y;
+                return new RectangleF(x, y, width, height);
+            }
+        }
 
         #endregion
 
@@ -121,17 +135,20 @@ namespace CrawLib {
                         Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
                         Matrix.CreateRotationZ(Rotation) *
                         Matrix.CreateTranslation(Origin.X, Origin.Y, 0) *
-                        Matrix.CreateScale(new Vector3(Scale, Scale, Scale));
+                        Matrix.CreateScale(new Vector3(Scale, Scale, 0));
 
             Origin = ScreenCenter / Scale;
 
             // Move the Camera to the position that it needs to go
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-
             if(Focus != null) {
                 _position.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
                 _position.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;
+
+                RectangleF viewBounds = ViewBounds;
+                _position.X = MathHelper.Clamp(_position.X, MoveBounds.Left + (viewBounds.Width / 2), MoveBounds.Right - (viewBounds.Width / 2));
+                _position.Y = MathHelper.Clamp(_position.Y, MoveBounds.Top + (viewBounds.Height / 2), MoveBounds.Bottom - (viewBounds.Height / 2));
             }
 
             base.Update(gameTime);
