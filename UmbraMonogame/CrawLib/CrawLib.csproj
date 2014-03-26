@@ -67,13 +67,16 @@
     <Compile Include="Network\Messages\INetworkMessage.cs" />
     <Compile Include="Network\NetworkAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quad.cs" />
     <Compile Include="RectangleF.cs" />
     <Compile Include="TileMap\MapTile.cs" />
     <Compile Include="TileMap\Map.cs" />
     <Compile Include="Coord2D.cs" />
     <Compile Include="TileMap\TileConfig.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Shapes\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

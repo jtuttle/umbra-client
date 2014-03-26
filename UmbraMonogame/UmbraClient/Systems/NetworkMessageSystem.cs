@@ -66,9 +66,9 @@ namespace UmbraClient.Systems {
 
                 TransformComponent transform = player.GetComponent<TransformComponent>();
 
-                Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
-                camera.Position = transform.Position;
-                camera.Focus = transform;
+                //Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
+                //camera.Position = transform.Position;
+                //camera.Focus = transform;
             }
         }
 
