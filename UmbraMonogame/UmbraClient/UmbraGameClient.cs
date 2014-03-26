@@ -18,6 +18,7 @@ using UmbraLib;
 using UmbraLib.Components;
 using CrawLib.Artemis;
 using CrawLib.TileMap;
+using UmbraClient.Components;
 #endregion
 
 namespace UmbraClient {
@@ -29,7 +30,7 @@ namespace UmbraClient {
         
         private EntityWorld _entityWorld;
 
-        private Camera2D _camera;
+        //private Camera2D _camera;
 
         public UmbraGameClient()
             : base() {
@@ -43,15 +44,23 @@ namespace UmbraClient {
 
             _netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
 
-            _camera = new Camera2D(this);
-            Components.Add(_camera);
+            //_camera = new Camera2D(this);
+            //Components.Add(_camera);
 
             EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
+            EntitySystem.BlackBoard.SetEntry("GraphicsDevice", GraphicsDevice);
+            EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
-            EntitySystem.BlackBoard.SetEntry("Camera", _camera);
+            //EntitySystem.BlackBoard.SetEntry("Camera", _camera);
 
             _entityWorld = new EntityWorld();
+            
+            Entity cameraEntity = _entityWorld.CreateEntity();
+            CameraComponent cameraComponent = new CameraComponent(GraphicsDevice, new Vector3(0, 0, 10));
+            cameraEntity.AddComponent(cameraComponent);
+            EntitySystem.BlackBoard.SetEntry("Camera", cameraComponent);
+
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
@@ -61,7 +70,7 @@ namespace UmbraClient {
             Entity mapEntity = _entityWorld.CreateEntity();
             mapEntity.AddComponent(new TileMapComponent(map));
 
-            _camera.MoveBounds = new Rectangle(0, 0, map.Width * TileConfig.TILE_WIDTH, map.Height * TileConfig.TILE_HEIGHT);
+            //_camera.MoveBounds = new Rectangle(0, 0, map.Width * TileConfig.TILE_WIDTH, map.Height * TileConfig.TILE_HEIGHT);
             //// TEMP ////
             
             _netAgent.Connect("127.0.0.1");
@@ -87,17 +96,19 @@ namespace UmbraClient {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.FrontToBack, 
-                              BlendState.AlphaBlend, 
-                              SamplerState.LinearClamp, 
-                              DepthStencilState.None,
-                              RasterizerState.CullCounterClockwise, 
-                              null, 
-                              _camera.Transform);
+            //spriteBatch.Begin();
+
+            //spriteBatch.Begin(SpriteSortMode.FrontToBack, 
+            //                  BlendState.AlphaBlend, 
+            //                  SamplerState.LinearClamp, 
+            //                  DepthStencilState.None,
+            //                  RasterizerState.CullCounterClockwise, 
+            //                  null, 
+            //                  _camera.Transform);
 
             _entityWorld.Draw();
 
-            spriteBatch.End();
+            //spriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -39,8 +39,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ClientEntityFactory.cs" />
+    <Compile Include="Components\CameraComponent.cs" />
     <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
+    <Compile Include="Systems\CameraControlSystem.cs" />
     <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\RenderSystem.cs" />
@@ -77,6 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Content\Effects\DiffuseColorEffect.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Content\Images\OryxChar.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -94,9 +99,7 @@
       <Name>UmbraLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Components\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
