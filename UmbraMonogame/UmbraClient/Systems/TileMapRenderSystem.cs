@@ -41,10 +41,11 @@ namespace UmbraClient.Systems {
 
             _quads = new List<QuadShape>();
 
-            for(int z = -2; z <= 2; z++) {
-                for(int x = -2; x <= 2; x++) {
+            for(int z = -5; z <= 5; z++) {
+                for(int x = -7; x <= 7; x++) {
                     Vector3 quadOrigin = new Vector3(x, 0, z);
-                    _quads.Add(new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward));
+                    RectangleF textureFrame = new RectangleF(0.375f, 0, 0.0625f, 0.0625f);
+                    _quads.Add(new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward, textureFrame));
                 }
             }
         }
