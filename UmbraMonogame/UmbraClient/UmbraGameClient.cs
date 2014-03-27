@@ -30,8 +30,6 @@ namespace UmbraClient {
         
         private EntityWorld _entityWorld;
 
-        //private Camera2D _camera;
-
         public UmbraGameClient()
             : base() {
 
@@ -44,21 +42,22 @@ namespace UmbraClient {
 
             _netAgent = new NetworkAgent(AgentRole.Client, "Umbra");
 
-            //_camera = new Camera2D(this);
-            //Components.Add(_camera);
-
+            EntitySystem.BlackBoard.SetEntry("Game", this);
             EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("SpriteBatch", spriteBatch);
             EntitySystem.BlackBoard.SetEntry("GraphicsDevice", GraphicsDevice);
             EntitySystem.BlackBoard.SetEntry("ContentManager", Content);
             EntitySystem.BlackBoard.SetEntry("NetworkAgent", _netAgent);
-            //EntitySystem.BlackBoard.SetEntry("Camera", _camera);
 
             _entityWorld = new EntityWorld();
             
+            // create camera
             Entity cameraEntity = _entityWorld.CreateEntity();
-            CameraComponent cameraComponent = new CameraComponent(GraphicsDevice, new Vector3(0, 0, 10));
+            Vector3 camPosition = new Vector3(0, 5, 5);
+            Matrix camRotation = Matrix.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.ToRadians(-50.0f));
+            CameraComponent cameraComponent = new CameraComponent(GraphicsDevice, camPosition, camRotation);
             cameraEntity.AddComponent(cameraComponent);
+
             EntitySystem.BlackBoard.SetEntry("Camera", cameraComponent);
 
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
@@ -69,14 +68,11 @@ namespace UmbraClient {
             Map map = new Map(30, 30);
             Entity mapEntity = _entityWorld.CreateEntity();
             mapEntity.AddComponent(new TileMapComponent(map));
-
-            //_camera.MoveBounds = new Rectangle(0, 0, map.Width * TileConfig.TILE_WIDTH, map.Height * TileConfig.TILE_HEIGHT);
             //// TEMP ////
             
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
-            //_camera.Scale = 2.0f;
         }
 
         protected override void UnloadContent() {
