@@ -22,7 +22,6 @@ namespace UmbraClient.Systems {
 
         private BasicEffect _effect;
 
-        private Quad _quad;
         private Texture2D _texture;
         private VertexDeclaration _vertexDeclaration;
 
@@ -34,7 +33,6 @@ namespace UmbraClient.Systems {
             _graphicsDevice = BlackBoard.GetEntry<GraphicsDevice>("GraphicsDevice");
             ContentManager content = BlackBoard.GetEntry<ContentManager>("ContentManager");
 
-            _quad = new Quad(Vector3.Zero, Vector3.Backward, Vector3.Up, 1, 1);
             _texture = content.Load<Texture2D>("Images/OryxEnv");
 
             _effect = new BasicEffect(_graphicsDevice); //content.Load<Effect>("Effects/DiffuseColorEffect");

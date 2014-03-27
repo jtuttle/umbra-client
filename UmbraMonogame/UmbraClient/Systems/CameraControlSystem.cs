@@ -13,29 +13,44 @@ using Microsoft.Xna.Framework;
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
     class CameraControlSystem : EntityComponentProcessingSystem<CameraComponent> {
-        private float _speed = 1.0f;
+        private Game _game;
+
+        private MouseState _lastMouseState;
 
         public override void LoadContent() {
-            
+            _game = BlackBoard.GetEntry<Game>("Game");
         }
 
         public override void Process(Entity entity, CameraComponent cameraComponent) {
             KeyboardState keyboardState = Keyboard.GetState();
+            MouseState mouseState = Mouse.GetState();
 
             if(keyboardState.IsKeyDown(Keys.W))
-                cameraComponent.MoveCamera(CameraMovement.Forward);
+                cameraComponent.TranslateCamera(CameraMovement.Forward);
             if(keyboardState.IsKeyDown(Keys.S))
-                cameraComponent.MoveCamera(CameraMovement.Backward);
+                cameraComponent.TranslateCamera(CameraMovement.Backward);
             if(keyboardState.IsKeyDown(Keys.A))
-                cameraComponent.MoveCamera(CameraMovement.Left);
+                cameraComponent.TranslateCamera(CameraMovement.Left);
             if(keyboardState.IsKeyDown(Keys.D))
-                cameraComponent.MoveCamera(CameraMovement.Right);
+                cameraComponent.TranslateCamera(CameraMovement.Right);
             if(keyboardState.IsKeyDown(Keys.PageUp))
-                cameraComponent.MoveCamera(CameraMovement.Up);
+                cameraComponent.TranslateCamera(CameraMovement.Up);
             if(keyboardState.IsKeyDown(Keys.PageDown))
-                cameraComponent.MoveCamera(CameraMovement.Down);
+                cameraComponent.TranslateCamera(CameraMovement.Down);
+
+            int centerX = _game.Window.ClientBounds.Width / 2;
+            int centerY = _game.Window.ClientBounds.Height / 2;
+
+            if(mouseState.LeftButton == ButtonState.Pressed) {
+                float yaw = MathHelper.ToRadians((mouseState.X - _lastMouseState.X) * 0.05f);
+                float pitch = MathHelper.ToRadians((mouseState.Y - _lastMouseState.Y) * 0.05f);
+
+                cameraComponent.RotateCamera(yaw, pitch, 0);
+            }
 
             cameraComponent.UpdateViewMatrix();
+
+            _lastMouseState = mouseState;
         }
     }
 }

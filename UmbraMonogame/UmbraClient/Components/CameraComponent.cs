@@ -22,19 +22,23 @@ namespace UmbraClient.Components {
 
         public float MoveSpeed { get; private set; }
 
-        public CameraComponent(GraphicsDevice graphics, Vector3 position) {
+        private float _yaw;
+        private float _pitch;
+        private float _roll;
+
+        public CameraComponent(GraphicsDevice graphics, Vector3 position, Matrix rotation) {
             Position = position;
-            Rotation = Matrix.Identity;
+            Rotation = rotation;
 
             View = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero, Vector3.Up);
 
             float ratio = (float)graphics.Viewport.Width / graphics.Viewport.Height;
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, ratio, 0.1f, 100.0f);
 
-            MoveSpeed = 1.0f;
+            MoveSpeed = 0.2f;
         }
 
-        public void MoveCamera(CameraMovement movement) {
+        public void TranslateCamera(CameraMovement movement) {
             switch(movement) {
                 case CameraMovement.Forward:
                     Position += Rotation.Forward * MoveSpeed;
@@ -58,8 +62,27 @@ namespace UmbraClient.Components {
             }
         }
 
+        public void RotateCamera(float yaw, float pitch, float roll) {
+            _yaw += yaw;
+            _pitch += pitch;
+            _roll += roll;
+        }
+
         public void UpdateViewMatrix() {
+            Rotation.Forward.Normalize();
+            Rotation.Up.Normalize();
+            Rotation.Right.Normalize();
+
+            Rotation *= Matrix.CreateFromAxisAngle(Rotation.Right, _pitch);
+            Rotation *= Matrix.CreateFromAxisAngle(Rotation.Up, _yaw);
+            Rotation *= Matrix.CreateFromAxisAngle(Rotation.Forward, _roll);
+
+            _yaw = 0.0f;
+            _pitch = 0.0f;
+            _roll = 0.0f;
+
             Target = Position + Rotation.Forward;
+
             View = Matrix.CreateLookAt(Position, Target, Rotation.Up);
         }
     }

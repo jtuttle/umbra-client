@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using CrawLib;
 using UmbraClient.Components;
+using CrawLib.Shapes;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 0)]
@@ -22,7 +23,8 @@ namespace UmbraClient.Systems {
 
         private Texture2D _texture;
         private BasicEffect _effect;
-        private List<Quad> _quads;
+        //private List<Quad> _quads;
+        private List<QuadShape> _quads;
 
         private CameraComponent _camera;
 
@@ -37,12 +39,14 @@ namespace UmbraClient.Systems {
             _effect.TextureEnabled = true;
             _effect.Texture = _texture;
 
-            _quads = new List<Quad>();
+            _quads = new List<QuadShape>();
 
-            for(int y = 0; y < 5; y++) {
-                for(int x = 0; x < 5; x++) {
-                    Vector3 pos = new Vector3(x, y, 0);
-                    _quads.Add(new Quad(pos, Vector3.Backward, Vector3.Up, 1, 1));
+            for(int z = -2; z <= 2; z++) {
+                for(int x = -2; x <= 2; x++) {
+                    Vector3 pos = new Vector3(x, 0, z);
+                    //_quads.Add(new Quad(pos, Vector3.Backward, Vector3.Up, 1, 1));
+
+                    _quads.Add(new QuadShape(pos, Vector3.Up, Vector3.Forward));
                 }
             }
         }
@@ -51,19 +55,14 @@ namespace UmbraClient.Systems {
             //Matrix View = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero, Vector3.Up);
             //Matrix Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, 4.0f / 3.0f, 1, 500);
 
-            //_effect.View = View;
-            //_effect.Projection = Projection;
-
             _effect.View = _camera.View;
             _effect.Projection = _camera.Projection;
 
             _effect.CurrentTechnique.Passes[0].Apply();
 
             for(int i = 0; i < _quads.Count; i++) {
-                int x = i % 5;
-                int y = (int)Math.Floor(i / 5.0f);
-
-                _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, _quads[i].Vertices, 0, 4, _quads[i].Indexes, 0, 2);
+                QuadShape quad = _quads[i];
+                _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, quad.Vertices, 0, 4, quad.Indexes, 0, 2);
             }
         }
 
