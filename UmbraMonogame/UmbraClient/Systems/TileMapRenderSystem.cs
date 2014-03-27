@@ -43,18 +43,13 @@ namespace UmbraClient.Systems {
 
             for(int z = -2; z <= 2; z++) {
                 for(int x = -2; x <= 2; x++) {
-                    Vector3 pos = new Vector3(x, 0, z);
-                    //_quads.Add(new Quad(pos, Vector3.Backward, Vector3.Up, 1, 1));
-
-                    _quads.Add(new QuadShape(pos, Vector3.Up, Vector3.Forward));
+                    Vector3 quadOrigin = new Vector3(x, 0, z);
+                    _quads.Add(new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward));
                 }
             }
         }
 
         public override void Process(Entity entity, TileMapComponent tileMapComponent) {
-            //Matrix View = Matrix.CreateLookAt(new Vector3(0, 0, 5), Vector3.Zero, Vector3.Up);
-            //Matrix Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, 4.0f / 3.0f, 1, 500);
-
             _effect.View = _camera.View;
             _effect.Projection = _camera.Projection;
 
