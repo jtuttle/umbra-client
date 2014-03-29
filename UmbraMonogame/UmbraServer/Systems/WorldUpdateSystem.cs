@@ -10,6 +10,7 @@ using Artemis;
 using Lidgren.Network;
 using CrawLib.Network.Messages;
 using CrawLib.Network;
+using Microsoft.Xna.Framework;
 
 namespace UmbraServer.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
@@ -42,7 +43,8 @@ namespace UmbraServer.Systems {
 
         public override void Process(Entity entity, TransformComponent transform) {
             if(_sendUpdates) {
-                _netAgent.BroadcastMessage(new EntityMoveMessage(entity.UniqueId, transform.Position));
+                Vector2 position = new Vector2(transform.Position.X, transform.Position.Y);
+                _netAgent.BroadcastMessage(new EntityMoveMessage(entity.UniqueId, position));
             }
         }
     }

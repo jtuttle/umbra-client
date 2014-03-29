@@ -45,7 +45,7 @@
     <Compile Include="Systems\CameraControlSystem.cs" />
     <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
-    <Compile Include="Systems\RenderSystem.cs" />
+    <Compile Include="Systems\SpatialRenderSystem.cs" />
     <Compile Include="Systems\TileMapRenderSystem.cs" />
     <Compile Include="UmbraGameClient.cs" />
     <Compile Include="Program.cs" />

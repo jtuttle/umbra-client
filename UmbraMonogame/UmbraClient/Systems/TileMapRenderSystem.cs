@@ -20,13 +20,11 @@ namespace UmbraClient.Systems {
     public class TilemapRenderSystem : EntityComponentProcessingSystem<TileMapComponent> {
         private ContentManager _content;
         private GraphicsDevice _graphicsDevice;
+        private CameraComponent _camera;
 
         private Texture2D _texture;
         private BasicEffect _effect;
-        //private List<Quad> _quads;
         private List<QuadShape> _quads;
-
-        private CameraComponent _camera;
 
         public override void LoadContent() {
             _content = BlackBoard.GetEntry<ContentManager>("ContentManager");
@@ -41,10 +39,10 @@ namespace UmbraClient.Systems {
 
             _quads = new List<QuadShape>();
 
-            for(int z = -5; z <= 5; z++) {
-                for(int x = -7; x <= 7; x++) {
+            for(int z = 0; z <= 10; z++) {
+                for(int x = 0; x <= 10; x++) {
                     Vector3 quadOrigin = new Vector3(x, 0, z);
-                    RectangleF textureFrame = new RectangleF(0.375f, 0, 0.0625f, 0.0625f);
+                    TextureFrame textureFrame = new TextureFrame(0.375f, 0, 0.0625f, 0.0625f);
                     _quads.Add(new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward, textureFrame));
                 }
             }

@@ -25,13 +25,13 @@ namespace UmbraClient.Systems {
             KeyboardState keyboardState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
 
-            if(keyboardState.IsKeyDown(Keys.W))
+            if(keyboardState.IsKeyDown(Keys.Up))
                 cameraComponent.TranslateCamera(CameraMovement.Forward);
-            if(keyboardState.IsKeyDown(Keys.S))
+            if(keyboardState.IsKeyDown(Keys.Down))
                 cameraComponent.TranslateCamera(CameraMovement.Backward);
-            if(keyboardState.IsKeyDown(Keys.A))
+            if(keyboardState.IsKeyDown(Keys.Left))
                 cameraComponent.TranslateCamera(CameraMovement.Left);
-            if(keyboardState.IsKeyDown(Keys.D))
+            if(keyboardState.IsKeyDown(Keys.Right))
                 cameraComponent.TranslateCamera(CameraMovement.Right);
             if(keyboardState.IsKeyDown(Keys.PageUp))
                 cameraComponent.TranslateCamera(CameraMovement.Up);

@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using CrawLib.Network;
 using CrawLib.Network.Messages;
 using Lidgren.Network;
+using Microsoft.Xna.Framework;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
@@ -32,24 +33,26 @@ namespace UmbraClient.Systems {
         public override void Process(Entity entity) {
             TransformComponent transform = entity.GetComponent<TransformComponent>();
 
+            Console.WriteLine(transform.Position);
+
             KeyboardState keyboardState = Keyboard.GetState();
 
-            float keyMoveSpeed = 0.3f * TimeSpan.FromTicks(EntityWorld.Delta).Milliseconds;
+            float keyMoveSpeed = 0.005f * TimeSpan.FromTicks(EntityWorld.Delta).Milliseconds;
 
-            if(keyboardState.IsKeyDown(Keys.A) || keyboardState.IsKeyDown(Keys.Left)) {
+            if(keyboardState.IsKeyDown(Keys.A)) {// || keyboardState.IsKeyDown(Keys.Left)) {
                 transform.X -= keyMoveSpeed;
-            } 
+            }
 
-            if(keyboardState.IsKeyDown(Keys.D) || keyboardState.IsKeyDown(Keys.Right)) {
+            if(keyboardState.IsKeyDown(Keys.D)) {// || keyboardState.IsKeyDown(Keys.Right)) {
                 transform.X += keyMoveSpeed;
             }
 
-            if(keyboardState.IsKeyDown(Keys.W) || keyboardState.IsKeyDown(Keys.Up)) {
-                transform.Y -= keyMoveSpeed;
+            if(keyboardState.IsKeyDown(Keys.W)) {// || keyboardState.IsKeyDown(Keys.Up)) {
+                transform.Z -= keyMoveSpeed;
             }
 
-            if(keyboardState.IsKeyDown(Keys.S) || keyboardState.IsKeyDown(Keys.Down)) {
-                transform.Y += keyMoveSpeed;
+            if(keyboardState.IsKeyDown(Keys.S)) {// || keyboardState.IsKeyDown(Keys.Down)) {
+                transform.Z += keyMoveSpeed;
             }
 
             // send position update message to server at set interval
@@ -60,7 +63,8 @@ namespace UmbraClient.Systems {
 
                 List<INetworkMessage> outgoingMessages = new List<INetworkMessage>();
 
-                outgoingMessages.Add(new EntityMoveMessage(entity.UniqueId, transform.Position));
+                Vector2 position = new Vector2(transform.Position.X, transform.Position.Y);
+                outgoingMessages.Add(new EntityMoveMessage(entity.UniqueId, position));
 
                 _netAgent.SendMessages(outgoingMessages);
                 
