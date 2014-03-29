@@ -7,11 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace CrawLib.Shapes {
     public class QuadShape {
-        public Vector3 Origin { get; private set; }
+        public Vector3 Origin { get; set; }
         public Vector3 Normal { get; private set; }
         public Vector3 Up { get; private set; }
 
-        public RectangleF TextureFrame { get; private set; }
+        public TextureFrame TextureFrame { get; private set; }
 
         public float Width { get; private set; }
         public float Height { get; private set; }
@@ -19,13 +19,13 @@ namespace CrawLib.Shapes {
         public VertexPositionNormalTexture[] Vertices;
         public short[] Indexes;
 
-        public QuadShape(Vector3 origin, Vector3 normal, Vector3 up, RectangleF textureFrame, float width = 1.0f, float height = 1.0f) {
+        public QuadShape(Vector3 origin, Vector3 normal, Vector3 up, TextureFrame textureFrame, float width = 1.0f, float height = 1.0f) {
             Origin = origin;
             Normal = normal;
             Up = up;
             
             TextureFrame = textureFrame;
-            
+
             Width = width;
             Height = height;
 

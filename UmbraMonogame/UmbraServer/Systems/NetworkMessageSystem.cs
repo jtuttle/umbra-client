@@ -13,6 +13,7 @@ using CrawLib.Network.Messages;
 using CrawLib.Artemis;
 using UmbraLib.Components;
 using UmbraLib;
+using Microsoft.Xna.Framework;
 
 namespace UmbraServer.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -50,7 +51,7 @@ namespace UmbraServer.Systems {
 
             if(entityType == UmbraEntityType.Player) {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
-                transform.Position = msg.Position;
+                transform.Position = new Vector3(msg.Position, 0);
             }
         }
     }

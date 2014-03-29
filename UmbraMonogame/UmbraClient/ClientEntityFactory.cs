@@ -18,7 +18,7 @@ namespace UmbraClient {
             _entityWorld = entityWorld;
         }
 
-        public Entity CreatePlayer(long? entityId, Vector2 position) {
+        public Entity CreatePlayer(long? entityId, Vector3 position) {
             Entity player = _entityWorld.CreateEntity(entityId);
 
             player.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.Player));
@@ -29,7 +29,7 @@ namespace UmbraClient {
             return player;
         }
 
-        public Entity CreateNPC(long? entityId, Vector2 position) {
+        public Entity CreateNPC(long? entityId, Vector3 position) {
             Entity npc = _entityWorld.CreateEntity(entityId);
 
             npc.AddComponent(new UmbraEntityTypeComponent(UmbraEntityType.NPC));
