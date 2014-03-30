@@ -19,6 +19,8 @@ namespace CrawLib.Shapes {
         public VertexPositionNormalTexture[] Vertices;
         public short[] Indexes;
 
+        public Rectangle Bounds { get; private set; }
+
         public QuadShape(Vector3 origin, Vector3 normal, Vector3 up, TextureFrame textureFrame, float width = 1.0f, float height = 1.0f) {
             Origin = origin;
             Normal = normal;

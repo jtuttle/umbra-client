@@ -33,8 +33,6 @@ namespace UmbraClient.Systems {
         public override void Process(Entity entity) {
             TransformComponent transform = entity.GetComponent<TransformComponent>();
 
-            Console.WriteLine(transform.Position);
-
             KeyboardState keyboardState = Keyboard.GetState();
 
             float keyMoveSpeed = 0.005f * TimeSpan.FromTicks(EntityWorld.Delta).Milliseconds;
@@ -59,7 +57,7 @@ namespace UmbraClient.Systems {
             // might be better to add this to a queue and send them all at once
             // TODO - delta compression, only send if it changes
             if(NetTime.Now > _nextSendUpdates) {
-                Console.WriteLine("sending player position update");
+                //Console.WriteLine("sending player position update");
 
                 List<INetworkMessage> outgoingMessages = new List<INetworkMessage>();
 

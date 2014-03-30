@@ -5,15 +5,15 @@ using System.Text;
 using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
-using CrawLib.Artemis.Components;
 using Artemis;
+using CrawLib;
+using CrawLib.Artemis.Components;
+using CrawLib.Shapes;
 using CrawLib.TileMap;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using CrawLib;
 using UmbraClient.Components;
-using CrawLib.Shapes;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 0)]
@@ -21,15 +21,19 @@ namespace UmbraClient.Systems {
         private ContentManager _content;
         private GraphicsDevice _graphicsDevice;
         private CameraComponent _camera;
+        private Map _map;
 
         private Texture2D _texture;
         private BasicEffect _effect;
         private List<QuadShape> _quads;
 
+        private Rectangle _renderBounds;
+
         public override void LoadContent() {
             _content = BlackBoard.GetEntry<ContentManager>("ContentManager");
             _graphicsDevice = BlackBoard.GetEntry<GraphicsDevice>("GraphicsDevice");
             _camera = BlackBoard.GetEntry<CameraComponent>("Camera");
+            _map = BlackBoard.GetEntry<Map>("Map");
 
             _texture = _content.Load<Texture2D>("Images/OryxEnv");
 
@@ -39,11 +43,12 @@ namespace UmbraClient.Systems {
 
             _quads = new List<QuadShape>();
 
-            for(int z = 0; z <= 10; z++) {
-                for(int x = 0; x <= 10; x++) {
+            for(int z = 0; z < _map.Height; z++) {
+                for(int x = 0; x < _map.Width; x++) {
                     Vector3 quadOrigin = new Vector3(x, 0, z);
                     TextureFrame textureFrame = new TextureFrame(0.375f, 0, 0.0625f, 0.0625f);
-                    _quads.Add(new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward, textureFrame));
+                    QuadShape quad = new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward, textureFrame);
+                    _quads.Add(quad);
                 }
             }
         }
@@ -54,11 +59,29 @@ namespace UmbraClient.Systems {
 
             _effect.CurrentTechnique.Passes[0].Apply();
 
-            for(int i = 0; i < _quads.Count; i++) {
-                QuadShape quad = _quads[i];
-                _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList, quad.Vertices, 0, 4, quad.Indexes, 0, 2);
+            UpdateRenderBounds();
+
+            for(int y = _renderBounds.Y; y < _renderBounds.Height; y++) {
+                for(int x = _renderBounds.X; x < _renderBounds.Width; x++) {
+                    int index = y * _map.Width + x;
+
+                    _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList,
+                                                                                           _quads[index].Vertices, 0, 4,
+                                                                                           _quads[index].Indexes, 0, 2);
+                }
             }
         }
+
+        // this should probably be computed from the camera position but for now hard-coding
+        private void UpdateRenderBounds() {
+            _renderBounds.X = Math.Max(0, (int)_camera.Position.X - 10);
+            _renderBounds.Y = Math.Max(0, (int)_camera.Position.Z - 11);
+            _renderBounds.Width = Math.Min((int)_camera.Position.X + 11, _map.Width);
+            _renderBounds.Height = Math.Min((int)_camera.Position.Z + 1, _map.Height);
+
+            //Console.WriteLine(_renderBounds);
+        }
+
 
         // TODO - so much useless casting, might need to roll my own Floor and Clamp
         private Coord2D WorldPositionToTileCoords(Vector2 worldPos, Coord2D mapDimensions, float scale) {
