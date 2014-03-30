@@ -35,16 +35,18 @@ namespace UmbraClient.Components {
             float ratio = (float)graphics.Viewport.Width / graphics.Viewport.Height;
             Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, ratio, 0.1f, 100.0f);
 
-            MoveSpeed = 0.2f;
+            MoveSpeed = 0.1f;
         }
 
         public void TranslateCamera(CameraMovement movement) {
             switch(movement) {
                 case CameraMovement.Forward:
-                    Position += Rotation.Forward * MoveSpeed;
+                    //Position += Rotation.Forward * MoveSpeed;
+                    Position -= new Vector3(0, 0, MoveSpeed);
                     break;
                 case CameraMovement.Backward:
-                    Position += Rotation.Backward * MoveSpeed;
+                    //Position += Rotation.Backward * MoveSpeed;
+                    Position += new Vector3(0, 0, MoveSpeed);
                     break;
                 case CameraMovement.Left:
                     Position += Rotation.Left * MoveSpeed;

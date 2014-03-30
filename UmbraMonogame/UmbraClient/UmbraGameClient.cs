@@ -53,23 +53,25 @@ namespace UmbraClient {
             
             // create camera
             Entity cameraEntity = _entityWorld.CreateEntity();
-            Vector3 camPosition = new Vector3(0, 5, 5);
-            Matrix camRotation = Matrix.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.ToRadians(-50.0f));
+            Vector3 camPosition = new Vector3(10, 10, 12);
+            Matrix camRotation = Matrix.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.ToRadians(-65.0f));
             CameraComponent cameraComponent = new CameraComponent(GraphicsDevice, camPosition, camRotation);
             cameraEntity.AddComponent(cameraComponent);
 
             EntitySystem.BlackBoard.SetEntry("Camera", cameraComponent);
 
+            //// TEMP ////
+            Map map = new Map(100, 100);
+            Entity mapEntity = _entityWorld.CreateEntity();
+            mapEntity.AddComponent(new TileMapComponent(map));
+
+            EntitySystem.BlackBoard.SetEntry("Map", map);
+            //// TEMP ////
+
             _entityWorld.InitializeAll(new[] { GetType().Assembly });
 
             CrawEntityManager.Instance.Initialize(_entityWorld, new ClientEntityFactory(_entityWorld));
 
-            //// TEMP ////
-            Map map = new Map(30, 30);
-            Entity mapEntity = _entityWorld.CreateEntity();
-            mapEntity.AddComponent(new TileMapComponent(map));
-            //// TEMP ////
-            
             _netAgent.Connect("127.0.0.1");
 
             base.Initialize();
