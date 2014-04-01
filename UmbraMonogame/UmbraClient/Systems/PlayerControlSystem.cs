@@ -56,9 +56,6 @@ namespace UmbraClient.Systems {
                 transform.Z += keyMoveSpeed;
             }
 
-            _camera.Position = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
-            _camera.UpdateViewMatrix();
-
             // send position update message to server at set interval
             // might be better to add this to a queue and send them all at once
             // TODO - delta compression, only send if it changes

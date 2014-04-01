@@ -52,11 +52,14 @@ namespace UmbraClient {
             _entityWorld = new EntityWorld();
             
             // create camera
-            Entity cameraEntity = _entityWorld.CreateEntity();
             Vector3 camPosition = new Vector3(0, 10, 5);
             Matrix camRotation = Matrix.CreateFromAxisAngle(new Vector3(1, 0, 0), MathHelper.ToRadians(-65.0f));
-            CameraComponent cameraComponent = new CameraComponent(camPosition, camRotation, GraphicsDevice);
+            float aspectRatio = (float)GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height;
+
+            CameraComponent cameraComponent = new CameraComponent(camPosition, camRotation, aspectRatio);
             cameraComponent.UpdateViewMatrix();
+
+            Entity cameraEntity = _entityWorld.CreateEntity();
             cameraEntity.AddComponent(cameraComponent);
 
             EntitySystem.BlackBoard.SetEntry("Camera", cameraComponent);

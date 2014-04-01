@@ -40,9 +40,10 @@
   <ItemGroup>
     <Compile Include="ClientEntityFactory.cs" />
     <Compile Include="Components\CameraComponent.cs" />
+    <Compile Include="Components\FreeCameraComponent.cs" />
     <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
-    <Compile Include="Systems\CameraControlSystem.cs" />
+    <Compile Include="Systems\CameraUpdateSystem.cs" />
     <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
     <Compile Include="Systems\SpatialRenderSystem.cs" />
