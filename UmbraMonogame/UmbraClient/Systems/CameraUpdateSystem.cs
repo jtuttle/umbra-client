@@ -9,10 +9,11 @@ using Artemis;
 using UmbraClient.Components;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using CrawLib.Artemis.Components;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 2)]
-    class CameraControlSystem : EntityComponentProcessingSystem<CameraComponent> {
+    class CameraUpdateSystem : EntityComponentProcessingSystem<CameraComponent> {
         private Game _game;
 
         private MouseState _lastMouseState;
@@ -22,10 +23,13 @@ namespace UmbraClient.Systems {
         }
 
         public override void Process(Entity entity, CameraComponent cameraComponent) {
-            KeyboardState keyboardState = Keyboard.GetState();
-            MouseState mouseState = Mouse.GetState();
+            TransformComponent transform = cameraComponent.Target;
 
+            cameraComponent.Position = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
+            cameraComponent.UpdateViewMatrix();
 
+            //KeyboardState keyboardState = Keyboard.GetState();
+            //MouseState mouseState = Mouse.GetState();
 
             /*
             if(keyboardState.IsKeyDown(Keys.Up))

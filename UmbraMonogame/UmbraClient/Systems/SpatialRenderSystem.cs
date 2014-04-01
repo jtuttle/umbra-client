@@ -37,15 +37,6 @@ namespace UmbraClient.Systems {
         public override void Process(Entity entity, SpatialFormComponent spatialFormComponent, TransformComponent transformComponent) {
             _spatialName = spatialFormComponent.SpatialFormFile;
 
-
-
-            // this ain't quite workin'
-            //Matrix bboard = Matrix.CreateConstrainedBillboard(transformComponent.Position, _camera.Position, new Vector3(0, 1, 0), _camera.Rotation.Up, _camera.Rotation.Forward);
-            //bboard.Right = -bboard.Right; // this had the wrong sign for some reason
-            //_effect.World = bboard;
-
-
-
             _effect.View = _camera.View;
             _effect.Projection = _camera.Projection;
 

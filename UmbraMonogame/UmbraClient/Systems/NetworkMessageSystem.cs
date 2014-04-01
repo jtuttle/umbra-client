@@ -14,6 +14,7 @@ using CrawLib.Artemis;
 using UmbraLib;
 using Microsoft.Xna.Framework;
 using CrawLib;
+using UmbraClient.Components;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -63,11 +64,9 @@ namespace UmbraClient.Systems {
             if(msg.IsSelf) {
                 player.Tag = "PLAYER";
 
-                TransformComponent transform = player.GetComponent<TransformComponent>();
-
-                //Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
-                //camera.Position = transform.Position;
-                //camera.Focus = transform;
+                // TODO: this probably shouldn't happen here
+                CameraComponent camera = BlackBoard.GetEntry<CameraComponent>("Camera");
+                camera.Target = player.GetComponent<TransformComponent>();
             }
         }
 
