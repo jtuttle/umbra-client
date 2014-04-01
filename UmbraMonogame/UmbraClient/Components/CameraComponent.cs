@@ -12,7 +12,7 @@ namespace UmbraClient.Components {
     }
 
     public class CameraComponent : IComponent {
-        public Vector3 Position { get; private set; }
+        public Vector3 Position { get; set; }
         public Matrix Rotation { get; private set; }
 
         public Matrix Projection { get; private set; }
@@ -26,7 +26,7 @@ namespace UmbraClient.Components {
         private float _pitch;
         private float _roll;
 
-        public CameraComponent(GraphicsDevice graphics, Vector3 position, Matrix rotation) {
+        public CameraComponent(Vector3 position, Matrix rotation, GraphicsDevice graphics) {
             Position = position;
             Rotation = rotation;
 

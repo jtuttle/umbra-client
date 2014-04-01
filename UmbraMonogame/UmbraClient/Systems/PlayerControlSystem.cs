@@ -12,11 +12,13 @@ using CrawLib.Network;
 using CrawLib.Network.Messages;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
+using UmbraClient.Components;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
     class PlayerControlSystem : TagSystem {
         private NetworkAgent _netAgent;
+        private CameraComponent _camera;
 
         private int _updatesPerSecond = 10;
         private double _nextSendUpdates = NetTime.Now;
@@ -28,6 +30,7 @@ namespace UmbraClient.Systems {
 
         public override void LoadContent() {
             _netAgent = BlackBoard.GetEntry<NetworkAgent>("NetworkAgent");
+            _camera = BlackBoard.GetEntry<CameraComponent>("Camera");
         }
 
         public override void Process(Entity entity) {
@@ -53,6 +56,9 @@ namespace UmbraClient.Systems {
                 transform.Z += keyMoveSpeed;
             }
 
+            _camera.Position = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
+            _camera.UpdateViewMatrix();
+
             // send position update message to server at set interval
             // might be better to add this to a queue and send them all at once
             // TODO - delta compression, only send if it changes
@@ -61,8 +67,7 @@ namespace UmbraClient.Systems {
 
                 List<INetworkMessage> outgoingMessages = new List<INetworkMessage>();
 
-                Vector2 position = new Vector2(transform.Position.X, transform.Position.Y);
-                outgoingMessages.Add(new EntityMoveMessage(entity.UniqueId, position));
+                outgoingMessages.Add(new EntityMoveMessage(entity.UniqueId, transform.Position));
 
                 _netAgent.SendMessages(outgoingMessages);
                 

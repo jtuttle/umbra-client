@@ -57,9 +57,8 @@ namespace UmbraClient.Systems {
 
         private void PlayerConnect(PlayerConnectMessage<UmbraEntityType> msg) {
             long entityId = msg.EntityId;
-            Vector3 position = new Vector3(msg.Position, 0);
-
-            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+            
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, msg.Position);
 
             if(msg.IsSelf) {
                 player.Tag = "PLAYER";
@@ -74,12 +73,11 @@ namespace UmbraClient.Systems {
 
         private void AddEntity(EntityAddMessage<UmbraEntityType> msg) {
             long entityId = msg.EntityId;
-            Vector3 position = new Vector3(msg.Position, 0);
-
+            
             if(msg.EntityType == UmbraEntityType.Player) {
-                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, msg.Position);
             } else if(msg.EntityType == UmbraEntityType.NPC) {
-                CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, msg.Position);
             }
         }
 
@@ -88,7 +86,7 @@ namespace UmbraClient.Systems {
 
             if(entity != null && entity.Tag != "PLAYER") {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
-                transform.Position = new Vector3(msg.Position, 0);
+                transform.Position = msg.Position;
             }
         }
 

@@ -10,12 +10,12 @@ using Microsoft.Xna.Framework;
 namespace CrawLib.Network.Messages {
     public class PlayerConnectMessage<TEnum> : EntityMessage {
         public TEnum EntityType { get; private set; }
-        public Vector2 Position { get; private set; }
+        public Vector3 Position { get; private set; }
         public bool IsSelf { get; private set; }
 
         public PlayerConnectMessage() : base() { }
 
-        public PlayerConnectMessage(long entityId, TEnum entityType, Vector2 position, bool isSelf)
+        public PlayerConnectMessage(long entityId, TEnum entityType, Vector3 position, bool isSelf)
             : base(entityId, NetworkMessageType.PlayerConnect) {
 
             EntityType = entityType;
@@ -30,7 +30,8 @@ namespace CrawLib.Network.Messages {
 
             float x = msg.ReadFloat();
             float y = msg.ReadFloat();
-            Position = new Vector2(x, y);
+            float z = msg.ReadFloat();
+            Position = new Vector3(x, y, z);
 
             IsSelf = msg.ReadBoolean();
         }
@@ -42,6 +43,7 @@ namespace CrawLib.Network.Messages {
 
             msg.Write(Position.X);
             msg.Write(Position.Y);
+            msg.Write(Position.Z);
 
             msg.Write(IsSelf);
         }
