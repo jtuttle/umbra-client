@@ -42,11 +42,11 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            //Vector2 position = new Vector2(600, 600);
-            //Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, new Vector3(position, 0));
+            Vector2 position = new Vector2(0, 0);
+            Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, new Vector3(position, 0));
 
-            //EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
-            //_networkAgent.BroadcastMessage(msg, true);
+            EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
+            _networkAgent.BroadcastMessage(msg, true);
             //// TEMP ////
         }
         

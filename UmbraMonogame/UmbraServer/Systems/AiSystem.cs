@@ -20,11 +20,11 @@ namespace UmbraServer.Systems {
 
         public override void Process(Entity entity, AiComponent ai, TransformComponent transform) {
             if(_right)
-                transform.X += 0.1f;
+                transform.X += 0.001f;
             else
-                transform.X -= 0.1f;
-
-            if(transform.X > 800 || transform.X < 600)
+                transform.X -= 0.001f;
+            
+            if(transform.X < 0 || transform.X > 10)
                 _right = !_right;
         }
     }

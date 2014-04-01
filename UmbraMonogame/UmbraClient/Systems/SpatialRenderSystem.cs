@@ -52,11 +52,11 @@ namespace UmbraClient.Systems {
             _effect.CurrentTechnique.Passes[0].Apply();
 
             if(string.Compare("Hero", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
-                Hero.Render(_content, _graphicsDevice, transformComponent, _effect);
+                Hero.Render(_content, _graphicsDevice, transformComponent, _camera, _effect);
             }
 
             if(string.Compare("NPC", _spatialName, StringComparison.InvariantCultureIgnoreCase) == 0) {
-                //NPC.Render(_content, _graphicsDevice, transformComponent, _effect);
+                NPC.Render(_content, _graphicsDevice, transformComponent, _camera, _effect);
             }
 
             //if(spatialFormComponent != null) {
