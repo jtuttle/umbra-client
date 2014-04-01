@@ -43,8 +43,7 @@ namespace UmbraServer.Systems {
 
         public override void Process(Entity entity, TransformComponent transform) {
             if(_sendUpdates) {
-                Vector2 position = new Vector2(transform.Position.X, transform.Position.Y);
-                _netAgent.BroadcastMessage(new EntityMoveMessage(entity.UniqueId, position));
+                _netAgent.BroadcastMessage(new EntityMoveMessage(entity.UniqueId, transform.Position));
             }
         }
     }

@@ -10,11 +10,11 @@ using Microsoft.Xna.Framework;
 namespace CrawLib.Network.Messages {
     public class EntityAddMessage<TEnum> : EntityMessage {
         public TEnum EntityType { get; private set; }
-        public Vector2 Position { get; private set; }
+        public Vector3 Position { get; private set; }
 
         public EntityAddMessage() : base() { }
 
-        public EntityAddMessage(long entityId, TEnum entityType, Vector2 position)
+        public EntityAddMessage(long entityId, TEnum entityType, Vector3 position)
             : base(entityId, NetworkMessageType.EntityAdd) {
 
             EntityType = entityType;
@@ -28,7 +28,8 @@ namespace CrawLib.Network.Messages {
 
             float x = msg.ReadFloat();
             float y = msg.ReadFloat();
-            Position = new Vector2(x, y);
+            float z = msg.ReadFloat();
+            Position = new Vector3(x, y, z);
         }
 
         public override void Encode(NetOutgoingMessage msg) {
@@ -38,6 +39,7 @@ namespace CrawLib.Network.Messages {
 
             msg.Write(Position.X);
             msg.Write(Position.Y);
+            msg.Write(Position.Z);
         }
     }
 }

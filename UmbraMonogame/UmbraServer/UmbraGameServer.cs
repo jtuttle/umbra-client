@@ -42,8 +42,8 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            Vector2 position = new Vector2(0, 0);
-            Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, new Vector3(position, 0));
+            Vector3 position = new Vector3(0, 0, 0);
+            Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
             _networkAgent.BroadcastMessage(msg, true);
@@ -67,17 +67,16 @@ namespace UmbraServer {
             foreach(Entity entity in entities) {
                 UmbraEntityTypeComponent entityType = entity.GetComponent<UmbraEntityTypeComponent>();
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
-                Vector3 position = transform.Position;
 
-                entityAddMessage = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, new Vector2(position.X, position.Y));
+                entityAddMessage = new EntityAddMessage<UmbraEntityType>(entity.UniqueId, entityType.EntityType, transform.Position);
                 _networkAgent.SendMessage(entityAddMessage, playerConnection);
             }
 
             // send message confirming player's connection
             PlayerConnectMessage<UmbraEntityType> playerConnectMessage;
 
-            Vector2 startPos = new Vector2(0, 0);
-            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, new Vector3(startPos, 0));
+            Vector3 startPos = new Vector3(10, 0, 10);
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, startPos);
 
             playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, startPos, true);
             _networkAgent.SendMessage(playerConnectMessage, playerConnection);

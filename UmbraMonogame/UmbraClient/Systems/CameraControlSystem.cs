@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 
 namespace UmbraClient.Systems {
-    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
+    [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 2)]
     class CameraControlSystem : EntityComponentProcessingSystem<CameraComponent> {
         private Game _game;
 
@@ -25,6 +25,9 @@ namespace UmbraClient.Systems {
             KeyboardState keyboardState = Keyboard.GetState();
             MouseState mouseState = Mouse.GetState();
 
+
+
+            /*
             if(keyboardState.IsKeyDown(Keys.Up))
                 cameraComponent.TranslateCamera(CameraMovement.Forward);
             if(keyboardState.IsKeyDown(Keys.Down))
@@ -51,6 +54,7 @@ namespace UmbraClient.Systems {
             cameraComponent.UpdateViewMatrix();
 
             _lastMouseState = mouseState;
+            */
         }
     }
 }

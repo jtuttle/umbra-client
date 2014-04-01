@@ -51,7 +51,7 @@ namespace UmbraServer.Systems {
 
             if(entityType == UmbraEntityType.Player) {
                 TransformComponent transform = entity.GetComponent<TransformComponent>();
-                transform.Position = new Vector3(msg.Position, 0);
+                transform.Position = msg.Position;
             }
         }
     }
