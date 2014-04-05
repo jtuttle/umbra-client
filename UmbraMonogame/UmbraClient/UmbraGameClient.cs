@@ -57,6 +57,7 @@ namespace UmbraClient {
             float aspectRatio = (float)GraphicsDevice.Viewport.Width / GraphicsDevice.Viewport.Height;
 
             CameraComponent cameraComponent = new CameraComponent(camPosition, camRotation, aspectRatio);
+            cameraComponent.UpdateViewMatrix();
 
             Entity cameraEntity = _entityWorld.CreateEntity();
             cameraEntity.AddComponent(cameraComponent);
