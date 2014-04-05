@@ -42,7 +42,7 @@ namespace UmbraServer {
 
         public void Start() {
             //// TEMP ////
-            Vector2 position = new Vector2(600, 600);
+            Vector3 position = new Vector3(0, 0, 0);
             Entity npc = CrawEntityManager.Instance.EntityFactory.CreateNPC(null, position);
 
             EntityAddMessage<UmbraEntityType> msg = new EntityAddMessage<UmbraEntityType>(npc.UniqueId, UmbraEntityType.NPC, position);
@@ -75,14 +75,14 @@ namespace UmbraServer {
             // send message confirming player's connection
             PlayerConnectMessage<UmbraEntityType> playerConnectMessage;
 
-            Vector2 position = new Vector2(500, 500);
-            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, position);
+            Vector3 startPos = new Vector3(10, 0, 10);
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer(null, startPos);
 
-            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position, true);
+            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, startPos, true);
             _networkAgent.SendMessage(playerConnectMessage, playerConnection);
 
             // message other clients about player's connection
-            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, position, false);
+            playerConnectMessage = new PlayerConnectMessage<UmbraEntityType>(player.UniqueId, UmbraEntityType.Player, startPos, false);
             
             foreach(NetConnection connection in _networkAgent.Connections) {
                 if(connection != playerConnection) {

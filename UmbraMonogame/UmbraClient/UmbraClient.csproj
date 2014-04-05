@@ -39,11 +39,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ClientEntityFactory.cs" />
+    <Compile Include="Components\CameraComponent.cs" />
+    <Compile Include="Components\FreeCameraComponent.cs" />
     <Compile Include="Spatials\NPC.cs" />
     <Compile Include="Spatials\Hero.cs" />
+    <Compile Include="Systems\CameraUpdateSystem.cs" />
     <Compile Include="Systems\NetworkMessageSystem.cs" />
     <Compile Include="Systems\PlayerControlSystem.cs" />
-    <Compile Include="Systems\RenderSystem.cs" />
+    <Compile Include="Systems\SpatialRenderSystem.cs" />
     <Compile Include="Systems\TileMapRenderSystem.cs" />
     <Compile Include="UmbraGameClient.cs" />
     <Compile Include="Program.cs" />
@@ -95,7 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Components\" />
+    <Folder Include="Content\Effects\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

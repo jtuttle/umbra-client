@@ -77,7 +77,7 @@ namespace CrawLib.Network {
             NetIncomingMessage msg;
 
             while((msg = _peer.ReadMessage()) != null) {
-                Log("Received " + msg.MessageType + " message");
+                //Log("Received " + msg.MessageType + " message");
 
                 switch(msg.MessageType) {
                     case NetIncomingMessageType.DiscoveryRequest:

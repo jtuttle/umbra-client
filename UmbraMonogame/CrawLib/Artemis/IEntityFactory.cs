@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace CrawLib.Artemis {
     public interface IEntityFactory {
-        Entity CreatePlayer(long? entityId, Vector2 position);
-        Entity CreateNPC(long? entityId, Vector2 position);
+        Entity CreatePlayer(long? entityId, Vector3 position);
+        Entity CreateNPC(long? entityId, Vector3 position);
     }
 }

@@ -10,6 +10,7 @@ using Artemis;
 using Lidgren.Network;
 using CrawLib.Network.Messages;
 using CrawLib.Network;
+using Microsoft.Xna.Framework;
 
 namespace UmbraServer.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 1)]
