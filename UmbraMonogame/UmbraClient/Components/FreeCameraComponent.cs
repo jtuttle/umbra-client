@@ -87,38 +87,5 @@ namespace UmbraClient.Components {
 
             View = Matrix.CreateLookAt(Position, Target, Rotation.Up);
         }
-
-        /* from the related system: */
-        //KeyboardState keyboardState = Keyboard.GetState();
-        //MouseState mouseState = Mouse.GetState();
-
-        /*
-        if(keyboardState.IsKeyDown(Keys.Up))
-            cameraComponent.TranslateCamera(CameraMovement.Forward);
-        if(keyboardState.IsKeyDown(Keys.Down))
-            cameraComponent.TranslateCamera(CameraMovement.Backward);
-        if(keyboardState.IsKeyDown(Keys.Left))
-            cameraComponent.TranslateCamera(CameraMovement.Left);
-        if(keyboardState.IsKeyDown(Keys.Right))
-            cameraComponent.TranslateCamera(CameraMovement.Right);
-        if(keyboardState.IsKeyDown(Keys.PageUp))
-            cameraComponent.TranslateCamera(CameraMovement.Up);
-        if(keyboardState.IsKeyDown(Keys.PageDown))
-            cameraComponent.TranslateCamera(CameraMovement.Down);
-
-        int centerX = _game.Window.ClientBounds.Width / 2;
-        int centerY = _game.Window.ClientBounds.Height / 2;
-
-        if(mouseState.LeftButton == ButtonState.Pressed) {
-            float yaw = MathHelper.ToRadians((mouseState.X - _lastMouseState.X) * 0.05f);
-            float pitch = MathHelper.ToRadians((mouseState.Y - _lastMouseState.Y) * 0.05f);
-
-            cameraComponent.RotateCamera(yaw, pitch, 0);
-        }
-
-        cameraComponent.UpdateViewMatrix();
-
-        _lastMouseState = mouseState;
-        */
     }
 }

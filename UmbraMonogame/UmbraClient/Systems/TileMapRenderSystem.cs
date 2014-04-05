@@ -84,7 +84,6 @@ namespace UmbraClient.Systems {
 
 
         // TODO - so much useless casting, might need to roll my own Floor and Clamp
-        /*
         private Coord2D WorldPositionToTileCoords(Vector2 worldPos, Coord2D mapDimensions, float scale) {
             int xCoord = (int)(worldPos.X / (TileConfig.TILE_WIDTH * scale));
             int yCoord = (int)(worldPos.Y / (TileConfig.TILE_HEIGHT * scale));
@@ -98,6 +97,5 @@ namespace UmbraClient.Systems {
         private int TileCoordsToArrayIndex(Coord2D tileCoords, int mapWidth) {
             return tileCoords.Y * mapWidth + tileCoords.X;
         }
-        */
     }
 }

@@ -14,6 +14,14 @@ using CrawLib.Artemis.Components;
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 2)]
     class CameraUpdateSystem : EntityComponentProcessingSystem<CameraComponent> {
+        private Game _game;
+
+        private MouseState _lastMouseState;
+
+        public override void LoadContent() {
+            _game = BlackBoard.GetEntry<Game>("Game");
+        }
+
         public override void Process(Entity entity, CameraComponent cameraComponent) {
             Rectangle bounds = new Rectangle(0, 0, 100, 100); // temp, compute this from map size by projecting onto plane
 
@@ -53,10 +61,11 @@ namespace UmbraClient.Systems {
                 float pitch = MathHelper.ToRadians((mouseState.Y - _lastMouseState.Y) * 0.05f);
 
                 cameraComponent.RotateCamera(yaw, pitch, 0);
-                
-                cameraComponent.Position = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
-                cameraComponent.UpdateViewMatrix();
             }
+
+            cameraComponent.UpdateViewMatrix();
+
+            _lastMouseState = mouseState;
             */
         }
     }
