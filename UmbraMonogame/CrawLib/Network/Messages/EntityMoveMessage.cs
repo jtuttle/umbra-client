@@ -9,11 +9,11 @@ using Microsoft.Xna.Framework;
 
 namespace CrawLib.Network.Messages {
     public class EntityMoveMessage : EntityMessage {
-        public Vector2 Position { get; set; }
+        public Vector3 Position { get; set; }
 
         public EntityMoveMessage() : base() { }
 
-        public EntityMoveMessage(long entityId, Vector2 position)
+        public EntityMoveMessage(long entityId, Vector3 position)
             : base(entityId, NetworkMessageType.EntityMove) {
 
             Position = position;
@@ -24,8 +24,9 @@ namespace CrawLib.Network.Messages {
 
             // opt - should probably use ints here
             float x = msg.ReadFloat();
-            float y = msg.ReadFloat(); 
-            Position = new Vector2(x, y);
+            float y = msg.ReadFloat();
+            float z = msg.ReadFloat();
+            Position = new Vector3(x, y, z);
         }
 
         public override void Encode(NetOutgoingMessage msg) {
@@ -34,6 +35,7 @@ namespace CrawLib.Network.Messages {
             // opt - should probably use ints here
             msg.Write(Position.X);
             msg.Write(Position.Y);
+            msg.Write(Position.Z);
         }
     }
 }

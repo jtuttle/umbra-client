@@ -68,6 +68,8 @@
     <Compile Include="Network\NetworkAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RectangleF.cs" />
+    <Compile Include="Shapes\QuadShape.cs" />
+    <Compile Include="TextureFrame.cs" />
     <Compile Include="TileMap\MapTile.cs" />
     <Compile Include="TileMap\Map.cs" />
     <Compile Include="Coord2D.cs" />

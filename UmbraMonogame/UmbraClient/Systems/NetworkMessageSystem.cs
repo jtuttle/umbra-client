@@ -14,6 +14,7 @@ using CrawLib.Artemis;
 using UmbraLib;
 using Microsoft.Xna.Framework;
 using CrawLib;
+using UmbraClient.Components;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Update, Layer = 0)]
@@ -57,29 +58,25 @@ namespace UmbraClient.Systems {
 
         private void PlayerConnect(PlayerConnectMessage<UmbraEntityType> msg) {
             long entityId = msg.EntityId;
-            Vector2 position = msg.Position;
-
-            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+            
+            Entity player = CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, msg.Position);
 
             if(msg.IsSelf) {
                 player.Tag = "PLAYER";
 
-                TransformComponent transform = player.GetComponent<TransformComponent>();
-
-                Camera2D camera = BlackBoard.GetEntry<Camera2D>("Camera");
-                camera.Position = transform.Position;
-                camera.Focus = transform;
+                // TODO: this probably shouldn't happen here
+                CameraComponent camera = BlackBoard.GetEntry<CameraComponent>("Camera");
+                camera.Target = player.GetComponent<TransformComponent>();
             }
         }
 
         private void AddEntity(EntityAddMessage<UmbraEntityType> msg) {
             long entityId = msg.EntityId;
-            Vector2 position = msg.Position;
-
+            
             if(msg.EntityType == UmbraEntityType.Player) {
-                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreatePlayer((long?)entityId, msg.Position);
             } else if(msg.EntityType == UmbraEntityType.NPC) {
-                CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, position);
+                CrawEntityManager.Instance.EntityFactory.CreateNPC((long?)entityId, msg.Position);
             }
         }
 

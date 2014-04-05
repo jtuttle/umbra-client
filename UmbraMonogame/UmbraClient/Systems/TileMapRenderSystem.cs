@@ -5,84 +5,83 @@ using System.Text;
 using Artemis.Attributes;
 using Artemis.Manager;
 using Artemis.System;
-using CrawLib.Artemis.Components;
 using Artemis;
+using CrawLib;
+using CrawLib.Artemis.Components;
+using CrawLib.Shapes;
 using CrawLib.TileMap;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using CrawLib;
+using UmbraClient.Components;
 
 namespace UmbraClient.Systems {
     [ArtemisEntitySystem(GameLoopType = GameLoopType.Draw, Layer = 0)]
     public class TilemapRenderSystem : EntityComponentProcessingSystem<TileMapComponent> {
         private ContentManager _content;
-        private SpriteBatch _spriteBatch;
-        private Camera2D _camera;
+        private GraphicsDevice _graphicsDevice;
+        private CameraComponent _camera;
+        private Map _map;
 
-        private Texture2D _sprite;
-        //private float _scale;
+        private Texture2D _texture;
+        private BasicEffect _effect;
+        private List<QuadShape> _quads;
+
+        private Rectangle _renderBounds;
 
         public override void LoadContent() {
             _content = BlackBoard.GetEntry<ContentManager>("ContentManager");
-            _spriteBatch = BlackBoard.GetEntry<SpriteBatch>("SpriteBatch");
-            _camera = BlackBoard.GetEntry<Camera2D>("Camera");
+            _graphicsDevice = BlackBoard.GetEntry<GraphicsDevice>("GraphicsDevice");
+            _camera = BlackBoard.GetEntry<CameraComponent>("Camera");
+            _map = BlackBoard.GetEntry<Map>("Map");
+
+            _texture = _content.Load<Texture2D>("Images/OryxEnv");
+
+            _effect = new BasicEffect(_graphicsDevice);
+            _effect.TextureEnabled = true;
+            _effect.Texture = _texture;
+
+            _quads = new List<QuadShape>();
+
+            for(int z = 0; z < _map.Height; z++) {
+                for(int x = 0; x < _map.Width; x++) {
+                    Vector3 quadOrigin = new Vector3(x, 0, z);
+                    TextureFrame textureFrame = new TextureFrame(0.375f, 0, 0.0625f, 0.0625f);
+                    QuadShape quad = new QuadShape(quadOrigin, Vector3.Up, Vector3.Forward, textureFrame);
+                    _quads.Add(quad);
+                }
+            }
         }
-        
+
         public override void Process(Entity entity, TileMapComponent tileMapComponent) {
-            if(_sprite == null) {
-                _sprite = _content.Load<Texture2D>("Images/OryxEnv");
-            }
+            _effect.View = _camera.View;
+            _effect.Projection = _camera.Projection;
 
-            float scale = _camera.Scale;
+            _effect.CurrentTechnique.Passes[0].Apply();
 
-            MapTile[] tiles = tileMapComponent.TileMap.Tiles;
+            UpdateRenderBounds();
 
-            RectangleF viewBounds = _camera.ViewBounds;
+            for(int y = _renderBounds.Y; y < _renderBounds.Height; y++) {
+                for(int x = _renderBounds.X; x < _renderBounds.Width; x++) {
+                    int index = y * _map.Width + x;
 
-            int tileWidth = TileConfig.TILE_WIDTH;
-            int tileHeight = TileConfig.TILE_HEIGHT;
-
-            Coord2D mapDimensions = new Coord2D(tileMapComponent.TileMap.Width, tileMapComponent.TileMap.Height);
-            Coord2D topLeft = WorldPositionToTileCoords(new Vector2(viewBounds.X, viewBounds.Y) - new Vector2(tileWidth, tileHeight), mapDimensions, scale);
-            Coord2D bottomRight = WorldPositionToTileCoords(new Vector2(viewBounds.X + viewBounds.Width, viewBounds.Y + viewBounds.Height) + new Vector2(tileWidth, tileHeight), mapDimensions, scale);
-
-            for(int y = topLeft.Y; y < bottomRight.Y; y++) {
-                for(int x = topLeft.X; x < bottomRight.X; x++) {
-                    int index = TileCoordsToArrayIndex(new Coord2D(x, y), tileMapComponent.TileMap.Width);
-
-                    float drawX = index % tileMapComponent.TileMap.Width * tileWidth * scale;
-                    float drawY = (float)(int)(index / tileMapComponent.TileMap.Width) * tileHeight * scale;
-
-                    _spriteBatch.Draw(_sprite, new Vector2(drawX, drawY), new Rectangle(32, 224, tileWidth, tileHeight), Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
+                    _graphicsDevice.DrawUserIndexedPrimitives<VertexPositionNormalTexture>(PrimitiveType.TriangleList,
+                                                                                           _quads[index].Vertices, 0, 4,
+                                                                                           _quads[index].Indexes, 0, 2);
                 }
             }
-
-
-            /*
-            Viewport viewport = _spriteBatch.GraphicsDevice.Viewport;
-            float left = _camera.Position.X - (viewport.Width / 2.0f) - TILE_WIDTH * scale;
-            float right = _camera.Position.X + (viewport.Width / 2.0f) + TILE_WIDTH * scale;
-            float top = _camera.Position.Y - (viewport.Height / 2.0f) - TILE_HEIGHT * scale;
-            float bottom = _camera.Position.Y + (viewport.Height / 2.0f) + TILE_HEIGHT * scale;
-
-            Coord2D mapDimensions = new Coord2D(tileMapComponent.TileMap.Width, tileMapComponent.TileMap.Height);
-
-            Coord2D topLeft = WorldPositionToTileCoords(new Vector2(left, top), mapDimensions, scale);
-            Coord2D bottomRight = WorldPositionToTileCoords(new Vector2(right, bottom), mapDimensions, scale);
-
-            for(int y = topLeft.Y; y < bottomRight.Y; y++) {
-                for(int x = topLeft.X; x < bottomRight.X; x++) {
-                    int index = TileCoordsToArrayIndex(new Coord2D(x, y), tileMapComponent.TileMap.Width);
-
-                    float drawX = index % tileMapComponent.TileMap.Width * TILE_WIDTH * scale;
-                    float drawY = (float)(int)(index / tileMapComponent.TileMap.Width) * TILE_HEIGHT * scale;
-
-                    _spriteBatch.Draw(_sprite, new Vector2(drawX, drawY), new Rectangle(32, 224, TILE_WIDTH, TILE_HEIGHT), Color.White, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
-                }
-            }
-            */
         }
+
+        // this should probably be computed from the camera position but for now hard-coding
+        private void UpdateRenderBounds() {
+            _renderBounds.X = Math.Max(0, (int)_camera.Position.X - 10);
+            _renderBounds.Y = Math.Max(0, (int)_camera.Position.Z - 11);
+            _renderBounds.Width = Math.Min((int)_camera.Position.X + 11, _map.Width);
+            _renderBounds.Height = Math.Min((int)_camera.Position.Z + 1, _map.Height);
+
+            //Console.WriteLine(_renderBounds);
+        }
+
 
         // TODO - so much useless casting, might need to roll my own Floor and Clamp
         private Coord2D WorldPositionToTileCoords(Vector2 worldPos, Coord2D mapDimensions, float scale) {
