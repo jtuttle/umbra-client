@@ -23,10 +23,18 @@ namespace UmbraClient.Systems {
         }
 
         public override void Process(Entity entity, CameraComponent cameraComponent) {
+            Rectangle bounds = new Rectangle(0, 0, 100, 100); // temp, compute this from map size by projecting onto plane
+
             TransformComponent transform = cameraComponent.Target;
 
-            cameraComponent.Position = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
-            cameraComponent.UpdateViewMatrix();
+            if(transform != null) {
+                Vector3 newPos = new Vector3(transform.X, transform.Y + 10, transform.Z + 5);
+
+                if(bounds.Contains(new Point((int)newPos.X, (int)newPos.Z))) {
+                    cameraComponent.Position = newPos;
+                    cameraComponent.UpdateViewMatrix();
+                }
+            }
 
             //KeyboardState keyboardState = Keyboard.GetState();
             //MouseState mouseState = Mouse.GetState();
